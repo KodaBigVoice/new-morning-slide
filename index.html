@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Morning Slide</title>
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playpen+Sans:wght@400;500;600;700;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+/* =====================================================================
+   SLIDE (designed at 1920 x 1080 from the Claude Design redesign,
+   scaled to fit wherever it's shown). Colours come from the day's theme.
+   ===================================================================== */
+.slide {
+  position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden;
+  transform-origin: 0 0; background: var(--bg); color: var(--ink);
+  font-family: "Playpen Sans", "Comic Sans MS", "Segoe Print", cursive;
+}
+.slide * { box-sizing: border-box; }
+.slide .circle { position: absolute; border-radius: 50%; background: var(--circle); }
+.slide .grid {
+  position: absolute; inset: 48px; padding-top: 24px; display: grid;
+  grid-template-columns: 660px 470px 630px; grid-template-rows: 168px auto minmax(0, 1fr); gap: 28px 32px;
+}
+.slide .card { background: #fff; border-radius: 40px; box-shadow: 0 14px 36px -16px rgba(23, 50, 79, 0.25); }
+.slide .heading { font-size: 44px; font-weight: 700; color: var(--main); line-height: 1; flex: none; }
+
+/* Date banner */
+.slide .banner {
+  grid-column: 1 / 3; grid-row: 1; position: relative; background: var(--main); border-radius: 40px;
+  padding: 0 36px; display: flex; flex-direction: column; justify-content: center; gap: 4px; color: #fff;
+}
+.slide .banner-main { font-size: 54px; font-weight: 700; line-height: 1.05; letter-spacing: -0.5px; white-space: nowrap; }
+.slide .banner-main sup { font-size: 29px; vertical-align: top; position: relative; top: 6px; }
+.slide .banner-sub { font-size: 40px; font-weight: 500; color: var(--bannerSub); font-variant-numeric: tabular-nums; }
+.slide .bitmoji { position: absolute; right: 40px; bottom: 0; height: 222px; max-width: 280px; object-fit: contain; object-position: bottom; }
+
+/* Morning task and 8:30, side by side under the date */
+.slide .pair { grid-column: 1 / 3; grid-row: 2; display: grid; grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr)); gap: 32px; }
+.slide .info { background: var(--tint); border-radius: 40px; padding: 20px 32px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.slide .info-label { font-size: 27px; color: var(--label); font-weight: 500; }
+
+/* What's happening: left of the timetable, or across both columns when the timetable is off */
+.slide .left { grid-column: 1; grid-row: 3; display: flex; flex-direction: column; gap: 24px; min-height: 0; }
+.slide.no-tt .left { grid-column: 1 / 3; }
+.slide.no-tt .notes .rich { column-count: 2; column-gap: 48px; column-fill: auto; }
+.slide.no-tt .notes .rich li, .slide.no-tt .notes .rich p { break-inside: avoid; }
+.slide .info-value { font-size: 52px; font-weight: 800; line-height: 1.1; min-height: 1.1em; overflow-wrap: anywhere; }
+.slide .notes { flex: 1; min-height: 0; padding: 32px 36px; display: flex; flex-direction: column; gap: 18px; }
+
+/* Rich text (notes and bullet panels) */
+.slide .rich { flex: 1; min-height: 0; overflow: hidden; font-size: 32px; line-height: 1.3; text-wrap: pretty; }
+.slide .rich p { margin: 0 0 0.44em; }
+.slide .rich ul { list-style: none; margin: 0 0 0.44em; padding: 0; display: flex; flex-direction: column; gap: 0.44em; }
+.slide .rich li { position: relative; padding-left: 1.06em; }
+.slide .rich > ul > li::before { content: ""; position: absolute; left: 0; top: 0.47em; width: 0.5em; height: 0.5em; border-radius: 50%; background: var(--dot); }
+.slide .rich > ul > li.orphan { padding-left: 0; }
+.slide .rich > ul > li.orphan::before { display: none; }
+.slide .rich ul.sub { margin: 0.25em 0 0 0.38em; gap: 0.25em; }
+.slide .rich ul.sub li { font-size: 0.875em; color: var(--label); padding-left: 1.07em; }
+.slide .rich ul.sub li::before { content: ""; position: absolute; left: 0; top: 0.46em; width: 0.43em; height: 0.43em; border-radius: 50%; border: 0.107em solid var(--dot); box-sizing: border-box; }
+.slide .rich .gap { height: 0.3em; }
+.slide .rich strong { font-weight: 700; }
+.slide .rich > :last-child { margin-bottom: 0; }
+
+/* Timetable */
+.slide .tt { grid-column: 2; grid-row: 3; padding: 28px 24px 24px; display: flex; flex-direction: column; gap: 14px; min-height: 0; }
+.slide .tt .heading { padding-left: 12px; }
+.slide .tt-rows { flex: 1; margin: 0 0 -6px; display: flex; flex-direction: column; justify-content: flex-start; gap: 6px; min-height: 0; }
+.slide .tt-row {
+  flex: none; display: grid; grid-template-columns: 100px minmax(0, 1fr) auto; align-items: center; gap: 10px;
+  border-radius: 16px; padding: 0 16px; background: var(--soft); color: var(--ink);
+}
+.slide .tt-row.hl { background: var(--tint); }
+.slide .tt-time { font-size: 22px; font-weight: 500; font-variant-numeric: tabular-nums; opacity: 0.85; }
+.slide .tt-subj { font-size: 28px; font-weight: 700; white-space: nowrap; overflow: hidden; }
+.slide .tt-row.hl .tt-subj { font-weight: 400; }
+.slide .tt-room { font-size: 22px; font-weight: 600; text-align: right; white-space: nowrap; max-width: 140px; overflow: hidden; }
+.slide .tt-image { flex: 1; min-height: 0; width: 100%; object-fit: contain; border-radius: 16px; }
+.slide .tt-empty { font-size: 28px; color: var(--muted); text-align: center; margin: auto 0; }
+
+/* Right column */
+.slide .right { grid-column: 3; grid-row: 1 / 4; display: flex; flex-direction: column; gap: 28px; min-height: 0; }
+.slide .music { padding: 32px; display: flex; flex-direction: column; gap: 18px; min-height: 0; flex: 1 1 0; }
+.slide .music.natural { flex: 0 1 auto; }
+.slide .music-body { flex: 1 1 auto; min-height: 0; overflow: hidden; font-size: 24px; display: flex; flex-direction: column; gap: 0.33em; }
+.slide .m-row { flex: none; display: grid; grid-template-columns: 7.5em minmax(0, 1fr); gap: 0.5em; align-items: center; background: var(--soft); border-radius: 16px; padding: 0.33em 0.58em 0.33em 0.75em; }
+.slide .m-name { font-size: 1.04em; font-weight: 700; line-height: 1.1; }
+.slide .m-lessons { display: flex; flex-direction: column; }
+.slide .m-lesson { display: grid; grid-template-columns: 4.33em minmax(0, 1fr); line-height: 1.4; white-space: nowrap; }
+.slide .m-time { font-weight: 600; color: var(--main); font-variant-numeric: tabular-nums; }
+.slide .m-teacher { overflow: hidden; text-overflow: ellipsis; }
+.slide .music-empty { font-size: 28px; color: var(--muted); }
+
+.slide .panel { padding: 32px; display: flex; flex-direction: column; gap: 18px; min-height: 0; }
+.slide .panel.bullets { flex: 1 1 0; min-height: 300px; }
+.slide .panel.house { flex: none; }
+.slide .panel .heading { font-size: 40px; line-height: 1.05; }
+.slide .panel.house .heading { font-size: 36px; white-space: nowrap; }
+.slide .panel .rich { font-size: 30px; }
+.slide .houses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.slide .house-tile { display: flex; flex-direction: column; gap: 6px; border-radius: 16px; padding: 8px 8px 10px; }
+.slide .house-name { border-radius: 8px; padding: 6px 0; text-align: center; font-size: 27px; font-weight: 700; }
+.slide .house-loc { text-align: center; font-size: 27px; font-weight: 500; line-height: 1.2; min-height: 1.2em; overflow-wrap: anywhere; }
+
+/* =====================================================================
+   DASHBOARD
+   ===================================================================== */
+:root {
+  --ink: #1C3048; --steel: #3E6489; --slate: #64798F; --line: #CBD7E4; --mist: #EAF0F6; --frost: #F5F8FB;
+  --sky: #CFEAF8; --white: #fff; --ui: "Atkinson Hyperlegible", "Segoe UI", Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: var(--ui); color: var(--ink); background: #F3F7FB; font-size: 15px; line-height: 1.45; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid #4F86B8; outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+.topbar { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; padding: 0.75rem 1.25rem; background: var(--white); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 30; }
+.brand { font-family: "Playpen Sans", cursive; font-weight: 700; font-size: 1.25rem; color: var(--ink); margin: 0 auto 0 0; }
+.datenav { display: flex; align-items: center; gap: 0.35rem; }
+.datenav input { padding: 0.4rem 0.5rem; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+.iconbtn { width: 2.2rem; height: 2.2rem; border: 1px solid var(--line); background: #fff; border-radius: 6px; cursor: pointer; display: grid; place-items: center; }
+.iconbtn:hover { background: var(--mist); }
+.btn { padding: 0.5rem 0.95rem; border-radius: 6px; border: 1px solid var(--steel); background: #fff; color: var(--steel); font-weight: 700; cursor: pointer; }
+.btn:hover:not(:disabled) { background: var(--mist); }
+.btn.primary { background: var(--steel); color: #fff; }
+.btn.primary:hover:not(:disabled) { background: #345677; }
+.btn.small { padding: 0.3rem 0.65rem; font-size: 0.85rem; font-weight: 400; }
+.btn.danger { border-color: #B54848; color: #B54848; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.present-btn { padding: 0.6rem 1.4rem; font-size: 1.02rem; display: inline-flex; align-items: center; gap: 0.5rem; }
+.presenting-pill { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; color: #1D6B3C; background: #E3F5EA; border-radius: 999px; padding: 0.25rem 0.7rem; }
+.presenting-pill::before { content: ""; width: 0.55rem; height: 0.55rem; border-radius: 50%; background: #2E9D5A; }
+
+.main { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(360px, 1fr); gap: 1.25rem; padding: 1.25rem; max-width: 1700px; margin: 0 auto; align-items: start; }
+@media (max-width: 1000px) { .main { grid-template-columns: 1fr; } .preview-col { position: static !important; } }
+.preview-col { position: sticky; top: 4.6rem; }
+.preview { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 12px rgba(28,48,72,0.12); background: #eaf2fa; }
+.status { margin-top: 0.7rem; display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; font-size: 0.88rem; color: var(--slate); }
+.status .warn { color: #9B2C2C; }
+
+.editor { background: #fff; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.tabs { display: flex; border-bottom: 1px solid var(--line); background: var(--frost); }
+.tabs button { flex: 1; padding: 0.75rem 0.5rem; background: none; border: 0; border-bottom: 3px solid transparent; cursor: pointer; font-weight: 700; color: var(--slate); }
+.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--steel); background: #fff; }
+.tabpanel { padding: 1.1rem 1.15rem 1.3rem; }
+
+.sec { margin-bottom: 1.35rem; }
+.sec:last-child { margin-bottom: 0; }
+.sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.4rem; }
+.sec-head h3 { margin: 0; font-size: 0.98rem; }
+.tag { font-size: 0.78rem; color: var(--slate); }
+input.text, select.text { width: 100%; padding: 0.5rem 0.6rem; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+.hint { font-size: 0.8rem; color: var(--slate); margin: 0.35rem 0 0; }
+.check { display: flex; gap: 0.45rem; align-items: center; font-size: 0.86rem; margin-top: 0.45rem; cursor: pointer; }
+.check input { accent-color: var(--steel); width: 1rem; height: 1rem; }
+.override { margin-top: 0.45rem; padding: 0.55rem; background: #FFF8E1; border: 1px solid #F0DFA6; border-radius: 6px; }
+.override label { font-size: 0.8rem; color: #7A5D12; display: block; margin-bottom: 0.25rem; }
+
+.richbox { border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: #fff; }
+.toolbar { display: flex; gap: 0.25rem; padding: 0.3rem; background: var(--frost); border-bottom: 1px solid var(--line); align-items: center; }
+.toolbar button { border: 1px solid transparent; background: none; border-radius: 4px; padding: 0.2rem 0.55rem; cursor: pointer; font-size: 0.85rem; }
+.toolbar button:hover { background: #fff; border-color: var(--line); }
+.toolbar .spacer { flex: 1; }
+.richbox textarea { display: block; width: 100%; min-height: 7.5rem; border: 0; padding: 0.55rem 0.65rem; resize: vertical; font-family: var(--ui); line-height: 1.5; }
+.richbox textarea:focus { outline: none; }
+.richbox:focus-within { border-color: #4F86B8; box-shadow: 0 0 0 2px rgba(79,134,184,0.25); }
+
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: #fff; }
+.seg button { border: 0; background: none; padding: 0.5rem 0.3rem; cursor: pointer; font-size: 0.84rem; line-height: 1.2; position: relative; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--steel); color: #fff; font-weight: 700; }
+.seg .def { display: block; font-size: 0.68rem; opacity: 0.75; font-weight: 400; }
+
+.housegrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-top: 0.6rem; }
+.houseinput { border-radius: 6px; overflow: hidden; border: 1px solid var(--line); }
+.houseinput span { display: block; padding: 0.3rem 0.6rem; font-weight: 700; font-size: 0.85rem; }
+.houseinput input { width: 100%; border: 0; padding: 0.5rem 0.6rem; background: #fff; }
+
+.daychips { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-bottom: 0.9rem; }
+.daychips button { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 0.3rem 0.8rem; cursor: pointer; font-weight: 700; font-size: 0.85rem; }
+.daychips button[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+.tt-table { width: 100%; border-collapse: collapse; }
+.tt-table th { text-align: left; font-size: 0.78rem; color: var(--slate); font-weight: 700; padding: 0 0.25rem 0.3rem; }
+.tt-table td { padding: 0.18rem 0.2rem; }
+.tt-table input { width: 100%; padding: 0.38rem 0.45rem; border: 1px solid var(--line); border-radius: 5px; }
+.tt-table td.time-c { width: 5.2rem; }
+.tt-table td.room-c { width: 5.6rem; }
+.tt-table td.act { width: 5.4rem; white-space: nowrap; }
+.mini { border: 1px solid transparent; background: none; border-radius: 4px; cursor: pointer; padding: 0.15rem 0.35rem; color: var(--slate); }
+.mini:hover { background: var(--mist); color: var(--ink); }
+.tt-table tr.hi input.subj { background: #E1F0FF; }
+.imgprev { max-width: 100%; max-height: 220px; display: block; margin-top: 0.5rem; border: 1px solid var(--line); border-radius: 6px; }
+.bitprev { height: 90px; display: block; margin-top: 0.5rem; }
+.row { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+.themegrid { display: grid; grid-template-columns: 6.5rem auto minmax(0, 1fr) auto; gap: 0.45rem 0.6rem; align-items: center; }
+.themegrid .dname { font-weight: 700; font-size: 0.9rem; }
+.swatches { display: inline-flex; border-radius: 999px; overflow: hidden; border: 1px solid var(--line); }
+.swatches i { display: block; width: 1rem; height: 1.3rem; }
+.pastebox { margin-top: 0.7rem; padding: 0.75rem; border: 1px solid var(--line); border-radius: 8px; background: var(--frost); }
+.pastebox textarea { width: 100%; min-height: 9rem; padding: 0.55rem 0.65rem; border: 1px solid var(--line); border-radius: 6px; font-family: ui-monospace, Consolas, monospace; font-size: 0.82rem; line-height: 1.45; resize: vertical; background: #fff; }
+.pastebox .row { margin-top: 0.55rem; }
+.ttprev { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 0.6rem; margin-top: 0.5rem; max-height: 260px; overflow: auto; }
+.ttprev > div { background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 0.4rem 0.5rem; font-size: 0.8rem; }
+.ttprev-row { display: grid; grid-template-columns: 3rem minmax(0, 1fr) auto; gap: 0.4rem; color: var(--ink); }
+.ttprev-row span:last-child { color: var(--slate); }
+.warnline { font-size: 0.8rem; color: #9B2C2C; margin: 0.4rem 0 0; }
+.sched-wrap { overflow-x: auto; margin-top: 0.4rem; }
+.sched { width: 100%; border-collapse: collapse; min-width: 520px; }
+.sched th { text-align: left; font-size: 0.75rem; font-weight: 700; padding: 0.3rem 0.25rem; }
+.sched th.hh { border-radius: 4px 4px 0 0; }
+.sched td { padding: 0.15rem 0.2rem; }
+.sched input:not([type=checkbox]) { width: 100%; padding: 0.35rem 0.3rem; border: 1px solid var(--line); border-radius: 5px; font-size: 0.85rem; }
+.sched td.sd { width: 8.6rem; }
+.sched td.sd input { padding-right: 0.15rem; }
+.sched td.cgc { width: 3.6rem; text-align: center; }
+.sched td.cgc input { width: 1rem; height: 1rem; accent-color: var(--steel); }
+.sched tr.cg input:disabled { background: var(--mist); }
+.sched td.srcc { width: 4.4rem; white-space: nowrap; }
+.sched tr.mine td.sd input { border-color: #E2B654; }
+.mine-pill { border: 1px solid #E2B654; background: #FFF6DE; color: #7A5D12; border-radius: 999px; padding: 0.12rem 0.5rem; font-size: 0.72rem; cursor: pointer; font-family: inherit; }
+.mine-pill:hover { background: #FCE9B8; }
+.mine-pill.plain { cursor: default; display: inline-block; }
+.sched input:disabled { background: var(--frost); color: var(--slate); }
+.houseinput input:disabled { background: var(--frost); color: var(--ink); }
+.housegrid.locked .houseinput { opacity: 0.85; }
+.srcnote { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; color: var(--slate); background: var(--mist); border-radius: 999px; padding: 0.15rem 0.6rem; }
+.note { font-size: 0.82rem; color: var(--slate); background: var(--frost); border-left: 3px solid var(--line); padding: 0.45rem 0.6rem; margin-top: 0.5rem; }
+
+.toast { position: fixed; left: 50%; bottom: 1.4rem; transform: translate(-50%, 1rem); background: var(--ink); color: #fff; padding: 0.6rem 1.05rem; border-radius: 8px; font-size: 0.9rem; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 100; max-width: calc(100% - 2rem); }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* In-page presenting (single screen / duplicate mode) and the slide window */
+.stage { position: fixed; inset: 0; background: #eaf2fa; z-index: 200; overflow: hidden; cursor: none; }
+.stage .fs-hint { position: absolute; right: 18px; bottom: 14px; background: rgba(10,33,66,0.85); color: #fff; font-family: var(--ui); font-size: 15px; padding: 8px 14px; border-radius: 8px; transition: opacity 0.6s; cursor: pointer; }
+body.slide-only { background: #eaf2fa; overflow: hidden; }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <header class="topbar">
+    <h1 class="brand">Morning Slide</h1>
+    <div class="datenav" aria-label="Slide date">
+      <button type="button" class="iconbtn" id="prevDay" aria-label="Previous school day">
+        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M9 2L4 7l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <input type="date" id="dateInput" aria-label="Slide date">
+      <button type="button" class="iconbtn" id="nextDay" aria-label="Next school day">
+        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M5 2l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button type="button" class="btn small" id="todayBtn">Today</button>
+    </div>
+    <span class="presenting-pill" id="presentingPill" hidden>Presenting</span>
+    <button type="button" class="btn" id="endBtn" hidden>End</button>
+    <button type="button" class="btn primary present-btn" id="presentBtn">
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 11.5v2.5M5 14h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      Present
+    </button>
+  </header>
+
+  <main class="main">
+    <section class="preview-col" aria-label="Slide preview">
+      <div class="preview" id="preview"></div>
+      <div class="status" id="status"></div>
+    </section>
+
+    <section class="editor">
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" aria-selected="true" data-tab="day" id="tabDayBtn">Day</button>
+        <button type="button" role="tab" aria-selected="false" data-tab="tt">Timetable</button>
+        <button type="button" role="tab" aria-selected="false" data-tab="setup">Settings</button>
+      </div>
+
+      <!-- DAY -->
+      <div class="tabpanel" data-panel="day">
+        <div class="sec" id="taskSec">
+          <div class="sec-head"><h3>Morning task</h3><span class="tag" id="taskTag"></span></div>
+          <input class="text" id="taskInput">
+          <label class="check"><input type="checkbox" id="taskOvrToggle"><span id="taskOvrLabel"></span></label>
+          <div class="override" id="taskOvrBox" hidden><label for="taskOvr">Just for this date</label><input class="text" id="taskOvr"></div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-head"><h3 id="atHeading">Then at 8:30…</h3><span class="tag" id="atTag"></span></div>
+          <input class="text" id="atInput">
+          <p class="hint" id="atThuHint" hidden>This shows <strong>House Meetings</strong> or <strong>Congers</strong> automatically on Thursdays and on dates in the house meeting schedule. Otherwise it shows what you type here.</p>
+          <label class="check"><input type="checkbox" id="atOvrToggle"><span id="atOvrLabel"></span></label>
+          <div class="override" id="atOvrBox" hidden><label for="atOvr">Just for this date</label><input class="text" id="atOvr"></div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-head"><h3>What's happening today?</h3><span class="tag" id="notesTag"></span></div>
+          <div class="richbox" data-rich="notes"></div>
+          <p class="hint">Saved for this weekday, so it reappears next week until you change or clear it.</p>
+        </div>
+
+        <div class="sec">
+          <div class="sec-head"><h3>Bottom-right panel</h3><span class="tag" id="panelTag"></span></div>
+          <div class="seg" id="panelSeg" role="group" aria-label="Bottom-right panel">
+            <button type="button" data-v="none">None</button>
+            <button type="button" data-v="info">Additional information</button>
+            <button type="button" data-v="lunch">Lunchtime arrangements</button>
+            <button type="button" data-v="house">House meetings</button>
+          </div>
+          <div id="panelEdit" style="margin-top:0.7rem"></div>
+        </div>
+      </div>
+
+      <!-- TIMETABLE -->
+      <div class="tabpanel" data-panel="tt" hidden>
+        <div class="daychips" id="ttDays"></div>
+        <div class="sec">
+          <label class="check" style="margin-top:0"><input type="checkbox" id="ttShowToggle"><span id="ttShowLabel">Show the timetable</span></label>
+          <p class="hint" id="ttOffHint" hidden>The timetable is hidden on this day. “What’s happening today?” takes its space and spreads across two columns.</p>
+        </div>
+        <div class="sec" id="ttStyleSec">
+          <div class="seg" id="ttModeSeg" role="group" aria-label="Timetable style">
+            <button type="button" data-v="grid">Built-in design</button>
+            <button type="button" data-v="image">Use my own image</button>
+          </div>
+        </div>
+        <div id="ttGridEdit">
+          <table class="tt-table">
+            <thead><tr><th>Time</th><th>Subject</th><th>Room</th><th></th></tr></thead>
+            <tbody id="ttBody"></tbody>
+          </table>
+          <div class="row" style="margin-top:0.6rem">
+            <button type="button" class="btn small" id="ttAdd">Add row</button>
+            <button type="button" class="btn small" id="ttSort">Sort by time</button>
+            <span style="flex:1"></span>
+            <button type="button" class="btn small" id="ttPasteOpen">Paste timetable</button>
+            <button type="button" class="btn small" id="ttCopy">Copy timetable</button>
+          </div>
+          <div class="pastebox" id="ttPasteBox" hidden>
+            <label for="ttPasteText" style="font-weight:700;font-size:0.9rem">Paste a timetable</label>
+            <p class="hint" style="margin:0.2rem 0 0.5rem">One line per lesson: <strong>Day | Time | Subject | Room</strong>, e.g. <code>MON | 09:00 | Science | S1</code>. Columns copied from Excel work too. To convert someone's timetable, copy the instructions below, then paste them into Claude with a photo or copy of the timetable.</p>
+            <textarea id="ttPasteText" spellcheck="false" aria-label="Pasted timetable"></textarea>
+            <div id="ttPastePreview"></div>
+            <div class="row">
+              <button type="button" class="btn small primary" id="ttPasteUse" disabled>Use this timetable</button>
+              <button type="button" class="btn small" id="ttPasteCancel">Cancel</button>
+              <span style="flex:1"></span>
+              <button type="button" class="btn small" id="ttPromptCopy">Copy instructions for Claude</button>
+            </div>
+          </div>
+          <p class="hint">Break, Lunch and Prep are highlighted automatically. Leave the room blank where pupils go elsewhere.</p>
+        </div>
+        <div id="ttImageEdit" hidden>
+          <div class="row">
+            <button type="button" class="btn small" id="ttImgBtn">Choose image</button>
+            <button type="button" class="btn small" id="ttImgRemove">Remove image</button>
+          </div>
+          <img id="ttImgPrev" class="imgprev" alt="Timetable image preview" hidden>
+          <p class="hint">The image is fitted into the timetable box under the "Timetable" heading.</p>
+        </div>
+        <input type="file" id="ttImgInput" accept="image/*" hidden>
+      </div>
+
+      <!-- SETUP -->
+      <div class="tabpanel" data-panel="setup" hidden>
+        <div class="sec">
+          <div class="sec-head"><h3>Music &amp; LAMDA lessons spreadsheet</h3></div>
+          <div class="row">
+            <button type="button" class="btn small" id="lessonsBtn">Upload this week's file</button>
+            <span class="tag" id="lessonsInfo">No file yet</span>
+          </div>
+          <p class="hint">The file is read and stored on this laptop only. Each day's slide shows that day's lessons for your form.</p>
+          <div class="note" id="ignoredNote" hidden></div>
+          <input type="file" id="lessonsInput" accept=".xlsx,.xls,.xlsm,.csv" hidden>
+        </div>
+
+        <div class="sec">
+          <div class="sec-head"><h3>Your form</h3></div>
+          <select class="text" id="formSelect"><option value="">Upload the lessons file first</option></select>
+        </div>
+
+        <div class="sec">
+          <div class="sec-head"><h3>Morning task</h3></div>
+          <label class="check" style="margin-top:0"><input type="checkbox" id="showTaskToggle" checked><span>Show the “Today’s morning task” box</span></label>
+          <p class="hint">Turn this off if your form doesn’t do a morning task. The slide then shows “At 8:30…” across the top on its own.</p>
+        </div>
+
+        <div class="sec">
+          <div class="sec-head"><h3>Day colours</h3></div>
+          <div class="themegrid" id="themeGrid"></div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-head"><h3>Bitmoji</h3></div>
+          <div class="row">
+            <button type="button" class="btn small" id="bitBtn">Choose image</button>
+            <button type="button" class="btn small" id="bitRemove">Remove</button>
+          </div>
+          <img id="bitPrev" class="bitprev" alt="Bitmoji preview" hidden>
+          <input type="file" id="bitInput" accept="image/*" hidden>
+          <p class="hint">A PNG with a transparent background looks best.</p>
+        </div>
+
+        <div class="sec">
+          <div class="sec-head"><h3>House meeting schedule</h3><span class="tag" id="schedSource"></span></div>
+          <p class="hint" style="margin-top:0">Dates listed here set the house meeting locations (or Congers) automatically. Anything you change here is kept as your own, and you still get updates to the built-in schedule for every other date. You can also change a single date on the Day tab.</p>
+          <div class="sched-wrap">
+            <table class="sched">
+              <thead><tr><th>Date</th><th class="hh" style="background:#3f8f5a;color:#fff">Athlone</th><th class="hh" style="background:#c8473f;color:#fff">Alexander</th><th class="hh" style="background:#f2c230;color:#17324f">Goodhart</th><th class="hh" style="background:#2f6db5;color:#fff">Dewar</th><th style="text-align:center">Congers</th><th colspan="2"></th></tr></thead>
+              <tbody id="schedBody"></tbody>
+            </table>
+          </div>
+          <div class="row" style="margin-top:0.6rem">
+            <button type="button" class="btn small" id="schedAdd">Add date</button>
+            <label class="check" style="margin:0"><input type="checkbox" id="schedPast"><span id="schedPastLabel">Show past dates</span></label>
+            <span style="flex:1"></span>
+            <button type="button" class="btn small" id="schedPasteOpen">Paste schedule</button>
+            <button type="button" class="btn small" id="schedCopy">Copy schedule</button>
+          </div>
+          <div class="pastebox" id="schedPasteBox" hidden>
+            <label for="schedPasteText" style="font-weight:700;font-size:0.9rem">Paste a schedule</label>
+            <p class="hint" style="margin:0.2rem 0 0.5rem">Copy the school’s house meeting sheet straight from Excel (rooms across the top, houses in the cells), or write one line per date: <strong>Date | Athlone | Alexander | Goodhart | Dewar</strong>, or <strong>Date | Congers</strong>. Dates like 06/11/2026. Half-term rows are skipped.</p>
+            <textarea id="schedPasteText" spellcheck="false" aria-label="Pasted schedule"></textarea>
+            <div id="schedPastePreview"></div>
+            <div class="row">
+              <button type="button" class="btn small primary" id="schedPasteAdd" disabled>Add these dates</button>
+              <button type="button" class="btn small" id="schedPasteCancel">Cancel</button>
+            </div>
+          </div>
+          <div class="row" style="margin-top:0.6rem"><button type="button" class="btn small" id="schedRestore" hidden></button><button type="button" class="btn small" id="schedReset" hidden>Undo all my changes</button></div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-head"><h3>Weekly defaults</h3></div>
+          <p class="hint" style="margin-top:0">Morning task, 8:30 and notes are set per weekday on the Day tab. Pick any date to edit that weekday.</p>
+        </div>
+
+        <div class="sec">
+          <div class="sec-head"><h3>Backup</h3></div>
+          <div class="row">
+            <button type="button" class="btn small" id="exportBtn">Export settings</button>
+            <button type="button" class="btn small" id="importBtn">Import settings</button>
+            <input type="file" id="importInput" accept=".json,application/json" hidden>
+          </div>
+          <p class="hint">Saves everything (timetable, notes, Bitmoji, lessons, house meeting schedule) to a file you can keep or move to another laptop.</p>
+        </div>
+
+        <div class="sec">
+          <div class="sec-head"><h3>Start again</h3></div>
+          <button type="button" class="btn small danger" id="resetAll">Reset everything</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="stage" id="stage" hidden></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+'use strict';
+/* =====================================================================
+   Constants and defaults
+   ===================================================================== */
+const DAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+const ALL_DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+const DAY_NAMES = { MON: 'Monday', TUE: 'Tuesday', WED: 'Wednesday', THU: 'Thursday', FRI: 'Friday', SAT: 'Saturday', SUN: 'Sunday' };
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const STORE_KEY = 'morningSlide.state.v1';
+const PANEL_DEFAULT = { MON: 'none', TUE: 'none', WED: 'lunch', THU: 'house', FRI: 'none', SAT: 'lunch' };
+const PANEL_TITLES = { info: 'Additional Information', lunch: 'Lunchtime Arrangements', house: 'House Meeting Locations' };
+const HOUSES = [
+  { name: 'Athlone', bg: '#3f8f5a', fg: '#ffffff', tint: '#d9ecdf' },
+  { name: 'Alexander', bg: '#c8473f', fg: '#ffffff', tint: '#f6dcd9' },
+  { name: 'Goodhart', bg: '#f2c230', fg: '#17324f', tint: '#fbf0c8' },
+  { name: 'Dewar', bg: '#2f6db5', fg: '#ffffff', tint: '#d9e6f5' }
+];
+/* ---------- Built-in house meeting schedule ----------
+   BUILTIN_SCHEDULE is the school's schedule for the current term. Everyone gets it when the page
+   refreshes. A user's own changes are stored per date in state.schedEdits and sit on top of it.
+   Each row: { date: 'YYYY-MM-DD', congers: true }  or  { date, Athlone, Alexander, Goodhart, Dewar } */
+const BUILTIN_SCHEDULE = [
+  // Michaelmas term 2026 (half term 29 Oct and 5 Nov left out)
+  { date: '2026-09-24', Athlone: 'DJC', Alexander: 'Sports Hall', Goodhart: 'BG Room', Dewar: 'Dining Room' },
+  { date: '2026-10-01', congers: true },
+  { date: '2026-10-08', Athlone: 'Sports Hall', Alexander: 'BG Room', Goodhart: 'Dining Room', Dewar: 'DJC (Talent show)' },
+  { date: '2026-10-15', Athlone: 'BG Room', Alexander: 'Dining Room', Goodhart: 'DJC (Talent show)', Dewar: 'Sports Hall' },
+  { date: '2026-10-22', congers: true },
+  { date: '2026-11-12', Athlone: 'Dining Room', Alexander: 'DJC (Talent show)', Goodhart: 'Sports Hall', Dewar: 'BG Room' },
+  { date: '2026-11-19', congers: true },
+  { date: '2026-11-26', Athlone: 'DJC (Talent show)', Alexander: 'Sports Hall', Goodhart: 'BG Room', Dewar: 'Dining Room' },
+  { date: '2026-12-03', Athlone: 'Sports Hall', Alexander: 'BG Room', Goodhart: 'Dining Room', Dewar: 'DJC' }
+];
+const DEFAULT_THEMES = { MON: 'blueberry', TUE: 'sage', WED: 'lavender', THU: 'teal', FRI: 'rose', SAT: 'dusk' };
+const HIGHLIGHT = /^(break|lunch|prep)$/i;
+
+const T = (time, subject, room) => ({ time, subject, room });
+const DEFAULT_TT = { MON: [], TUE: [], WED: [], THU: [], FRI: [], SAT: [] };
+
+function defaultState() {
+  const per = v => Object.fromEntries(DAYS.map(d => [d, typeof v === 'function' ? v(d) : v]));
+  return {
+    v: 1,
+    form: '',
+    lessons: null,                       // { fileName, savedAt, rows: [[form, name, day, mins, teacher]], ignored }
+    timetable: JSON.parse(JSON.stringify(DEFAULT_TT)),
+    ttMode: per('grid'),
+    ttImage: per(null),
+    ttShow: per(true),                   // timetable on the slide, per weekday
+    task: per(''),
+    at830: per(''),
+    notes: per(''),
+    lunch: per(''),
+    info: per(''),
+    infoTitle: per(''),                  // own heading for the "Additional Information" panel, per weekday
+    house: { Athlone: '', Alexander: '', Goodhart: '', Dewar: '' },   // no longer used (kept for old backups)
+    showTask: true,
+    schedEdits: {},                      // this user's changes to the built-in schedule, by date
+    overrides: {},                       // { 'YYYY-MM-DD': { task, at830, panel } }
+    dayTheme: Object.assign({}, DEFAULT_THEMES),
+    bitmoji: null
+  };
+}
+
+/* =====================================================================
+   Helpers
+   ===================================================================== */
+const $ = id => document.getElementById(id);
+function esc(s) { return String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+function toISO(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function fromISO(s) { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || ''); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; }
+function addDays(d, n) { return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); }
+function dayCode(d) { return ALL_DAYS[d.getDay()]; }
+function schoolDay(d) { return d.getDay() === 0 ? addDays(d, 1) : d; }     // Sunday → Monday
+function ordinal(n) { const s = ['th', 'st', 'nd', 'rd'], v = n % 100; return s[(v - 20) % 10] || s[v] || s[0]; }
+function fmtTime(mins) { return mins == null ? '' : String(Math.floor(mins / 60)).padStart(2, '0') + ':' + String(mins % 60).padStart(2, '0'); }
+function timeToMins(t) { const m = /^(\d{1,2})[:.](\d{2})/.exec(String(t || '').trim()); return m ? +m[1] * 60 + +m[2] : 9999; }
+const nameCmp = (a, b) => a.localeCompare(b, 'en-GB', { sensitivity: 'base' });
+
+/* Rich text: "- bullet", "  - sub-bullet" (or Tab), "**bold**", blank line = gap */
+function richHTML(src) {
+  const items = [];
+  String(src || '').replace(/\r/g, '').split('\n').forEach(line => {
+    let m;
+    if (/^\s*$/.test(line)) items.push({ t: 'gap' });
+    else if ((m = /^(?:\t+|\s{2,})[-*•]\s+(.*)$/.exec(line))) items.push({ t: 'sub', s: m[1] });
+    else if ((m = /^\s?[-*•]\s+(.*)$/.exec(line))) items.push({ t: 'li', s: m[1] });
+    else items.push({ t: 'p', s: line.trim() });
+  });
+  while (items.length && items[0].t === 'gap') items.shift();
+  while (items.length && items[items.length - 1].t === 'gap') items.pop();
+  const inline = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  let out = '', i = 0;
+  while (i < items.length) {
+    const it = items[i];
+    if (it.t === 'li' || it.t === 'sub') {
+      out += '<ul>';
+      while (i < items.length && (items[i].t === 'li' || items[i].t === 'sub')) {
+        const isLi = items[i].t === 'li';
+        out += isLi ? '<li>' + inline(items[i].s) : '<li class="orphan">';
+        if (isLi) i++;
+        if (i < items.length && items[i].t === 'sub') {
+          out += '<ul class="sub">';
+          while (i < items.length && items[i].t === 'sub') { out += '<li>' + inline(items[i].s) + '</li>'; i++; }
+          out += '</ul>';
+        }
+        out += '</li>';
+      }
+      out += '</ul>';
+    } else if (it.t === 'gap') {
+      if (out && !out.endsWith('<div class="gap"></div>')) out += '<div class="gap"></div>';
+      i++;
+    } else { out += '<p>' + inline(it.s) + '</p>'; i++; }
+  }
+  return out;
+}
+
+/* =====================================================================
+   State
+   ===================================================================== */
+function loadState() {
+  const base = defaultState();
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORE_KEY));
+    if (saved && saved.v === 1) {
+      for (const k of Object.keys(base)) {
+        if (saved[k] === undefined) continue;
+        if (base[k] && typeof base[k] === 'object' && !Array.isArray(base[k]) && saved[k] && typeof saved[k] === 'object' && !['lessons', 'overrides', 'timetable'].includes(k)) {
+          base[k] = Object.assign(base[k], saved[k]);
+        } else base[k] = saved[k];
+      }
+    }
+    if (saved && Array.isArray(saved.schedule)) base.schedule = saved.schedule;   // older versions kept a full copy
+  } catch (e) { /* fresh start */ }
+  return migrateSchedule(base);
+}
+let state = loadState();
+function migrateSchedule(st) {
+  if (Array.isArray(st.schedule)) {
+    st.schedEdits = st.schedEdits || {};
+    st.schedule.forEach(r => { if (r && r.date) {
+      const b = BUILTIN_SCHEDULE.find(x => x.date === r.date);
+      if (!b || JSON.stringify(b) !== JSON.stringify(r)) st.schedEdits[r.date] = r;
+    } });
+    delete st.schedule;
+  }
+  return st;
+}
+function pruneOverrides() {
+  const cutoff = toISO(addDays(new Date(), -21));
+  Object.keys(state.overrides).forEach(k => { if (k < cutoff) delete state.overrides[k]; });
+}
+let saveTimer = null;
+function save() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+    catch (e) { toast('Couldn\'t save: storage is full. Try a smaller image.'); }
+  }, 250);
+}
+
+/* ---------- House meeting schedule (see BUILTIN_SCHEDULE at the top) ---------- */
+function scheduleList(st) {
+  const ed = st.schedEdits || {}, out = [];
+  BUILTIN_SCHEDULE.forEach(r => { if (!ed[r.date]) out.push(r); });
+  Object.values(ed).forEach(e => { if (!e.deleted) out.push(e); });
+  return out;
+}
+function scheduleFor(st, iso) { return scheduleList(st).find(r => r.date === iso) || null; }
+const NO_HOUSES = () => ({ Athlone: '', Alexander: '', Goodhart: '', Dewar: '' });
+const housesOf = r => ({ Athlone: r.Athlone || '', Alexander: r.Alexander || '', Goodhart: r.Goodhart || '', Dewar: r.Dewar || '' });
+
+/* What the slide shows for a given date */
+function resolveDay(st, date) {
+  const code = dayCode(date);
+  const wd = code === 'SUN' ? 'MON' : code;
+  const iso = toISO(date);
+  const ovr = st.overrides[iso] || {};
+  const sched = scheduleFor(st, iso);
+  let defaultPanel = PANEL_DEFAULT[wd];
+  if (sched) defaultPanel = sched.congers ? (defaultPanel === 'house' ? 'none' : defaultPanel) : 'house';
+  const panel = ovr.panel || defaultPanel;
+
+  let at830 = st.at830[wd] || '';
+  if (panel === 'house' && (wd === 'THU' || (sched && !sched.congers))) at830 = 'House Meetings';
+  else if (sched && sched.congers) at830 = 'Congers';
+  else if (wd === 'THU') at830 = st.at830.THU || 'Congers';
+  if (ovr.at830 != null) at830 = ovr.at830;
+
+  // House meeting locations: a per-date change wins, then the schedule, otherwise blank
+  let houses = NO_HOUSES(), houseSource = 'none';
+  if (ovr.house) { houses = housesOf(ovr.house); houseSource = 'override'; }
+  else if (sched && !sched.congers) { houses = housesOf(sched); houseSource = 'schedule'; }
+
+  return {
+    wd, iso, panel, defaultPanel, sched,
+    task: ovr.task != null ? ovr.task : (st.task[wd] || ''),
+    showTask: st.showTask !== false,
+    at830, houses, houseSource,
+    notes: st.notes[wd] || '',
+    panelText: panel === 'lunch' ? (st.lunch[wd] || '') : panel === 'info' ? (st.info[wd] || '') : '',
+    panelTitle: panel === 'info' ? (((st.infoTitle || {})[wd] || '').trim() || PANEL_TITLES.info) : (PANEL_TITLES[panel] || ''),
+    showTT: (st.ttShow || {})[wd] !== false
+  };
+}
+
+/* ---------- Pasting tables (from Claude, Excel or another user) ----------
+   Columns may be separated by tabs, " | " or commas. */
+function splitCols(line) {
+  if (line.includes('\t')) return line.split('\t').map(s => s.trim());
+  if (line.includes('|')) return line.replace(/^\s*\|/, '').replace(/\|\s*$/, '').split('|').map(s => s.trim());
+  return line.split(',').map(s => s.trim());
+}
+const DAY_ALIASES = { MON: 'MON', MONDAY: 'MON', TUE: 'TUE', TUES: 'TUE', TUESDAY: 'TUE', WED: 'WED', WEDNESDAY: 'WED', THU: 'THU', THUR: 'THU', THURS: 'THU', THURSDAY: 'THU', FRI: 'FRI', FRIDAY: 'FRI', SAT: 'SAT', SATURDAY: 'SAT' };
+function normTime(t) {
+  const m = /^(\d{1,2})[:.](\d{2})$/.exec(String(t || '').trim());
+  if (!m || +m[1] > 23 || +m[2] > 59) return null;
+  return String(+m[1]).padStart(2, '0') + ':' + m[2];
+}
+function parseTimetable(text) {
+  const days = {}, skipped = [];
+  String(text || '').replace(/\r/g, '').split('\n').forEach(raw => {
+    const line = raw.trim(); if (!line) return;
+    const c = splitCols(line);
+    const day = DAY_ALIASES[(c[0] || '').toUpperCase().replace(/[^A-Z]/g, '')];
+    const time = normTime(c[1]);
+    if (!day || !time || !c[2]) { if (!/^day\b/i.test(line)) skipped.push(line); return; }
+    (days[day] = days[day] || []).push(T(time, c[2], c[3] || ''));
+  });
+  Object.values(days).forEach(rows => rows.sort((a, b) => timeToMins(a.time) - timeToMins(b.time)));
+  return { days, skipped };
+}
+function timetableText(st) {
+  const lines = ['Day\tTime\tSubject\tRoom'];
+  DAYS.forEach(d => (st.timetable[d] || []).filter(r => r.time || r.subject).forEach(r => lines.push([d, r.time, r.subject, r.room || ''].join('\t'))));
+  return lines.join('\n');
+}
+function parseDateUK(s) {
+  s = String(s || '').trim();
+  let m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(s);
+  if (m) return toISO(new Date(+m[1], +m[2] - 1, +m[3]));
+  m = /^(?:[A-Za-z]+,?\s+)?(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2}|\d{4})$/.exec(s);
+  if (m) {
+    const y = m[3].length === 2 ? 2000 + +m[3] : +m[3], d = new Date(y, +m[2] - 1, +m[1]);
+    if (d.getMonth() === +m[2] - 1) return toISO(d);
+  }
+  return null;
+}
+function parseSchedule(text) {
+  // Two layouts are understood:
+  //  1. Date | Athlone | Alexander | Goodhart | Dewar   (a location under each house)
+  //  2. The school's master sheet: a header row of rooms (e.g. SPORTS HALL | BG ROOM | ...)
+  //     with a house in each cell, optionally with a note ("DEWAR - Talent show").
+  const rows = [], skipped = [];
+  const HOUSE_RE = /^(athlone|alexander|goodhart|dewar)\b\s*[-\u2013:]?\s*(.*)$/i;
+  const tidy = w => w.split(/\s+/).map(x => (x.length <= 3 && x === x.toUpperCase()) ? x : x.charAt(0).toUpperCase() + x.slice(1).toLowerCase()).join(' ');
+  let rooms = null;
+  String(text || '').replace(/\r/g, '').split('\n').forEach(raw => {
+    const line = raw.trim(); if (!line) return;
+    const c = splitCols(raw.includes('\t') ? raw.replace(/^ +/, '') : line);   // keep an empty first cell from Excel
+    const date = parseDateUK(c[0]);
+    if (!date) {
+      // a header row: remember the room names if they aren't the house names
+      if (c.length >= 3 && !c.slice(1).some(x => HOUSE_RE.test(x))) rooms = c.slice(1).map(x => tidy(x.trim()));
+      else if (!/^date\b/i.test(line)) skipped.push(line);
+      return;
+    }
+    const cells = c.slice(1).map(x => x.trim());
+    if (cells.some(x => /^congers?$/i.test(x))) { rows.push({ date, congers: true }); return; }
+    if (cells.some(x => /half[\s-]*term|holiday|no school/i.test(x))) return;        // not a school day
+    const houseCells = cells.map(x => HOUSE_RE.exec(x));
+    if (rooms && houseCells.some(Boolean)) {
+      const row = { date, Athlone: '', Alexander: '', Goodhart: '', Dewar: '' };
+      houseCells.forEach((m, i) => {
+        if (!m || !rooms[i]) return;
+        const house = m[1].charAt(0).toUpperCase() + m[1].slice(1).toLowerCase();
+        row[house] = rooms[i] + (m[2] ? ' (' + m[2].trim() + ')' : '');
+      });
+      rows.push(row);
+    } else if (cells.some(Boolean)) {
+      rows.push({ date, Athlone: cells[0] || '', Alexander: cells[1] || '', Goodhart: cells[2] || '', Dewar: cells[3] || '' });
+    } else skipped.push(line);
+  });
+  return { rows, skipped };
+}
+function ukDate(iso) { const d = fromISO(iso); return d ? String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear() : iso; }
+function scheduleText(list) {
+  return ['Date\tAthlone\tAlexander\tGoodhart\tDewar'].concat(list.slice().sort((a, b) => a.date.localeCompare(b.date)).map(r =>
+    r.congers ? ukDate(r.date) + '\tCongers' : [ukDate(r.date), r.Athlone || '', r.Alexander || '', r.Goodhart || '', r.Dewar || ''].join('\t'))).join('\n');
+}
+
+/* =====================================================================
+   Slide rendering
+   ===================================================================== */
+const THEMES = {
+  blueberry: { name: 'Blueberry', bg: '#eaf2fa', circle: '#dde9f5', main: '#24527f', bannerSub: '#cfe4f7', ink: '#17324f', tint: '#d3e5f6', label: '#2f557b', soft: '#eef4fa', dot: '#5b8dc0', muted: '#4e6a86' },
+  sage:      { name: 'Sage',      bg: '#eaf4ee', circle: '#dbebe1', main: '#2f6b52', bannerSub: '#d3eadc', ink: '#173a2c', tint: '#d2e8da', label: '#335a49', soft: '#eef6f1', dot: '#5c9a7c', muted: '#4b6b5d' },
+  lavender:  { name: 'Lavender',  bg: '#f0eef9', circle: '#e4e0f4', main: '#4a4486', bannerSub: '#ddd9f5', ink: '#25224a', tint: '#dedaf3', label: '#464170', soft: '#f3f1fb', dot: '#7d76c0', muted: '#5d5880' },
+  teal:      { name: 'Teal',      bg: '#e6f4f4', circle: '#d6ecec', main: '#1f6468', bannerSub: '#ccebeb', ink: '#133a3c', tint: '#cde7e7', label: '#2c5759', soft: '#ecf6f6', dot: '#4f9a9c', muted: '#476b6c' },
+  rose:      { name: 'Rose',      bg: '#fbeef2', circle: '#f4dfe6', main: '#8e3a57', bannerSub: '#f6d6e1', ink: '#3d1a26', tint: '#f3d9e2', label: '#743a4f', soft: '#fcf2f5', dot: '#c9708f', muted: '#7a5161' },
+  dusk:      { name: 'Dusk',      bg: '#eef0f8', circle: '#e0e3f2', main: '#34407a', bannerSub: '#d8dcf3', ink: '#1c2244', tint: '#dadff0', label: '#3d4670', soft: '#f2f4fa', dot: '#6f7bbd', muted: '#575e82' }
+};
+const THEME_KEYS = Object.keys(THEMES);
+function themeFor(st, wd) { return THEMES[(st.dayTheme || {})[wd]] || THEMES.blueberry; }
+function themeVars(t) {
+  return ['bg', 'circle', 'main', 'bannerSub', 'ink', 'tint', 'label', 'soft', 'dot', 'muted'].map(k => '--' + k + ':' + t[k]).join(';');
+}
+
+function dateHTML(d) {
+  const n = d.getDate();
+  return '<div class="banner-main">' + DAY_NAMES[dayCode(d)] + ' ' + n + '<sup>' + ordinal(n) + '</sup> ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear() + '</div>' +
+    '<div class="banner-sub">' + String(n).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear() + '</div>';
+}
+
+function timetableHTML(st, wd) {
+  if (st.ttMode[wd] === 'image' && st.ttImage[wd]) return '<img class="tt-image" src="' + st.ttImage[wd] + '" alt="">';
+  const rows = (st.timetable[wd] || []).filter(r => (r.time || r.subject || r.room));
+  if (!rows.length) return '<div class="tt-empty">No timetable for ' + DAY_NAMES[wd] + ' yet</div>';
+  return '<div class="tt-rows">' + rows.map(r => {
+    const hl = HIGHLIGHT.test((r.subject || '').trim());
+    return '<div class="tt-row' + (hl ? ' hl' : '') + '" style="height:48px">' +
+      '<span class="tt-time">' + esc(r.time) + '</span>' +
+      '<span class="tt-subj">' + esc(r.subject) + '</span>' +
+      '<span class="tt-room">' + esc((r.room || '').trim()) + '</span></div>';
+  }).join('') + '</div>';
+}
+
+function musicRows(st, wd) {
+  if (!st.lessons || !st.form) return [];
+  return st.lessons.rows
+    .filter(r => r[0] === st.form && r[2] === wd)
+    .map(r => ({ name: r[1], mins: r[3], teacher: r[4] }))
+    .sort((a, b) => nameCmp(a.name, b.name) || (a.mins ?? 9999) - (b.mins ?? 9999));
+}
+
+function musicHTML(rows) {
+  if (!rows.length) return '<div class="music-empty">No music lessons today</div>';
+  let html = '', i = 0;
+  while (i < rows.length) {
+    let j = i;
+    while (j < rows.length && rows[j].name === rows[i].name) j++;
+    html += '<div class="m-row"><div class="m-name">' + esc(rows[i].name) + '</div><div class="m-lessons">';
+    for (let k = i; k < j; k++) {
+      html += '<div class="m-lesson"><span class="m-time">' + esc(fmtTime(rows[k].mins)) + '</span><span class="m-teacher">' + esc(rows[k].teacher) + '</span></div>';
+    }
+    html += '</div></div>';
+    i = j;
+  }
+  return html;
+}
+
+function panelHTML(st, day) {
+  if (day.panel === 'none') return '';
+  if (day.panel === 'house') {
+    return '<div class="card panel house"><div class="heading">House Meeting Locations</div><div class="houses">' +
+      HOUSES.map(h => '<div class="house-tile" style="background:' + h.tint + '"><div class="house-name" style="background:' + h.bg + ';color:' + h.fg + '">' + h.name + '</div>' +
+        '<div class="house-loc">' + esc(day.houses[h.name] || '') + '</div></div>').join('') + '</div></div>';
+  }
+  return '<div class="card panel bullets"><div class="heading">' + esc(day.panelTitle) + '</div><div class="rich" data-fit="30,18">' + richHTML(day.panelText) + '</div></div>';
+}
+
+function renderSlide(host, st, date) {
+  const day = resolveDay(st, date);
+  const t = themeFor(st, day.wd);
+  const rows = musicRows(st, day.wd);
+  host.style.background = t.bg;
+  host.innerHTML =
+    '<div class="slide' + (day.showTT ? '' : ' no-tt') + '" style="' + themeVars(t) + '">' +
+      '<div class="circle" style="width:900px;height:900px;left:-300px;bottom:-480px"></div>' +
+      '<div class="circle" style="width:700px;height:700px;right:-260px;top:-360px"></div>' +
+      '<div class="grid">' +
+        '<div class="banner">' + dateHTML(date) + (st.bitmoji ? '<img class="bitmoji" src="' + st.bitmoji + '" alt="">' : '') + '</div>' +
+        '<div class="right">' +
+          '<div class="card music' + (day.panel === 'info' || day.panel === 'lunch' ? ' natural' : '') + '"><div class="heading">Music Lessons</div><div class="music-body">' + musicHTML(rows) + '</div></div>' +
+          panelHTML(st, day) +
+        '</div>' +
+        '<div class="pair" style="--cols:' + (day.showTask ? 2 : 1) + '">' +
+          (day.showTask ? '<div class="info"><div class="info-label">Today\u2019s morning task</div><div class="info-value" data-fit="42,26">' + esc(day.task) + '</div></div>' : '') +
+          '<div class="info"><div class="info-label">' + (day.showTask ? 'then at 8:30\u2026' : 'At 8:30\u2026') + '</div><div class="info-value" data-fit="' + (day.showTask ? '42,26' : '52,30') + '">' + esc(day.at830) + '</div></div>' +
+        '</div>' +
+        '<div class="left">' +
+          '<div class="card notes"><div class="heading">What\u2019s happening today?</div><div class="rich" data-fit="32,20">' + richHTML(day.notes) + '</div></div>' +
+        '</div>' +
+        (day.showTT ? '<div class="card tt"><div class="heading">Timetable</div>' + timetableHTML(st, day.wd) + '</div>' : '') +
+      '</div>' +
+    '</div>';
+  fitSlide(host.querySelector('.slide'), day.panel);
+  return host.querySelector('.slide');
+}
+
+/* Shrink text until it fits its box */
+function fitSlide(slide, panel) {
+  if (!slide) return;
+  // Music first: with a bullet panel the music card takes only what it needs, up to a cap
+  const music = slide.querySelector('.music');
+  const body = slide.querySelector('.music-body');
+  if (music) music.style.maxHeight = (panel === 'info' || panel === 'lunch') ? '640px' : '';
+  if (body && body.querySelector('.m-row')) {
+    let size = 24;
+    body.style.fontSize = size + 'px';
+    while (size > 13 && body.scrollHeight > body.clientHeight + 1) { size -= 1; body.style.fontSize = size + 'px'; }
+  }
+  slide.querySelectorAll('[data-fit]').forEach(el => {
+    const [max, min] = el.dataset.fit.split(',').map(Number);
+    const lines = el.classList.contains('info-value');      // morning task / 8:30: allow up to two lines
+    const over = sz => lines ? (el.offsetHeight > sz * 1.1 * 2 + 4 || el.scrollWidth > el.clientWidth + 1)
+                             : (el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1);
+    let size = max;
+    el.style.fontSize = size + 'px';
+    while (size > min && over(size)) { size -= 1; el.style.fontSize = size + 'px'; }
+  });
+  // Timetable rows: 48px each at most, smaller (with smaller text) when the day is long
+  const ttRows = slide.querySelector('.tt-rows');
+  if (ttRows) {
+    const rows = [...ttRows.children];
+    const h = Math.min(48, (ttRows.clientHeight - 6 * (rows.length - 1)) / rows.length);
+    const k = h / 48;
+    rows.forEach(r => {
+      r.style.height = h.toFixed(1) + 'px';
+      if (k < 1) {
+        r.querySelector('.tt-time').style.fontSize = (22 * k).toFixed(1) + 'px';
+        r.querySelector('.tt-subj').style.fontSize = (28 * k).toFixed(1) + 'px';
+        r.querySelector('.tt-room').style.fontSize = (22 * k).toFixed(1) + 'px';
+      }
+    });
+  }
+  // Long subject names shrink a little rather than being cut off
+  slide.querySelectorAll('.tt-subj').forEach(el => {
+    let size = parseFloat(getComputedStyle(el).fontSize);
+    while (size > 16 && el.scrollWidth > el.clientWidth + 1) { size -= 1; el.style.fontSize = size + 'px'; }
+  });
+}
+
+function scaleInto(host) {
+  const slide = host.querySelector('.slide');
+  if (!slide) return;
+  const s = Math.min(host.clientWidth / 1920, host.clientHeight / 1080);
+  const x = (host.clientWidth - 1920 * s) / 2, y = (host.clientHeight - 1080 * s) / 2;
+  slide.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + s + ')';
+}
+
+/* =====================================================================
+   SLIDE-ONLY MODE (the window shown on the projector)
+   ===================================================================== */
+if (location.hash === '#slide') {
+  document.body.classList.add('slide-only');
+  $('app').remove();
+  const stage = $('stage');
+  stage.hidden = false;
+  let viewDate = schoolDay(new Date());
+  const draw = () => { renderSlide(stage, state, viewDate); scaleInto(stage); };
+  window.addEventListener('message', e => {
+    const d = e.data;
+    if (d && d.type === 'ms-state') { state = d.state; viewDate = fromISO(d.date) || viewDate; draw(); }
+  });
+  window.addEventListener('storage', e => { if (e.key === STORE_KEY) { state = loadState(); draw(); } });
+  window.addEventListener('resize', () => scaleInto(stage));
+  if (document.fonts) document.fonts.ready.then(draw);
+  draw();
+  if (window.opener) { try { window.opener.postMessage({ type: 'ms-hello' }, '*'); } catch (e) {} }
+  document.title = 'Morning Slide (presenting)';
+
+  // Full screen: try straight away, otherwise a click / double-click on the slide does it
+  const hint = document.createElement('div');
+  hint.className = 'fs-hint';
+  hint.textContent = 'Click for full screen';
+  const goFull = () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {}); };
+  const updateHint = () => { hint.style.display = document.fullscreenElement ? 'none' : 'block'; };
+  stage.appendChild(hint);
+  stage.style.cursor = 'pointer';
+  stage.addEventListener('click', goFull);
+  document.addEventListener('fullscreenchange', () => { updateHint(); stage.style.cursor = document.fullscreenElement ? 'none' : 'pointer'; setTimeout(() => scaleInto(stage), 50); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !document.fullscreenElement) window.close(); });
+  goFull();
+  setTimeout(updateHint, 300);
+  // re-render on the hour so a slide left open overnight stays tidy
+  setInterval(() => scaleInto(stage), 5000);
+  return;
+}
+
+/* =====================================================================
+   DASHBOARD
+   ===================================================================== */
+const els = {
+  preview: $('preview'), status: $('status'), dateInput: $('dateInput'),
+  taskInput: $('taskInput'), taskTag: $('taskTag'), taskOvrToggle: $('taskOvrToggle'), taskOvrLabel: $('taskOvrLabel'), taskOvrBox: $('taskOvrBox'), taskOvr: $('taskOvr'),
+  atInput: $('atInput'), atTag: $('atTag'), atOvrToggle: $('atOvrToggle'), atOvrLabel: $('atOvrLabel'), atOvrBox: $('atOvrBox'), atOvr: $('atOvr'), atThuHint: $('atThuHint'),
+  notesTag: $('notesTag'), panelSeg: $('panelSeg'), panelEdit: $('panelEdit'), panelTag: $('panelTag'),
+  formSelect: $('formSelect'), lessonsInfo: $('lessonsInfo'), ignoredNote: $('ignoredNote'),
+  toast: $('toast'), stage: $('stage'), presentBtn: $('presentBtn'), endBtn: $('endBtn'), presentingPill: $('presentingPill')
+};
+let viewDate = schoolDay(new Date());
+let ttDay = dayCode(viewDate) === 'SUN' ? 'MON' : dayCode(viewDate);
+
+let toastTimer;
+function toast(msg) {
+  els.toast.textContent = msg; els.toast.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => els.toast.classList.remove('show'), 3200);
+}
+
+/* ---------- Rich text editor (textarea + toolbar) ---------- */
+function makeRich(container, get, set, opts = {}) {
+  container.innerHTML =
+    '<div class="toolbar">' +
+      '<button type="button" data-a="bold" title="Bold (Ctrl+B)"><strong>B</strong></button>' +
+      '<button type="button" data-a="bullet" title="Bullet">\u2022 Bullet</button>' +
+      '<button type="button" data-a="sub" title="Sub-bullet (Tab)">\u25E6 Sub-bullet</button>' +
+      '<span class="spacer"></span>' +
+      '<button type="button" data-a="clear" title="Clear">Clear</button>' +
+    '</div><textarea spellcheck="true" placeholder="' + esc(opts.placeholder || '') + '"></textarea>';
+  const ta = container.querySelector('textarea');
+  ta.value = get();
+  const commit = () => { set(ta.value); };
+  ta.addEventListener('input', commit);
+
+  const lineRange = () => {
+    const v = ta.value, s = ta.selectionStart, e = ta.selectionEnd;
+    const ls = v.lastIndexOf('\n', s - 1) + 1;
+    let le = v.indexOf('\n', e); if (le === -1) le = v.length;
+    return { v, ls, le };
+  };
+  const replaceLines = fn => {
+    const { v, ls, le } = lineRange();
+    const lines = v.slice(ls, le).split('\n').map(fn);
+    const text = lines.join('\n');
+    ta.setRangeText(text, ls, le, 'end');
+    ta.dispatchEvent(new Event('input'));
+  };
+  const strip = l => l.replace(/^(?:\t+|\s+)?[-*•]\s+/, '');
+  const isSub = l => /^(?:\t+|\s{2,})[-*•]\s+/.test(l);
+  const isLi = l => /^\s?[-*•]\s+/.test(l) && !isSub(l);
+  const act = a => {
+    if (a === 'bold') {
+      const s = ta.selectionStart, e = ta.selectionEnd, sel = ta.value.slice(s, e);
+      if (sel) { ta.setRangeText('**' + sel + '**', s, e, 'end'); }
+      else { ta.setRangeText('**bold**', s, e, 'end'); ta.setSelectionRange(s + 2, s + 6); }
+      ta.dispatchEvent(new Event('input'));
+    } else if (a === 'bullet') {
+      replaceLines(l => isLi(l) ? strip(l) : '- ' + strip(l));
+    } else if (a === 'sub') {
+      replaceLines(l => isSub(l) ? '- ' + strip(l) : '  - ' + strip(l));
+    } else if (a === 'clear') {
+      ta.value = ''; ta.dispatchEvent(new Event('input'));
+    }
+    ta.focus();
+  };
+  container.querySelector('.toolbar').addEventListener('click', e => { const b = e.target.closest('button'); if (b) act(b.dataset.a); });
+  ta.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') { e.preventDefault(); act('bold'); return; }
+    const { v, ls, le } = lineRange();
+    const line = v.slice(ls, le);
+    if (e.key === 'Tab' && (isLi(line) || isSub(line))) {
+      e.preventDefault();
+      replaceLines(l => e.shiftKey ? (isSub(l) ? '- ' + strip(l) : l) : (isLi(l) ? '  - ' + strip(l) : l));
+    } else if (e.key === 'Enter' && !e.shiftKey && ta.selectionStart === ta.selectionEnd && (isLi(line) || isSub(line))) {
+      e.preventDefault();
+      if (!strip(line).trim()) {                         // empty bullet → end the list
+        ta.setRangeText('', ls, le, 'end');
+      } else {
+        ta.setRangeText('\n' + (isSub(line) ? '  - ' : '- '), ta.selectionStart, ta.selectionEnd, 'end');
+      }
+      ta.dispatchEvent(new Event('input'));
+    }
+  });
+  return { refresh() { if (document.activeElement !== ta) ta.value = get(); }, ta };
+}
+
+/* ---------- Day tab ---------- */
+const wdOf = d => (dayCode(d) === 'SUN' ? 'MON' : dayCode(d));
+function ovr() { return state.overrides[toISO(viewDate)]; }
+function setOvr(key, val) {
+  const iso = toISO(viewDate);
+  const o = state.overrides[iso] || {};
+  if (val == null) delete o[key]; else o[key] = val;
+  if (Object.keys(o).length) state.overrides[iso] = o; else delete state.overrides[iso];
+}
+function shortDate(d) { return DAY_NAMES[dayCode(d)].slice(0, 3) + ' ' + d.getDate() + ' ' + MONTHS[d.getMonth()].slice(0, 3); }
+
+const notesEditor = makeRich(document.querySelector('[data-rich="notes"]'),
+  () => state.notes[wdOf(viewDate)] || '',
+  v => { state.notes[wdOf(viewDate)] = v; changed(); });
+let panelEditor = null;
+
+function refreshDay() {
+  const wd = wdOf(viewDate), name = DAY_NAMES[wd], o = ovr() || {};
+  const every = 'Every ' + name;
+  els.taskTag.textContent = every; els.atTag.textContent = every; els.notesTag.textContent = every;
+  if (document.activeElement !== els.taskInput) els.taskInput.value = state.task[wd] || '';
+  if (document.activeElement !== els.atInput) els.atInput.value = state.at830[wd] || '';
+  const dd = resolveDay(state, viewDate);
+  els.atThuHint.hidden = !(wd === 'THU' || dd.sched);
+  $('taskSec').hidden = !dd.showTask;
+  $('atHeading').textContent = dd.showTask ? 'Then at 8:30\u2026' : 'At 8:30\u2026';
+  els.taskOvrLabel.textContent = 'Different just for ' + shortDate(viewDate);
+  els.atOvrLabel.textContent = 'Different just for ' + shortDate(viewDate);
+  els.taskOvrToggle.checked = o.task != null; els.taskOvrBox.hidden = o.task == null;
+  els.atOvrToggle.checked = o.at830 != null; els.atOvrBox.hidden = o.at830 == null;
+  if (o.task != null && document.activeElement !== els.taskOvr) els.taskOvr.value = o.task;
+  if (o.at830 != null && document.activeElement !== els.atOvr) els.atOvr.value = o.at830;
+  notesEditor.refresh();
+
+  const day = dd;
+  const def = day.defaultPanel;
+  els.panelSeg.querySelectorAll('button').forEach(b => {
+    b.setAttribute('aria-pressed', String(b.dataset.v === day.panel));
+    const own = ((state.infoTitle || {})[wd] || '').trim();
+    const label = { none: 'None', info: own || 'Additional information', lunch: 'Lunchtime arrangements', house: 'House meetings' }[b.dataset.v];
+    b.innerHTML = esc(label) + (b.dataset.v === def ? '<span class="def">default</span>' : '');
+  });
+  els.panelTag.textContent = day.panel !== def ? 'Changed for ' + shortDate(viewDate) + ' only'
+    : day.sched ? 'From the house meeting schedule' : name + '\u2019s default';
+  buildPanelEditor(day.panel, wd, day);
+}
+
+let panelEditorKey = '';
+function buildPanelEditor(panel, wd, day) {
+  const key = panel + '|' + wd + (panel === 'house' ? '|' + day.iso + '|' + day.houseSource : '');
+  if (key === panelEditorKey) {
+    if (panelEditor) panelEditor.refresh();
+    else if (panel === 'house') els.panelEdit.querySelectorAll('input[data-house]').forEach(i => { if (document.activeElement !== i) i.value = day.houses[i.dataset.house] || ''; });
+    return;
+  }
+  panelEditorKey = key;
+  panelEditor = null;
+  const box = els.panelEdit;
+  if (panel === 'none') { box.innerHTML = '<p class="hint" style="margin:0">The music lessons panel uses the full height.</p>'; return; }
+  if (panel === 'house') {
+    // From the schedule: shown read-only until "Change for this date" is ticked.
+    // No schedule entry for this date: the box is ticked automatically and can't be unticked.
+    const hasSched = !!(day.sched && !day.sched.congers);
+    const editing = day.houseSource === 'override' || !hasSched;
+    const label = 'Change for ' + shortDate(viewDate);
+    box.innerHTML =
+      '<div class="row" style="justify-content:space-between">' +
+        '<label class="check" style="margin:0"><input type="checkbox" id="houseOvr"' + (editing ? ' checked' : '') + (hasSched ? '' : ' disabled') + '><span>' + esc(label) + '</span></label>' +
+        (hasSched ? (editing ? '<span class="srcnote">Changed from the schedule</span>' : '<span class="srcnote">From the schedule</span>')
+                  : '<span class="srcnote">' + (day.sched && day.sched.congers ? 'Schedule says Congers' : 'Not in the schedule') + '</span>') +
+      '</div>' +
+      '<div class="housegrid' + (editing ? '' : ' locked') + '">' + HOUSES.map(h =>
+        '<label class="houseinput"><span style="background:' + h.bg + ';color:' + h.fg + '">' + h.name + '</span>' +
+        '<input data-house="' + h.name + '" value="' + esc(day.houses[h.name] || '') + '"' + (editing ? '' : ' disabled') + '></label>').join('') + '</div>' +
+      '<p class="hint">' + (hasSched ? 'Tick the box to change the locations for this date only. The schedule itself isn\u2019t changed.'
+                                      : 'Type this date\u2019s locations. Add them to the schedule in Settings to fill them in automatically.') + '</p>';
+    const tick = box.querySelector('#houseOvr');
+    tick.addEventListener('change', () => {
+      setOvr('house', tick.checked ? housesOf(day.sched || {}) : null);
+      changed(); refreshDay();
+      if (tick.checked) { const f = els.panelEdit.querySelector('input[data-house]'); if (f) f.focus(); }
+    });
+    box.querySelectorAll('input[data-house]').forEach(inp => inp.addEventListener('input', () => {
+      const o = (ovr() || {}).house ? Object.assign({}, ovr().house) : housesOf(resolveDay(state, viewDate).houses);
+      o[inp.dataset.house] = inp.value; setOvr('house', o); changed();
+    }));
+    return;
+  }
+  const field = panel === 'lunch' ? 'lunch' : 'info';
+  box.innerHTML = (panel === 'info'
+      ? '<label for="infoTitleInput" style="display:block;font-weight:700;font-size:0.85rem;margin-bottom:0.25rem">Heading on ' + DAY_NAMES[wd] + 's</label>' +
+        '<input class="text" id="infoTitleInput" placeholder="' + PANEL_TITLES.info + '" value="' + esc((state.infoTitle || {})[wd] || '') + '" style="margin-bottom:0.6rem">'
+      : '') +
+    '<div class="richbox"></div><p class="hint">Saved for every ' + DAY_NAMES[wd] + ', like your notes.' +
+    (panel === 'info' ? ' Leave the heading blank to use \u201c' + PANEL_TITLES.info + '\u201d.' : '') + '</p>';
+  const titleInput = box.querySelector('#infoTitleInput');
+  if (titleInput) titleInput.addEventListener('input', () => {
+    state.infoTitle = state.infoTitle || {};
+    state.infoTitle[wdOf(viewDate)] = titleInput.value;
+    changed();
+    const b = els.panelSeg.querySelector('button[data-v="info"]');
+    if (b) b.firstChild.textContent = titleInput.value.trim() || 'Additional information';
+  });
+  panelEditor = makeRich(box.querySelector('.richbox'),
+    () => state[field][wdOf(viewDate)] || '',
+    v => { state[field][wdOf(viewDate)] = v; changed(); });
+}
+
+els.taskInput.addEventListener('input', () => { state.task[wdOf(viewDate)] = els.taskInput.value; changed(); });
+els.atInput.addEventListener('input', () => { state.at830[wdOf(viewDate)] = els.atInput.value; changed(); });
+els.taskOvrToggle.addEventListener('change', () => {
+  setOvr('task', els.taskOvrToggle.checked ? (els.taskInput.value || '') : null);
+  if (els.taskOvrToggle.checked) els.taskOvr.value = els.taskInput.value;
+  changed(); refreshDay(); if (els.taskOvrToggle.checked) els.taskOvr.select();
+});
+els.atOvrToggle.addEventListener('change', () => {
+  const cur = resolveDay(state, viewDate).at830;
+  setOvr('at830', els.atOvrToggle.checked ? cur : null);
+  if (els.atOvrToggle.checked) els.atOvr.value = cur;
+  changed(); refreshDay(); if (els.atOvrToggle.checked) els.atOvr.select();
+});
+els.taskOvr.addEventListener('input', () => { setOvr('task', els.taskOvr.value); changed(); });
+els.atOvr.addEventListener('input', () => { setOvr('at830', els.atOvr.value); changed(); });
+els.panelSeg.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const def = resolveDay(state, viewDate).defaultPanel;
+  setOvr('panel', b.dataset.v === def ? null : b.dataset.v);
+  changed(); refreshDay();
+});
+
+/* ---------- Date navigation ---------- */
+function setDate(d) {
+  viewDate = schoolDay(d);
+  els.dateInput.value = toISO(viewDate);
+  ttDay = wdOf(viewDate); refreshTT();
+  refreshDay(); renderAll();
+}
+$('prevDay').addEventListener('click', () => { let d = addDays(viewDate, -1); if (d.getDay() === 0) d = addDays(d, -1); setDate(d); });
+$('nextDay').addEventListener('click', () => setDate(addDays(viewDate, 1)));
+$('todayBtn').addEventListener('click', () => setDate(new Date()));
+els.dateInput.addEventListener('change', () => { const d = fromISO(els.dateInput.value); if (d) setDate(d); });
+
+/* ---------- Tabs ---------- */
+document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.tabs button').forEach(x => x.setAttribute('aria-selected', String(x === b)));
+  document.querySelectorAll('.tabpanel').forEach(p => { p.hidden = p.dataset.panel !== b.dataset.tab; });
+}));
+
+/* ---------- Timetable tab ---------- */
+function refreshTT() {
+  $('ttDays').innerHTML = DAYS.map(d => '<button type="button" data-d="' + d + '" aria-pressed="' + (d === ttDay) + '">' + DAY_NAMES[d].slice(0, 3) + '</button>').join('');
+  const on = (state.ttShow || {})[ttDay] !== false;
+  $('ttShowToggle').checked = on;
+  $('ttShowLabel').textContent = 'Show the timetable on ' + DAY_NAMES[ttDay] + 's';
+  $('ttOffHint').hidden = on;
+  const mode = state.ttMode[ttDay] || 'grid';
+  $('ttModeSeg').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === mode)));
+  $('ttGridEdit').hidden = mode !== 'grid';
+  $('ttImageEdit').hidden = mode !== 'image';
+  const img = state.ttImage[ttDay];
+  $('ttImgPrev').hidden = !img; if (img) $('ttImgPrev').src = img;
+  const rows = state.timetable[ttDay] || (state.timetable[ttDay] = []);
+  $('ttBody').innerHTML = rows.map((r, i) =>
+    '<tr class="' + (HIGHLIGHT.test((r.subject || '').trim()) ? 'hi' : '') + '" data-i="' + i + '">' +
+      '<td class="time-c"><input data-f="time" value="' + esc(r.time) + '" aria-label="Time"></td>' +
+      '<td><input class="subj" data-f="subject" value="' + esc(r.subject) + '" aria-label="Subject"></td>' +
+      '<td class="room-c"><input data-f="room" value="' + esc(r.room) + '" aria-label="Room"></td>' +
+      '<td class="act"><button type="button" class="mini" data-m="up" aria-label="Move up">\u2191</button><button type="button" class="mini" data-m="down" aria-label="Move down">\u2193</button><button type="button" class="mini" data-m="del" aria-label="Delete row">\u2715</button></td>' +
+    '</tr>').join('');
+}
+$('ttShowToggle').addEventListener('change', () => {
+  state.ttShow = state.ttShow || {};
+  state.ttShow[ttDay] = $('ttShowToggle').checked;
+  changed(); refreshTT();
+});
+$('ttDays').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { ttDay = b.dataset.d; refreshTT(); } });
+$('ttModeSeg').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; state.ttMode[ttDay] = b.dataset.v; changed(); refreshTT(); });
+$('ttBody').addEventListener('input', e => {
+  const inp = e.target, tr = inp.closest('tr'); if (!tr) return;
+  const row = state.timetable[ttDay][+tr.dataset.i];
+  row[inp.dataset.f] = inp.value;
+  if (inp.dataset.f === 'subject') tr.classList.toggle('hi', HIGHLIGHT.test(inp.value.trim()));
+  changed();
+});
+$('ttBody').addEventListener('click', e => {
+  const b = e.target.closest('button[data-m]'); if (!b) return;
+  const rows = state.timetable[ttDay], i = +b.closest('tr').dataset.i;
+  if (b.dataset.m === 'del') rows.splice(i, 1);
+  if (b.dataset.m === 'up' && i > 0) [rows[i - 1], rows[i]] = [rows[i], rows[i - 1]];
+  if (b.dataset.m === 'down' && i < rows.length - 1) [rows[i + 1], rows[i]] = [rows[i], rows[i + 1]];
+  changed(); refreshTT();
+});
+$('ttAdd').addEventListener('click', () => {
+  state.timetable[ttDay].push(T('', '', '')); changed(); refreshTT();
+  const inputs = $('ttBody').querySelectorAll('tr:last-child input'); if (inputs[0]) inputs[0].focus();
+});
+$('ttSort').addEventListener('click', () => { state.timetable[ttDay].sort((a, b) => timeToMins(a.time) - timeToMins(b.time)); changed(); refreshTT(); });
+
+/* Images are resized before saving so storage stays small */
+function readImage(file, maxSide) {
+  return new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onerror = reject;
+    fr.onload = () => {
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = () => {
+        const s = Math.min(1, maxSide / Math.max(img.width, img.height));
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        resolve(c.toDataURL('image/png'));
+      };
+      img.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+$('ttImgBtn').addEventListener('click', () => { $('ttImgInput').value = ''; $('ttImgInput').click(); });
+$('ttImgInput').addEventListener('change', async () => {
+  const f = $('ttImgInput').files[0]; if (!f) return;
+  try { state.ttImage[ttDay] = await readImage(f, 1100); state.ttMode[ttDay] = 'image'; changed(); refreshTT(); }
+  catch (e) { toast('That image couldn\'t be read.'); }
+});
+$('ttImgRemove').addEventListener('click', () => { state.ttImage[ttDay] = null; state.ttMode[ttDay] = 'grid'; changed(); refreshTT(); });
+
+/* ---------- Pasting a timetable ---------- */
+const CLAUDE_TT_PROMPT = 'Convert this school timetable into plain text for my morning slide app. Write one line per lesson or break, in this exact format:\n\nDAY | TIME | SUBJECT | ROOM\n\nRules:\n- DAY is MON, TUE, WED, THU, FRI or SAT\n- TIME is the start time in 24-hour format, e.g. 09:00 or 14:40\n- Include Break, Lunch and Prep as their own lines\n- If there is no room, leave it empty but keep the last | (e.g. THU | 11:00 | Break | )\n- Output only these lines, nothing else.';
+let ttParsed = null;
+function showTTPaste(open) { $('ttPasteBox').hidden = !open; if (open) $('ttPasteText').focus(); }
+$('ttPasteOpen').addEventListener('click', () => showTTPaste($('ttPasteBox').hidden));
+$('ttPasteCancel').addEventListener('click', () => { showTTPaste(false); $('ttPasteText').value = ''; $('ttPastePreview').innerHTML = ''; $('ttPasteUse').disabled = true; });
+$('ttPromptCopy').addEventListener('click', () => copyText(CLAUDE_TT_PROMPT, 'Instructions copied. Paste them into Claude with the timetable.'));
+$('ttCopy').addEventListener('click', () => copyText(timetableText(state), 'Timetable copied.'));
+$('ttPasteText').addEventListener('input', () => {
+  ttParsed = parseTimetable($('ttPasteText').value);
+  const got = DAYS.filter(d => ttParsed.days[d]);
+  let html = '';
+  if (got.length) {
+    html += '<p class="hint" style="margin-top:0">Found ' + got.map(d => DAY_NAMES[d].slice(0, 3) + ' (' + ttParsed.days[d].length + ')').join(', ') +
+      '. Only these days will be replaced; other days stay as they are.</p><div class="ttprev">' +
+      got.map(d => '<div><strong>' + DAY_NAMES[d] + '</strong>' + ttParsed.days[d].map(r =>
+        '<div class="ttprev-row"><span>' + esc(r.time) + '</span><span>' + esc(r.subject) + '</span><span>' + esc(r.room) + '</span></div>').join('') + '</div>').join('') + '</div>';
+  }
+  if (ttParsed.skipped.length) html += '<p class="warnline">' + ttParsed.skipped.length + (ttParsed.skipped.length === 1 ? ' line' : ' lines') + ' couldn’t be read: ' + esc(ttParsed.skipped.slice(0, 3).join(' / ')) + (ttParsed.skipped.length > 3 ? ' …' : '') + '</p>';
+  $('ttPastePreview').innerHTML = html;
+  $('ttPasteUse').disabled = !got.length;
+});
+$('ttPasteUse').addEventListener('click', () => {
+  if (!ttParsed) return;
+  const got = DAYS.filter(d => ttParsed.days[d]);
+  got.forEach(d => { state.timetable[d] = ttParsed.days[d]; state.ttMode[d] = 'grid'; });
+  changed(); $('ttPasteCancel').click(); refreshTT();
+  toast('Timetable updated for ' + got.map(d => DAY_NAMES[d].slice(0, 3)).join(', ') + '.');
+});
+
+function copyText(text, msg) {
+  const done = () => toast(msg);
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, () => fallback());
+  else fallback();
+  function fallback() {
+    const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) { toast('Copy failed. Select and copy by hand.'); }
+    ta.remove();
+  }
+}
+
+/* ---------- Morning task on/off ---------- */
+$('showTaskToggle').addEventListener('change', () => { state.showTask = $('showTaskToggle').checked; changed(); refreshDay(); });
+
+/* ---------- House meeting schedule (Settings) ----------
+   Your changes are stored per date on top of the built-in schedule, so updates to the
+   built-in schedule still reach you for every date you haven't changed. */
+function edits() { return state.schedEdits || (state.schedEdits = {}); }
+function rowSource(date) {
+  const e = (state.schedEdits || {})[date], b = BUILTIN_SCHEDULE.find(r => r.date === date);
+  if (!e) return 'builtin';
+  return b ? 'changed' : 'added';
+}
+function effectiveRow(date) { return scheduleList(state).find(r => r.date === date) || null; }
+function blankRow(date) { return { date, Athlone: '', Alexander: '', Goodhart: '', Dewar: '' }; }
+function setEdit(date, row) {
+  const b = BUILTIN_SCHEDULE.find(r => r.date === date);
+  // an edit that matches the built-in row exactly is no longer a change
+  if (b && row && JSON.stringify(Object.assign({}, b, { date })) === JSON.stringify(Object.assign({}, row, { date })) ) delete edits()[date];
+  else edits()[date] = Object.assign({}, row, { date });
+}
+function removeDate(date) {
+  if (BUILTIN_SCHEDULE.some(r => r.date === date)) edits()[date] = { date, deleted: true };
+  else delete edits()[date];
+}
+function refreshSchedule() {
+  const list = scheduleList(state).slice().sort((a, b) => a.date.localeCompare(b.date));
+  const today = toISO(new Date()), showPast = $('schedPast').checked;
+  const all = Object.values(state.schedEdits || {});
+  const changes = all.filter(e => !e.deleted).length, removed = all.filter(e => e.deleted).length;
+  $('schedSource').textContent = (BUILTIN_SCHEDULE.length ? 'Built-in schedule' : 'No built-in schedule yet') +
+    (changes ? ' + ' + changes + (changes === 1 ? ' change of yours' : ' changes of yours') : '');
+  $('schedReset').hidden = !(changes || removed);
+  $('schedRestore').hidden = !removed;
+  $('schedRestore').textContent = 'Bring back ' + removed + (removed === 1 ? ' removed date' : ' removed dates');
+  const past = list.filter(r => r.date < today).length;
+  $('schedPastLabel').textContent = 'Show past dates' + (past ? ' (' + past + ')' : '');
+  const shown = list.filter(r => showPast || r.date >= today);
+  $('schedBody').innerHTML = shown.length ? shown.map(r => {
+    const src = rowSource(r.date);
+    return '<tr data-date="' + esc(r.date) + '" class="' + (r.congers ? 'cg ' : '') + (src !== 'builtin' ? 'mine' : '') + '">' +
+      '<td class="sd"><input type="date" data-f="date" value="' + esc(r.date) + '" aria-label="Date"></td>' +
+      HOUSES.map(h => '<td><input data-f="' + h.name + '" value="' + esc(r.congers ? '' : (r[h.name] || '')) + '"' + (r.congers ? ' disabled' : '') + ' aria-label="' + h.name + '"></td>').join('') +
+      '<td class="cgc"><input type="checkbox" data-f="congers"' + (r.congers ? ' checked' : '') + ' aria-label="Congers"></td>' +
+      '<td class="srcc">' + (src === 'changed' ? '<button type="button" class="mine-pill" data-undo title="Your change. Click to undo it and use the built-in schedule for this date">Yours ↺</button>'
+                            : src === 'added' ? '<span class="mine-pill plain" title="A date you added">Added</span>' : '') + '</td>' +
+      '<td><button type="button" class="mini" data-del aria-label="Remove this date">✕</button></td></tr>';
+  }).join('')
+    : '<tr><td colspan="8" class="hint" style="padding:0.6rem 0.2rem">' + (list.length ? 'No upcoming dates. Tick “Show past dates” to see earlier ones.' : 'No dates yet. Add one, or paste a schedule.') + '</td></tr>';
+}
+$('schedPast').addEventListener('change', refreshSchedule);
+$('schedBody').addEventListener('change', e => {
+  const inp = e.target, tr = inp.closest('tr'); if (!tr || !tr.dataset.date) return;
+  const date = tr.dataset.date, f = inp.dataset.f, cur = effectiveRow(date) || blankRow(date);
+  if (f === 'date') {
+    const nd = inp.value; if (!nd || nd === date) return;
+    if (effectiveRow(nd)) { toast('That date is already in the schedule.'); inp.value = date; return; }
+    removeDate(date); setEdit(nd, Object.assign({}, cur, { date: nd }));
+  } else if (f === 'congers') {
+    setEdit(date, inp.checked ? { date, congers: true } : blankRow(date));
+  } else return;
+  changed(); refreshSchedule(); refreshDay();
+});
+$('schedBody').addEventListener('input', e => {
+  const inp = e.target, tr = inp.closest('tr'); if (!tr || !tr.dataset.date) return;
+  const f = inp.dataset.f; if (!HOUSES.some(h => h.name === f)) return;
+  const date = tr.dataset.date, cur = Object.assign({}, effectiveRow(date) || blankRow(date));
+  cur[f] = inp.value; delete cur.congers;
+  setEdit(date, cur);
+  const src = rowSource(date);
+  tr.classList.toggle('mine', src !== 'builtin');
+  tr.querySelector('.srcc').innerHTML = src === 'changed' ? '<button type="button" class="mine-pill" data-undo title="Your change. Click to undo it and use the built-in schedule for this date">Yours ↺</button>' : src === 'added' ? '<span class="mine-pill plain" title="A date you added">Added</span>' : '';
+  changed(); refreshDay();
+});
+$('schedBody').addEventListener('blur', e => { if (e.target.matches && e.target.matches('input[data-f]')) refreshSchedule(); }, true);
+$('schedBody').addEventListener('click', e => {
+  const tr = e.target.closest('tr'); if (!tr || !tr.dataset.date) return;
+  if (e.target.closest('[data-undo]')) { delete edits()[tr.dataset.date]; changed(); refreshSchedule(); refreshDay(); }
+  else if (e.target.closest('[data-del]')) { removeDate(tr.dataset.date); changed(); refreshSchedule(); refreshDay(); }
+});
+$('schedAdd').addEventListener('click', () => {
+  const dates = scheduleList(state).map(r => r.date).sort();
+  let d = dates.length ? addDays(fromISO(dates[dates.length - 1]), 1) : new Date();
+  while (d.getDay() !== 4 || dates.includes(toISO(d))) d = addDays(d, 1);   // next free Thursday
+  setEdit(toISO(d), blankRow(toISO(d)));
+  changed(); refreshSchedule();
+});
+$('schedReset').addEventListener('click', () => {
+  if (!confirm('Undo all your changes to the schedule? You’ll be back on the built-in schedule.')) return;
+  state.schedEdits = {}; changed(); refreshSchedule(); refreshDay();
+});
+$('schedRestore').addEventListener('click', () => {
+  Object.keys(edits()).forEach(k => { if (edits()[k].deleted) delete edits()[k]; });
+  changed(); refreshSchedule(); refreshDay();
+});
+$('schedCopy').addEventListener('click', () => copyText(scheduleText(scheduleList(state)), 'Schedule copied.'));
+let schedParsed = null;
+$('schedPasteOpen').addEventListener('click', () => { $('schedPasteBox').hidden = !$('schedPasteBox').hidden; if (!$('schedPasteBox').hidden) $('schedPasteText').focus(); });
+$('schedPasteText').addEventListener('input', () => {
+  schedParsed = parseSchedule($('schedPasteText').value);
+  const n = schedParsed.rows.length, cg = schedParsed.rows.filter(r => r.congers).length;
+  let html = n ? '<p class="hint" style="margin-top:0">Found ' + n + (n === 1 ? ' date' : ' dates') + (cg ? ' (' + cg + ' Congers)' : '') + '. These dates are added, or replace the same dates in your schedule; other dates stay as they are.</p>' : '';
+  if (schedParsed.skipped.length) html += '<p class="warnline">' + schedParsed.skipped.length + (schedParsed.skipped.length === 1 ? ' line' : ' lines') + ' couldn’t be read: ' + esc(schedParsed.skipped.slice(0, 3).join(' / ')) + '</p>';
+  $('schedPastePreview').innerHTML = html;
+  $('schedPasteAdd').disabled = !n;
+});
+$('schedPasteAdd').addEventListener('click', () => {
+  if (!schedParsed || !schedParsed.rows.length) return;
+  schedParsed.rows.forEach(r => setEdit(r.date, r));
+  changed(); $('schedPasteCancel').click(); refreshSchedule(); refreshDay();
+  toast('Schedule updated: ' + schedParsed.rows.length + ' dates.');
+});
+$('schedPasteCancel').addEventListener('click', () => { $('schedPasteBox').hidden = true; $('schedPasteText').value = ''; $('schedPastePreview').innerHTML = ''; $('schedPasteAdd').disabled = true; });
+
+/* ---------- Day colours (Settings) ---------- */
+function nextDateFor(wd) {
+  let d = schoolDay(new Date());
+  for (let i = 0; i < 7 && wdOf(d) !== wd; i++) d = addDays(d, 1);
+  return d;
+}
+function refreshThemes() {
+  const grid = $('themeGrid');
+  grid.innerHTML = DAYS.map(d => {
+    const t = themeFor(state, d);
+    return '<span class="dname">' + DAY_NAMES[d] + '</span>' +
+      '<span class="swatches" aria-hidden="true"><i style="background:' + t.main + '"></i><i style="background:' + t.tint + '"></i><i style="background:' + t.bg + '"></i></span>' +
+      '<select class="text" data-day="' + d + '" aria-label="Colour for ' + DAY_NAMES[d] + '">' +
+        THEME_KEYS.map(k => '<option value="' + k + '"' + (state.dayTheme[d] === k ? ' selected' : '') + '>' + THEMES[k].name + '</option>').join('') +
+      '</select>' +
+      '<button type="button" class="btn small" data-preview="' + d + '">Preview</button>';
+  }).join('');
+}
+$('themeGrid').addEventListener('change', e => {
+  const sel = e.target.closest('select[data-day]'); if (!sel) return;
+  state.dayTheme[sel.dataset.day] = sel.value; changed(); refreshThemes();
+  if (wdOf(viewDate) !== sel.dataset.day) setDate(nextDateFor(sel.dataset.day));
+});
+$('themeGrid').addEventListener('click', e => {
+  const b = e.target.closest('button[data-preview]'); if (b) setDate(nextDateFor(b.dataset.preview));
+});
+
+/* ---------- Setup tab ---------- */
+function parseTime(v) {
+  if (typeof v === 'number' && isFinite(v)) { let m = Math.round((v % 1) * 1440); return m === 1440 ? 0 : m; }
+  if (v instanceof Date) return v.getHours() * 60 + v.getMinutes();
+  const m = /(\d{1,2})[:.](\d{2})\s*(am|pm)?/i.exec(String(v || '')); if (!m) return null;
+  let h = +m[1]; if (m[3]) { const pm = m[3].toLowerCase() === 'pm'; if (pm && h < 12) h += 12; if (!pm && h === 12) h = 0; }
+  return h * 60 + +m[2];
+}
+function normDay(v) { const s = String(v || '').trim().toUpperCase(); return ALL_DAYS.find(d => s.startsWith(d)) || s; }
+function formSort(a, b) { const na = parseInt(a, 10), nb = parseInt(b, 10); return na !== nb ? na - nb : a.localeCompare(b, 'en-GB', { numeric: true }); }
+
+$('lessonsBtn').addEventListener('click', () => { $('lessonsInput').value = ''; $('lessonsInput').click(); });
+$('lessonsInput').addEventListener('change', async () => {
+  const file = $('lessonsInput').files[0]; if (!file) return;
+  if (typeof XLSX === 'undefined') { toast('The spreadsheet reader didn\'t load. Check your internet connection.'); return; }
+  try {
+    const wb = XLSX.read(await file.arrayBuffer(), { type: 'array' });
+    const grid = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: true, defval: '' });
+    const rows = [], ignored = {};
+    grid.forEach((r, i) => {
+      const form = String(r[0] ?? '').trim(), name = String(r[1] ?? '').trim();
+      if (!form && !name) return;
+      if (i === 0 && form.toLowerCase() === 'form') return;
+      if (!/^\d/.test(form)) { ignored[form || '(blank)'] = (ignored[form || '(blank)'] || 0) + 1; return; }
+      rows.push([form, name, normDay(r[2]), parseTime(r[3]), String(r[4] ?? '').trim()]);
+    });
+    if (!rows.length) { toast('No lessons found. Check it\'s the right file.'); return; }
+    state.lessons = { fileName: file.name, savedAt: new Date().toISOString(), rows, ignored };
+    changed(); refreshSetup();
+    toast('Lessons loaded: ' + rows.length + ' across all forms.');
+  } catch (e) { toast('"' + file.name + '" couldn\'t be read as a spreadsheet.'); }
+});
+function refreshSetup() {
+  const L = state.lessons;
+  if (L) {
+    const d = new Date(L.savedAt);
+    els.lessonsInfo.textContent = L.fileName + ' (added ' + DAY_NAMES[dayCode(d)].slice(0, 3) + ' ' + d.getDate() + ' ' + MONTHS[d.getMonth()].slice(0, 3) + ')';
+    const ig = Object.entries(L.ignored || {});
+    els.ignoredNote.hidden = !ig.length;
+    if (ig.length) els.ignoredNote.textContent = 'Ignored rows whose form doesn\'t start with a number: ' + ig.map(([f, n]) => f + ' (' + n + ')').join(', ') + '.';
+    const forms = [...new Set(L.rows.map(r => r[0]))].sort(formSort);
+    const byYear = {};
+    forms.forEach(f => { const y = parseInt(f, 10); (byYear[y] = byYear[y] || []).push(f); });
+    els.formSelect.innerHTML = '<option value="">Choose your form</option>' + Object.keys(byYear).sort((a, b) => a - b).map(y =>
+      '<optgroup label="Year ' + y + '">' + byYear[y].map(f => '<option value="' + esc(f) + '">' + esc(f) + '</option>').join('') + '</optgroup>').join('');
+    els.formSelect.value = forms.includes(state.form) ? state.form : '';
+  } else {
+    els.lessonsInfo.textContent = 'No file yet';
+    els.ignoredNote.hidden = true;
+    els.formSelect.innerHTML = '<option value="">Upload the lessons file first</option>';
+  }
+  $('bitPrev').hidden = !state.bitmoji; if (state.bitmoji) $('bitPrev').src = state.bitmoji;
+}
+els.formSelect.addEventListener('change', () => { state.form = els.formSelect.value; changed(); });
+$('bitBtn').addEventListener('click', () => { $('bitInput').value = ''; $('bitInput').click(); });
+$('bitInput').addEventListener('change', async () => {
+  const f = $('bitInput').files[0]; if (!f) return;
+  try { state.bitmoji = await readImage(f, 520); changed(); refreshSetup(); } catch (e) { toast('That image couldn\'t be read.'); }
+});
+$('bitRemove').addEventListener('click', () => { state.bitmoji = null; changed(); refreshSetup(); });
+
+$('exportBtn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(state)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'morning-slide-settings-' + toISO(new Date()) + '.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+});
+$('importBtn').addEventListener('click', () => { $('importInput').value = ''; $('importInput').click(); });
+$('importInput').addEventListener('change', async () => {
+  const f = $('importInput').files[0]; if (!f) return;
+  try {
+    const data = JSON.parse(await f.text());
+    if (!data || data.v !== 1) throw new Error('bad');
+    localStorage.setItem(STORE_KEY, JSON.stringify(data));
+    state = loadState(); afterLoad(); toast('Settings imported.');
+  } catch (e) { toast('That file isn\'t a Morning Slide settings file.'); }
+});
+$('resetAll').addEventListener('click', () => {
+  if (!confirm('Reset everything? This clears your timetable changes, notes, Bitmoji and lessons file from this laptop.')) return;
+  try { localStorage.removeItem(STORE_KEY); } catch (e) {}
+  state = defaultState(); afterLoad(); toast('Everything has been reset.');
+});
+
+/* ---------- Status line under the preview ---------- */
+function refreshStatus() {
+  const wd = wdOf(viewDate), parts = [];
+  if (!state.lessons) parts.push('<span class="warn">No lessons file yet (Settings tab)</span>');
+  else if (!state.form) parts.push('<span class="warn">Choose your form (Settings tab)</span>');
+  else {
+    const n = musicRows(state, wd).length;
+    parts.push(esc(state.form) + ': ' + n + ' music ' + (n === 1 ? 'lesson' : 'lessons') + ' on ' + DAY_NAMES[wd]);
+  }
+  const isToday = toISO(viewDate) === toISO(schoolDay(new Date()));
+  if (!isToday) parts.push('Preparing ' + DAY_NAMES[dayCode(viewDate)] + ' ' + viewDate.getDate() + ' ' + MONTHS[viewDate.getMonth()].slice(0, 3));
+  els.status.innerHTML = parts.map(p => '<span>' + p + '</span>').join('');
+}
+
+/* =====================================================================
+   Rendering, syncing and presenting
+   ===================================================================== */
+let slideWin = null;
+let renderTimer = null;
+function renderAll() {
+  renderSlide(els.preview, state, viewDate); scaleInto(els.preview);
+  if (!els.stage.hidden) { renderSlide(els.stage, state, viewDate); scaleInto(els.stage); }
+  refreshStatus();
+  sendToSlide();
+}
+function changed() {
+  save();
+  clearTimeout(renderTimer);
+  renderTimer = setTimeout(renderAll, 60);
+}
+function sendToSlide() {
+  if (slideWin && !slideWin.closed) {
+    try { slideWin.postMessage({ type: 'ms-state', state, date: toISO(viewDate) }, '*'); } catch (e) {}
+  }
+}
+window.addEventListener('message', e => { if (e.data && e.data.type === 'ms-hello') sendToSlide(); });
+new ResizeObserver(() => scaleInto(els.preview)).observe(els.preview);
+
+async function present() {
+  if (slideWin && !slideWin.closed) { slideWin.focus(); sendToSlide(); return; }
+  let target = null, extended = !!(window.screen && window.screen.isExtended);
+  if ('getScreenDetails' in window) {
+    try {
+      const details = await window.getScreenDetails();
+      if (details.screens.length > 1) {
+        target = details.screens.find(s => s !== details.currentScreen) || details.screens.find(s => !s.isPrimary) || null;
+        extended = true;
+      }
+    } catch (e) { /* permission refused or unsupported */ }
+  }
+  if (!target && !extended) { presentHere(); return; }
+
+  const url = location.href.split('#')[0] + '#slide';
+  const feat = target
+    ? 'popup,left=' + target.availLeft + ',top=' + target.availTop + ',width=' + target.availWidth + ',height=' + target.availHeight + ',fullscreen'
+    : 'popup,width=1280,height=720';
+  slideWin = window.open(url, 'morningSlideWindow', feat);
+  if (!slideWin) { toast('Edge blocked the slide window. Click Present again, or allow pop-ups for this page.'); return; }
+  if (!target) toast('Drag the slide window onto the projector, then click it for full screen.');
+  updatePresenting();
+}
+function presentHere() {
+  els.stage.hidden = false;
+  renderSlide(els.stage, state, viewDate); scaleInto(els.stage);
+  const done = () => { els.stage.hidden = true; updatePresenting(); };
+  els.stage.requestFullscreen().then(() => setTimeout(() => scaleInto(els.stage), 60)).catch(() => {});
+  els.stage.onclick = null;
+  const onFs = () => { if (!document.fullscreenElement) { document.removeEventListener('fullscreenchange', onFs); done(); } };
+  document.addEventListener('fullscreenchange', onFs);
+  updatePresenting();
+}
+function endPresenting() {
+  if (slideWin && !slideWin.closed) slideWin.close();
+  slideWin = null;
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  els.stage.hidden = true;
+  updatePresenting();
+}
+function updatePresenting() {
+  const on = (slideWin && !slideWin.closed) || !els.stage.hidden;
+  els.presentingPill.hidden = !on; els.endBtn.hidden = !on;
+}
+setInterval(updatePresenting, 1000);
+window.addEventListener('resize', () => { if (!els.stage.hidden) scaleInto(els.stage); });
+els.presentBtn.addEventListener('click', present);
+els.endBtn.addEventListener('click', endPresenting);
+window.addEventListener('beforeunload', () => { if (slideWin && !slideWin.closed) slideWin.close(); });
+
+/* Roll the date over if the dashboard is left open past midnight */
+let lastDay = toISO(new Date());
+setInterval(() => {
+  const now = toISO(new Date());
+  if (now !== lastDay) { const wasToday = toISO(viewDate) === toISO(schoolDay(fromISO(lastDay))); lastDay = now; if (wasToday) setDate(new Date()); }
+}, 60000);
+
+function afterLoad() {
+  pruneOverrides();
+  panelEditorKey = '';
+  setDate(viewDate);
+  refreshSetup();
+  refreshThemes();
+  refreshSchedule();
+  $('showTaskToggle').checked = state.showTask !== false;
+}
+if (document.fonts) document.fonts.ready.then(renderAll);
+afterLoad();
+})();
+</script>
+</body>
+</html>
