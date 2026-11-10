@@ -52,7 +52,7 @@
 .slide:not(.modern) .info { padding-top: 16px; padding-bottom: 16px; }
 .slide:not(.modern) .info-value { line-height: 1.35; min-height: 1.35em; }
 .slide.modern .banner-main { font-size: 56px; }
-.slide.modern .banner-sub { font-weight: 400; letter-spacing: -0.02em; color: var(--bannerSub); white-space: nowrap; }
+.slide.modern .banner-sub { font-size: 36px; font-weight: 400; letter-spacing: -0.02em; color: var(--bannerSub); white-space: nowrap; }
 .slide .banner.has-bitmoji { padding-right: 280px; }
 .slide .bitmoji { position: absolute; right: 36px; bottom: 0; height: 172px; max-width: 220px; object-fit: contain; object-position: bottom; }
 
@@ -68,7 +68,7 @@
 .slide.no-tt .left { grid-column: 1 / 3; }
 .slide.no-tt .notes .rich { column-count: 2; column-gap: 48px; column-fill: auto; }
 .slide.no-tt .notes .rich li, .slide.no-tt .notes .rich p { break-inside: avoid; }
-.slide .info-value { font-family: var(--display); font-size: 44px; font-weight: 800; line-height: 1.15; min-height: 1.15em; white-space: nowrap; overflow: hidden; }
+.slide .info-value { font-family: var(--display); font-size: 44px; font-weight: 800; line-height: 1.15; min-height: 1.15em; white-space: nowrap; overflow-x: clip; overflow-y: visible; }   /* only trim sideways, so letters like g and y are never cut */
 .slide .notes { flex: 1; min-height: 0; padding: 32px 36px; display: flex; flex-direction: column; gap: 18px; }
 
 /* Rich text (notes and bullet panels) */
