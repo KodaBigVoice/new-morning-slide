@@ -18,8 +18,16 @@
 .slide {
   position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden;
   transform-origin: 0 0; background: var(--bg); color: var(--ink);
-  font-family: "Outfit", "Segoe UI", Arial, sans-serif;
+  --body: "Playpen Sans", "Comic Sans MS", "Segoe Print", cursive;
+  --display: var(--body);
+  --dateFont: var(--body);
+  font-family: var(--body);
+}
+/* Slide design: "Playful" uses Playpen Sans throughout; "Modern" uses Bricolage Grotesque headings, Outfit text and a mono short date */
+.slide.modern {
+  --body: "Outfit", "Segoe UI", Arial, sans-serif;
   --display: "Bricolage Grotesque", "Outfit", "Segoe UI", sans-serif;
+  --dateFont: "Space Mono", "Consolas", monospace;
 }
 .slide * { box-sizing: border-box; }
 .slide .circle { position: absolute; border-radius: 50%; background: var(--circle); }
@@ -35,9 +43,11 @@
   grid-column: 1 / 3; grid-row: 1; position: relative; background: var(--main); border-radius: 40px;
   padding: 0 40px; display: flex; flex-direction: row; justify-content: space-between; align-items: center; gap: 24px; color: #fff;
 }
-.slide .banner-main { font-family: var(--display); font-size: 56px; font-weight: 700; line-height: 1.05; letter-spacing: -0.5px; white-space: nowrap; }
+.slide .banner-main { font-family: var(--display); font-size: 54px; font-weight: 700; line-height: 1.05; letter-spacing: -0.5px; white-space: nowrap; }
 .slide .banner-main sup { font-size: 0.54em; vertical-align: top; position: relative; top: 0.11em; }
-.slide .banner-sub { font-family: "Space Mono", "Consolas", monospace; font-size: 40px; font-weight: 400; letter-spacing: -0.02em; color: var(--bannerSub); white-space: nowrap; }
+.slide .banner-sub { font-family: var(--dateFont); font-size: 40px; font-weight: 500; color: var(--bannerSub); white-space: nowrap; }
+.slide.modern .banner-main { font-size: 56px; }
+.slide.modern .banner-sub { font-weight: 400; letter-spacing: -0.02em; color: var(--bannerSub); white-space: nowrap; }
 .slide .banner.has-bitmoji { padding-right: 280px; }
 .slide .bitmoji { position: absolute; right: 36px; bottom: 0; height: 172px; max-width: 220px; object-fit: contain; object-position: bottom; }
 
@@ -386,6 +396,15 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
         </div>
 
         <div class="sec">
+          <div class="sec-head"><h3>Slide design</h3></div>
+          <div class="seg" id="designSeg" role="group" aria-label="Slide design">
+            <button type="button" data-v="playful">Playful</button>
+            <button type="button" data-v="modern">Modern</button>
+          </div>
+          <p class="hint">Playful uses one rounded handwriting-style font throughout. Modern uses bolder, more grown-up headings with a clean text font.</p>
+        </div>
+
+        <div class="sec">
           <div class="sec-head"><h3>Morning task</h3></div>
           <label class="check" style="margin-top:0"><input type="checkbox" id="showTaskToggle" checked><span>Show the “Today’s morning task” box</span></label>
           <p class="hint">Turn this off if your form doesn’t do a morning task. The slide then shows “At 8:30…” across the top on its own.</p>
@@ -525,7 +544,8 @@ function defaultState() {
     schedEdits: {},                      // this user's changes to the built-in schedule, by date
     overrides: {},                       // { 'YYYY-MM-DD': { task, at830, panel } }
     dayTheme: Object.assign({}, DEFAULT_THEMES),
-    bitmoji: null
+    bitmoji: null,
+    design: 'playful'                    // slide design: 'playful' or 'modern'
   };
 }
 
@@ -832,7 +852,7 @@ function renderSlide(host, st, date) {
   const rows = musicRows(st, day.wd);
   host.style.background = t.bg;
   host.innerHTML =
-    '<div class="slide' + (day.showTT ? '' : ' no-tt') + '" style="' + themeVars(t) + '">' +
+    '<div class="slide' + (day.showTT ? '' : ' no-tt') + (st.design === 'modern' ? ' modern' : '') + '" style="' + themeVars(t) + '">' +
       '<div class="circle" style="width:900px;height:900px;left:-300px;bottom:-480px"></div>' +
       '<div class="circle" style="width:700px;height:700px;right:-260px;top:-360px"></div>' +
       '<div class="grid">' +
@@ -869,7 +889,8 @@ function fitSlide(slide, panel) {
   }
   slide.querySelectorAll('[data-fit]').forEach(el => {
     const [max, min] = el.dataset.fit.split(',').map(Number);
-    const over = () => el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1;   // task / 8:30: one line, shrinks to fit
+    const oneLine = el.classList.contains('info-value');   // task / 8:30: one line, shrinks to fit its width
+    const over = () => el.scrollWidth > el.clientWidth + 1 || (!oneLine && el.scrollHeight > el.clientHeight + 1);
     let size = max;
     el.style.fontSize = size + 'px';
     while (size > min && over(size)) { size -= 1; el.style.fontSize = size + 'px'; }
@@ -1306,6 +1327,10 @@ function copyText(text, msg) {
 
 /* ---------- Morning task on/off ---------- */
 $('showTaskToggle').addEventListener('change', () => { state.showTask = $('showTaskToggle').checked; changed(); refreshDay(); });
+function refreshDesign() {
+  $('designSeg').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === (state.design === 'modern' ? 'modern' : 'playful'))));
+}
+$('designSeg').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; state.design = b.dataset.v; changed(); refreshDesign(); });
 
 /* ---------- House meeting schedule (Settings) ----------
    Your changes are stored per date on top of the built-in schedule, so updates to the
@@ -1477,6 +1502,7 @@ $('lessonsInput').addEventListener('change', async () => {
   } catch (e) { toast('"' + file.name + '" couldn\'t be read as a spreadsheet.'); }
 });
 function refreshSetup() {
+  refreshDesign();
   const L = state.lessons;
   if (L) {
     const d = new Date(L.savedAt);
