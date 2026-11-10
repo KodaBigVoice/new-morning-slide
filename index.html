@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playpen+Sans:wght@400;500;600;700;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playpen+Sans:wght@400;500;600;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Outfit:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 /* =====================================================================
@@ -18,38 +18,42 @@
 .slide {
   position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden;
   transform-origin: 0 0; background: var(--bg); color: var(--ink);
-  font-family: "Playpen Sans", "Comic Sans MS", "Segoe Print", cursive;
+  font-family: "Outfit", "Segoe UI", Arial, sans-serif;
+  --display: "Bricolage Grotesque", "Outfit", "Segoe UI", sans-serif;
 }
 .slide * { box-sizing: border-box; }
 .slide .circle { position: absolute; border-radius: 50%; background: var(--circle); }
 .slide .grid {
   position: absolute; inset: 48px; padding-top: 24px; display: grid;
-  grid-template-columns: 660px 470px 630px; grid-template-rows: 168px auto minmax(0, 1fr); gap: 28px 32px;
+  grid-template-columns: 660px 470px 630px; grid-template-rows: 120px auto minmax(0, 1fr); gap: 28px 32px;
 }
 .slide .card { background: #fff; border-radius: 40px; box-shadow: 0 14px 36px -16px rgba(23, 50, 79, 0.25); }
-.slide .heading { font-size: 44px; font-weight: 700; color: var(--main); line-height: 1; flex: none; }
+.slide .heading { font-family: var(--display); font-size: 44px; font-weight: 700; color: var(--main); line-height: 1; flex: none; }
 
 /* Date banner */
 .slide .banner {
   grid-column: 1 / 3; grid-row: 1; position: relative; background: var(--main); border-radius: 40px;
-  padding: 0 36px; display: flex; flex-direction: column; justify-content: center; gap: 4px; color: #fff;
+  padding: 0 40px; display: flex; flex-direction: row; justify-content: space-between; align-items: center; gap: 24px; color: #fff;
 }
-.slide .banner-main { font-size: 54px; font-weight: 700; line-height: 1.05; letter-spacing: -0.5px; white-space: nowrap; }
-.slide .banner-main sup { font-size: 29px; vertical-align: top; position: relative; top: 6px; }
-.slide .banner-sub { font-size: 40px; font-weight: 500; color: var(--bannerSub); font-variant-numeric: tabular-nums; }
-.slide .bitmoji { position: absolute; right: 40px; bottom: 0; height: 222px; max-width: 280px; object-fit: contain; object-position: bottom; }
+.slide .banner-main { font-family: var(--display); font-size: 56px; font-weight: 700; line-height: 1.05; letter-spacing: -0.5px; white-space: nowrap; }
+.slide .banner-main sup { font-size: 0.54em; vertical-align: top; position: relative; top: 0.11em; }
+.slide .banner-sub { font-family: "Space Mono", "Consolas", monospace; font-size: 40px; font-weight: 400; letter-spacing: -0.02em; color: var(--bannerSub); white-space: nowrap; }
+.slide .banner.has-bitmoji { padding-right: 280px; }
+.slide .bitmoji { position: absolute; right: 36px; bottom: 0; height: 172px; max-width: 220px; object-fit: contain; object-position: bottom; }
 
 /* Morning task and 8:30, side by side under the date */
-.slide .pair { grid-column: 1 / 3; grid-row: 2; display: grid; grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr)); gap: 32px; }
-.slide .info { background: var(--tint); border-radius: 40px; padding: 20px 32px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.slide .info-label { font-size: 27px; color: var(--label); font-weight: 500; }
+.slide .pair { grid-column: 1 / 3; grid-row: 2; display: grid; grid-template-columns: 660px 470px; gap: 32px; }
+.slide.no-tt .pair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.slide .pair.single, .slide.no-tt .pair.single { grid-template-columns: minmax(0, 1fr); }
+.slide .info { background: var(--tint); border-radius: 32px; padding: 20px 30px; display: flex; flex-direction: column; gap: 0; min-width: 0; }
+.slide .info-label { font-size: 24px; line-height: 1.25; color: var(--label); font-weight: 500; }
 
 /* What's happening: left of the timetable, or across both columns when the timetable is off */
 .slide .left { grid-column: 1; grid-row: 3; display: flex; flex-direction: column; gap: 24px; min-height: 0; }
 .slide.no-tt .left { grid-column: 1 / 3; }
 .slide.no-tt .notes .rich { column-count: 2; column-gap: 48px; column-fill: auto; }
 .slide.no-tt .notes .rich li, .slide.no-tt .notes .rich p { break-inside: avoid; }
-.slide .info-value { font-size: 52px; font-weight: 800; line-height: 1.1; min-height: 1.1em; overflow-wrap: anywhere; }
+.slide .info-value { font-family: var(--display); font-size: 44px; font-weight: 800; line-height: 1.15; min-height: 1.15em; white-space: nowrap; overflow: hidden; }
 .slide .notes { flex: 1; min-height: 0; padding: 32px 36px; display: flex; flex-direction: column; gap: 18px; }
 
 /* Rich text (notes and bullet panels) */
@@ -122,7 +126,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 [hidden] { display: none !important; }
 
 .topbar { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; padding: 0.75rem 1.25rem; background: var(--white); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 30; }
-.brand { font-family: "Playpen Sans", cursive; font-weight: 700; font-size: 1.25rem; color: var(--ink); margin: 0 auto 0 0; }
+.brand { font-family: "Bricolage Grotesque", "Segoe UI", sans-serif; font-weight: 700; font-size: 1.25rem; color: var(--ink); margin: 0 auto 0 0; }
 .datenav { display: flex; align-items: center; gap: 0.35rem; }
 .datenav input { padding: 0.4rem 0.5rem; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
 .iconbtn { width: 2.2rem; height: 2.2rem; border: 1px solid var(--line); background: #fff; border-radius: 6px; cursor: pointer; display: grid; place-items: center; }
@@ -832,14 +836,14 @@ function renderSlide(host, st, date) {
       '<div class="circle" style="width:900px;height:900px;left:-300px;bottom:-480px"></div>' +
       '<div class="circle" style="width:700px;height:700px;right:-260px;top:-360px"></div>' +
       '<div class="grid">' +
-        '<div class="banner">' + dateHTML(date) + (st.bitmoji ? '<img class="bitmoji" src="' + st.bitmoji + '" alt="">' : '') + '</div>' +
+        '<div class="banner' + (st.bitmoji ? ' has-bitmoji' : '') + '">' + dateHTML(date) + (st.bitmoji ? '<img class="bitmoji" src="' + st.bitmoji + '" alt="">' : '') + '</div>' +
         '<div class="right">' +
           '<div class="card music' + (day.panel === 'info' || day.panel === 'lunch' ? ' natural' : '') + '"><div class="heading">Music Lessons</div><div class="music-body">' + musicHTML(rows) + '</div></div>' +
           panelHTML(st, day) +
         '</div>' +
-        '<div class="pair" style="--cols:' + (day.showTask ? 2 : 1) + '">' +
-          (day.showTask ? '<div class="info"><div class="info-label">Today\u2019s morning task</div><div class="info-value" data-fit="42,26">' + esc(day.task) + '</div></div>' : '') +
-          '<div class="info"><div class="info-label">' + (day.showTask ? 'then at 8:30\u2026' : 'At 8:30\u2026') + '</div><div class="info-value" data-fit="' + (day.showTask ? '42,26' : '52,30') + '">' + esc(day.at830) + '</div></div>' +
+        '<div class="pair' + (day.showTask ? '' : ' single') + '">' +
+          (day.showTask ? '<div class="info"><div class="info-label">Today\u2019s morning task</div><div class="info-value" data-fit="44,30">' + esc(day.task) + '</div></div>' : '') +
+          '<div class="info"><div class="info-label">' + (day.showTask ? 'then at 8:30\u2026' : 'At 8:30\u2026') + '</div><div class="info-value" data-fit="44,30">' + esc(day.at830) + '</div></div>' +
         '</div>' +
         '<div class="left">' +
           '<div class="card notes"><div class="heading">What\u2019s happening today?</div><div class="rich" data-fit="32,20">' + richHTML(day.notes) + '</div></div>' +
@@ -865,12 +869,16 @@ function fitSlide(slide, panel) {
   }
   slide.querySelectorAll('[data-fit]').forEach(el => {
     const [max, min] = el.dataset.fit.split(',').map(Number);
-    const lines = el.classList.contains('info-value');      // morning task / 8:30: allow up to two lines
-    const over = sz => lines ? (el.offsetHeight > sz * 1.1 * 2 + 4 || el.scrollWidth > el.clientWidth + 1)
-                             : (el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1);
+    const over = () => el.scrollHeight > el.clientHeight + 1 || el.scrollWidth > el.clientWidth + 1;   // task / 8:30: one line, shrinks to fit
     let size = max;
     el.style.fontSize = size + 'px';
     while (size > min && over(size)) { size -= 1; el.style.fontSize = size + 'px'; }
+    // Task / 8:30 that still won't fit on one line: let it wrap onto two lines instead of cutting it off
+    if (el.classList.contains('info-value') && over()) {
+      el.style.whiteSpace = 'normal'; el.style.overflowWrap = 'anywhere';
+      size = Math.min(max, 34); el.style.fontSize = size + 'px';
+      while (size > 20 && el.offsetHeight > size * 1.15 * 2 + 4) { size -= 1; el.style.fontSize = size + 'px'; }
+    }
   });
   // Timetable rows: 48px each at most, smaller (with smaller text) when the day is long
   const ttRows = slide.querySelector('.tt-rows');
