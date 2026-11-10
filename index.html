@@ -46,6 +46,11 @@
 .slide .banner-main { font-family: var(--display); font-size: 54px; font-weight: 700; line-height: 1.05; letter-spacing: -0.5px; white-space: nowrap; }
 .slide .banner-main sup { font-size: 0.54em; vertical-align: top; position: relative; top: 0.11em; }
 .slide .banner-sub { font-family: var(--dateFont); font-size: 40px; font-weight: 500; color: var(--bannerSub); white-space: nowrap; }
+.slide:not(.modern) .banner-main { font-size: 50px; }
+.slide:not(.modern) .banner-sub { font-size: 36px; }
+/* Playpen Sans has deep descenders (g, y, p): give the one-line boxes taller lines so nothing is clipped */
+.slide:not(.modern) .info { padding-top: 16px; padding-bottom: 16px; }
+.slide:not(.modern) .info-value { line-height: 1.35; min-height: 1.35em; }
 .slide.modern .banner-main { font-size: 56px; }
 .slide.modern .banner-sub { font-weight: 400; letter-spacing: -0.02em; color: var(--bannerSub); white-space: nowrap; }
 .slide .banner.has-bitmoji { padding-right: 280px; }
