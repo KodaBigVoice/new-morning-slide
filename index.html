@@ -102,6 +102,9 @@
 .slide .tt-image { flex: 1; min-height: 0; width: 100%; object-fit: contain; border-radius: 16px; }
 .slide .tt-empty { font-size: 28px; color: var(--muted); text-align: center; margin: auto 0; }
 
+/* First lesson only: the first lesson joins the boxes along the top */
+.slide.first .pair { grid-template-columns: repeat(var(--boxes, 3), minmax(0, 1fr)); gap: 24px; }
+
 /* Right column */
 .slide .right { grid-column: 3; grid-row: 1 / 4; display: flex; flex-direction: column; gap: 28px; min-height: 0; }
 .slide .music { padding: 32px; display: flex; flex-direction: column; gap: 18px; min-height: 0; flex: 1 1 0; }
@@ -126,6 +129,45 @@
 .slide .house-name { border-radius: 8px; padding: 6px 0; text-align: center; font-size: 27px; font-weight: 700; }
 .slide .house-loc { text-align: center; font-size: 27px; font-weight: 500; line-height: 1.2; min-height: 1.2em; overflow-wrap: anywhere; }
 
+/* Prep slide: preps, prep info and tomorrow (or today) on the left; timer and music on the right */
+.slide.prep .grid { grid-template-columns: 1162px 630px; }
+.slide.prep .banner { grid-column: 1; justify-content: flex-start; gap: 26px; padding: 0 40px 0 22px; }
+.slide.prep .banner.no-clock { padding-left: 40px; }
+.slide.prep .banner-main { flex: 1; min-width: 0; overflow-x: clip; }
+.slide.prep .right { grid-column: 2; }
+.slide.prep .music { flex: 1 1 0; }
+.slide .pt-clock { flex: none; font-family: var(--dateFont); font-size: 48px; font-weight: 700; line-height: 1; padding: 14px 24px; border-radius: 18px; background: rgba(255, 255, 255, 0.16); color: #fff; letter-spacing: 1px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.slide .preps { grid-column: 1; grid-row: 2; padding: 22px; display: flex; flex-direction: column; gap: 12px; }
+.slide .prep-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 24px; border-radius: 18px; padding: 8px 30px; background: var(--soft); }
+.slide .prep-row.now { background: var(--tint); outline: 3px solid var(--main); outline-offset: -3px; }
+.slide .prep-subj { font-family: var(--display); font-size: 52px; font-weight: 800; line-height: 1.35; white-space: nowrap; overflow-x: clip; overflow-y: visible; }
+.slide .prep-tag { font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; padding: 6px 12px; border-radius: 10px; color: var(--main); }
+.slide .prep-tag:empty { display: none; }
+.slide .prep-row.now .prep-tag { background: var(--main); color: #fff; }
+.slide .prep-mins { font-size: 46px; font-weight: 600; line-height: 1.35; white-space: nowrap; }
+.slide .prep-mins small { font-size: 0.6em; font-weight: 500; opacity: 0.75; }
+.slide .preps.many .prep-subj { font-size: 44px; }
+.slide .preps.many .prep-mins { font-size: 40px; }
+.slide .prep-none { font-size: 32px; color: var(--muted); padding: 14px 16px; }
+.slide .prep-low { grid-column: 1; grid-row: 3; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; }
+.slide .prep-box { min-height: 0; padding: 30px 34px; display: flex; flex-direction: column; gap: 16px; }
+.slide .prep-box .heading { font-size: 40px; white-space: nowrap; }
+.slide.prep .music .heading { font-size: 40px; white-space: nowrap; }
+.slide .prep-box .rich { font-size: 30px; }
+.slide .prep-empty { font-size: 28px; color: var(--muted); }
+.slide .pt { flex: none; background: var(--main); color: #fff; border-radius: 40px; padding: 28px 36px 34px; display: flex; flex-direction: column; gap: 12px; }
+.slide .pt-label { font-size: 30px; font-weight: 600; opacity: 0.9; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.slide .pt-time { font-family: var(--dateFont); font-size: 156px; font-weight: 700; line-height: 1.05; letter-spacing: -2px; text-align: center; font-variant-numeric: tabular-nums; }
+.slide .pt-sub { font-size: 24px; opacity: 0.8; text-align: center; min-height: 1.3em; margin-top: -4px; }
+.slide .pt-bars { display: flex; gap: 10px; }
+.slide .pt-bar { flex: 1 1 0; height: 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.22); overflow: hidden; }
+.slide .pt-bar i { display: block; height: 100%; width: 0; border-radius: 8px; background: #fff; }
+/* Evening: a deeper version of the day's colours */
+.slide.evening .banner { background: var(--tint); color: var(--ink); }
+.slide.evening .banner-sub { color: var(--label); }
+.slide.evening .pt-clock { background: var(--main); }
+.slide.evening .card { box-shadow: 0 14px 36px -16px rgba(0, 0, 0, 0.4); }
+
 /* =====================================================================
    DASHBOARD
    ===================================================================== */
@@ -142,6 +184,26 @@ button, input, select, textarea { font: inherit; color: inherit; }
 
 .topbar { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; padding: 0.75rem 1.25rem; background: var(--white); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 30; }
 .brand { font-family: "Bricolage Grotesque", "Segoe UI", sans-serif; font-weight: 700; font-size: 1.25rem; color: var(--ink); margin: 0 auto 0 0; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.modeswitch { position: relative; display: grid; grid-template-columns: 1fr 1fr; background: var(--mist); border-radius: 999px; padding: 4px; margin-right: auto; }
+.modeswitch::before { content: ""; position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); border-radius: 999px; background: var(--steel); box-shadow: 0 3px 8px -3px rgba(28, 48, 72, 0.5); transition: transform 0.22s ease; }
+.modeswitch.prep::before { transform: translateX(100%); }
+.modeswitch button { position: relative; z-index: 1; border: 0; background: none; border-radius: 999px; padding: 0.45rem 1.1rem; cursor: pointer; font-family: "Bricolage Grotesque", "Segoe UI", sans-serif; font-weight: 700; font-size: 1.05rem; color: var(--slate); white-space: nowrap; transition: color 0.22s; }
+.modeswitch button[aria-pressed="true"] { color: #fff; }
+.preprow { display: grid; grid-template-columns: minmax(0, 1fr) 7rem auto; gap: 0.4rem; align-items: center; margin-bottom: 0.4rem; }
+.minsbox { display: flex; align-items: center; border: 1px solid var(--line); border-radius: 6px; background: #fff; overflow: hidden; }
+.minsbox input { width: 100%; min-width: 0; border: 0; padding: 0.5rem 0.2rem 0.5rem 0.6rem; text-align: right; }
+.minsbox span { padding: 0 0.6rem 0 0.25rem; color: var(--slate); font-size: 0.85rem; }
+.minsbox:focus-within { border-color: #4F86B8; box-shadow: 0 0 0 2px rgba(79,134,184,0.25); }
+.minsbox input:focus { outline: none; }
+.subsec { margin-top: 0.7rem; }
+.subsec > label { display: block; font-weight: 700; font-size: 0.8rem; color: var(--slate); margin-bottom: 0.25rem; }
+.timer-state { margin-top: 0.55rem; font-size: 0.88rem; color: var(--slate); }
+.timer-state b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.modal-back { position: fixed; inset: 0; background: rgba(28, 48, 72, 0.35); display: grid; place-items: center; z-index: 150; padding: 1rem; }
+.modal { background: #fff; border-radius: 14px; padding: 1.3rem 1.4rem; max-width: 26rem; box-shadow: 0 20px 50px -20px rgba(28, 48, 72, 0.5); }
+.modal h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+.modal p { margin: 0 0 1rem; color: var(--slate); }
 .datenav { display: flex; align-items: center; gap: 0.35rem; }
 .datenav input { padding: 0.4rem 0.5rem; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
 .iconbtn { width: 2.2rem; height: 2.2rem; border: 1px solid var(--line); background: #fff; border-radius: 6px; cursor: pointer; display: grid; place-items: center; }
@@ -154,7 +216,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .btn.danger { border-color: #B54848; color: #B54848; }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
 .present-btn { padding: 0.6rem 1.4rem; font-size: 1.02rem; display: inline-flex; align-items: center; gap: 0.5rem; }
-.presenting-pill { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; color: #1D6B3C; background: #E3F5EA; border-radius: 999px; padding: 0.25rem 0.7rem; }
+.presenting-pill { white-space: nowrap; display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; color: #1D6B3C; background: #E3F5EA; border-radius: 999px; padding: 0.25rem 0.7rem; }
 .presenting-pill::before { content: ""; width: 0.55rem; height: 0.55rem; border-radius: 50%; background: #2E9D5A; }
 
 .main { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(360px, 1fr); gap: 1.25rem; padding: 1.25rem; max-width: 1700px; margin: 0 auto; align-items: start; }
@@ -265,7 +327,11 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
 
 <div id="app">
   <header class="topbar">
-    <h1 class="brand">Morning Slide</h1>
+    <h1 class="sr-only">Morning Slide</h1>
+    <div class="modeswitch" id="modeSwitch" role="group" aria-label="Which slide you are editing">
+      <button type="button" data-m="morning" aria-pressed="true">Morning Slide</button>
+      <button type="button" data-m="prep" aria-pressed="false">Prep Slide</button>
+    </div>
     <div class="datenav" aria-label="Slide date">
       <button type="button" class="iconbtn" id="prevDay" aria-label="Previous school day">
         <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M9 2L4 7l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -277,6 +343,7 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
       <button type="button" class="btn small" id="todayBtn">Today</button>
     </div>
     <span class="presenting-pill" id="presentingPill" hidden>Presenting</span>
+    <button type="button" class="btn small" id="projSwap" hidden>Show this instead</button>
     <button type="button" class="btn" id="endBtn" hidden>End</button>
     <button type="button" class="btn primary present-btn" id="presentBtn">
       <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 11.5v2.5M5 14h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -292,8 +359,9 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
 
     <section class="editor">
       <div class="tabs" role="tablist">
-        <button type="button" role="tab" aria-selected="true" data-tab="day" id="tabDayBtn">Day</button>
-        <button type="button" role="tab" aria-selected="false" data-tab="tt">Timetable</button>
+        <button type="button" role="tab" aria-selected="true" data-tab="day" data-mode="morning" id="tabDayBtn">Day</button>
+        <button type="button" role="tab" aria-selected="false" data-tab="tt" data-mode="morning">Timetable</button>
+        <button type="button" role="tab" aria-selected="false" data-tab="prep" data-mode="prep" hidden>Prep</button>
         <button type="button" role="tab" aria-selected="false" data-tab="setup">Settings</button>
       </div>
 
@@ -336,8 +404,17 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
       <div class="tabpanel" data-panel="tt" hidden>
         <div class="daychips" id="ttDays"></div>
         <div class="sec">
-          <label class="check" style="margin-top:0"><input type="checkbox" id="ttShowToggle"><span id="ttShowLabel">Show the timetable</span></label>
-          <p class="hint" id="ttOffHint" hidden>The timetable is hidden on this day. “What’s happening today?” takes its space and spreads across two columns.</p>
+          <div class="sec-head"><h3 id="ttViewHeading">On the slide</h3></div>
+          <div class="seg" id="ttViewSeg" role="group" aria-label="What the slide shows from the timetable">
+            <button type="button" data-v="full">Full timetable</button>
+            <button type="button" data-v="first">First lesson only</button>
+            <button type="button" data-v="off">Off</button>
+          </div>
+          <div id="firstPick" class="subsec" hidden>
+            <label for="firstSelect">Which lesson counts as the first lesson</label>
+            <select class="text" id="firstSelect"></select>
+          </div>
+          <p class="hint" id="ttOffHint" hidden></p>
         </div>
         <div class="sec" id="ttStyleSec">
           <div class="seg" id="ttModeSeg" role="group" aria-label="Timetable style">
@@ -382,6 +459,79 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
         <input type="file" id="ttImgInput" accept="image/*" hidden>
       </div>
 
+      <!-- PREP -->
+      <div class="tabpanel" data-panel="prep" hidden>
+        <div class="sec">
+          <div class="sec-head"><h3 id="prepHeading">Preps</h3><span class="tag" id="prepTag"></span></div>
+          <div id="prepRows"></div>
+          <div class="row"><button type="button" class="btn small" id="prepAdd">Add a prep</button></div>
+          <p class="hint">Saved for this weekday. Type the minutes as a number, like 20. Leave a row blank to hide it.</p>
+        </div>
+
+        <div class="sec">
+          <div class="sec-head"><h3>Timer</h3></div>
+          <div class="row">
+            <button type="button" class="btn small primary" id="tStart">Start prep</button>
+            <button type="button" class="btn small" id="tPause" disabled>Pause</button>
+            <button type="button" class="btn small" id="tPlus" disabled>+1 min</button>
+            <button type="button" class="btn small" id="tNext" disabled>Skip to next</button>
+            <button type="button" class="btn small" id="tReset" disabled>Reset</button>
+          </div>
+          <div class="timer-state" id="timerState"></div>
+          <div class="row subsec">
+            <label for="tCustom" style="font-weight:700;font-size:0.85rem">Custom timer</label>
+            <input class="text" id="tCustom" style="width:6.5rem" placeholder="mins" aria-describedby="tCustomHint">
+            <button type="button" class="btn small" id="tCustomGo">Start</button>
+            <span style="flex:1"></span>
+            <button type="button" class="btn small" id="tTest">Test chime</button>
+          </div>
+          <p class="hint" id="tCustomHint">Minutes like 15, or minutes and seconds like 7:30.</p>
+          <div class="subsec">
+            <label>Timer follows</label>
+            <div class="seg" id="tModeSeg" role="group" aria-label="Timer follows">
+              <button type="button" data-v="preps">Each prep’s time</button>
+              <button type="button" data-v="tens">A chime every 10 mins</button>
+            </div>
+          </div>
+          <div class="subsec" id="tTotalBox">
+            <label>Whole prep session</label>
+            <div class="seg" id="tTotalSeg" role="group" aria-label="Whole prep session">
+              <button type="button" data-v="30">30 mins</button>
+              <button type="button" data-v="40">40 mins</button>
+            </div>
+          </div>
+          <div class="subsec" id="tBetweenBox">
+            <label>When a timer ends</label>
+            <div class="seg" id="tBetweenSeg" role="group" aria-label="When a timer ends">
+              <button type="button" data-v="auto">Start the next one</button>
+              <button type="button" data-v="wait">Wait for me</button>
+            </div>
+          </div>
+          <div class="subsec">
+            <label>Show on the slide</label>
+            <div class="seg" id="tShowSeg" role="group" aria-label="Show on the slide">
+              <button type="button" data-v="timer">Timer</button>
+              <button type="button" data-v="clock">Clock</button>
+              <button type="button" data-v="both">Both</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="sec">
+          <div class="sec-head"><h3>Prep info</h3><span class="tag" id="prepInfoTag"></span></div>
+          <div class="richbox" data-rich="prepinfo"></div>
+          <p class="hint">Anything teachers have said about tonight’s prep. Saved for this weekday.</p>
+        </div>
+
+        <div class="sec" id="tomSec">
+          <div class="sec-head"><h3>Tomorrow morning</h3><span class="tag" id="tomTag"></span></div>
+          <div class="richbox" data-rich="tomorrow"></div>
+          <div class="row" style="margin-top:0.5rem"><button type="button" class="btn small" id="tomCopy">Copy from tomorrow’s morning slide</button></div>
+          <p class="hint">Just for this evening. Copying makes a separate copy, so trimming it here never changes tomorrow’s morning slide.</p>
+        </div>
+        <p class="note" id="mpNote" hidden>This is a morning prep day, so the slide shows today’s “What’s happening today?” and today’s music lessons. Edit those on the Morning Slide.</p>
+      </div>
+
       <!-- SETUP -->
       <div class="tabpanel" data-panel="setup" hidden>
         <div class="sec">
@@ -413,6 +563,12 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
           <div class="sec-head"><h3>Morning task</h3></div>
           <label class="check" style="margin-top:0"><input type="checkbox" id="showTaskToggle" checked><span>Show the “Today’s morning task” box</span></label>
           <p class="hint">Turn this off if your form doesn’t do a morning task. The slide then shows “At 8:30…” across the top on its own.</p>
+        </div>
+
+        <div class="sec">
+          <div class="sec-head"><h3>Morning prep</h3></div>
+          <div class="daychips" id="mpDays" style="margin-bottom:0"></div>
+          <p class="hint">Tick the days when prep happens in the morning instead of the evening. On those days the prep slide shows today’s notes and music lessons, and there’s no evening prep.</p>
         </div>
 
         <div class="sec">
@@ -486,6 +642,13 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
 
 <div class="stage" id="stage" hidden></div>
 <div class="toast" id="toast" role="status"></div>
+<div class="modal-back" id="askBox" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="askTitle">
+    <h3 id="askTitle"></h3>
+    <p id="askText"></p>
+    <div class="row"><button type="button" class="btn primary" id="askYes">Switch</button><button type="button" class="btn" id="askNo">Not now</button></div>
+  </div>
+</div>
 
 <script>
 (() => {
@@ -537,7 +700,9 @@ function defaultState() {
     timetable: JSON.parse(JSON.stringify(DEFAULT_TT)),
     ttMode: per('grid'),
     ttImage: per(null),
-    ttShow: per(true),                   // timetable on the slide, per weekday
+    ttShow: per(true),                   // older on/off switch (still read if ttView isn't set)
+    ttView: per(null),                   // 'full' | 'first' | 'off', per weekday
+    firstRow: per(null),                 // which timetable row is the first lesson (null = worked out automatically)
     task: per(''),
     at830: per(''),
     notes: per(''),
@@ -550,7 +715,12 @@ function defaultState() {
     overrides: {},                       // { 'YYYY-MM-DD': { task, at830, panel } }
     dayTheme: Object.assign({}, DEFAULT_THEMES),
     bitmoji: null,
-    design: 'playful'                    // slide design: 'playful' or 'modern'
+    design: 'playful',                   // slide design: 'playful' or 'modern'
+    preps: per(() => [{ subject: '', mins: '' }, { subject: '', mins: '' }]),   // per weekday
+    prepInfo: per(''),                   // prep info, per weekday
+    prepTomorrow: {},                    // "Tomorrow morning" box, by prep date
+    prepDays: [],                        // weekdays when prep happens in the morning
+    prepTimer: { mode: 'preps', total: 30, between: 'auto', show: 'both' }
   };
 }
 
@@ -564,6 +734,9 @@ function fromISO(s) { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || ''); retur
 function addDays(d, n) { return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); }
 function dayCode(d) { return ALL_DAYS[d.getDay()]; }
 function schoolDay(d) { return d.getDay() === 0 ? addDays(d, 1) : d; }     // Sunday → Monday
+function nextSchoolDay(d) { return schoolDay(addDays(d, 1)); }
+const isMorningPrep = (st, wd) => (st.prepDays || []).includes(wd);
+const hasEveningPrep = (st, d) => d.getDay() !== 0 && d.getDay() !== 6 && !isMorningPrep(st, dayCode(d));
 function ordinal(n) { const s = ['th', 'st', 'nd', 'rd'], v = n % 100; return s[(v - 20) % 10] || s[v] || s[0]; }
 function fmtTime(mins) { return mins == null ? '' : String(Math.floor(mins / 60)).padStart(2, '0') + ':' + String(mins % 60).padStart(2, '0'); }
 function timeToMins(t) { const m = /^(\d{1,2})[:.](\d{2})/.exec(String(t || '').trim()); return m ? +m[1] * 60 + +m[2] : 9999; }
@@ -641,6 +814,7 @@ function migrateSchedule(st) {
 function pruneOverrides() {
   const cutoff = toISO(addDays(new Date(), -21));
   Object.keys(state.overrides).forEach(k => { if (k < cutoff) delete state.overrides[k]; });
+  Object.keys(state.prepTomorrow || {}).forEach(k => { if (k < cutoff) delete state.prepTomorrow[k]; });
 }
 let saveTimer = null;
 function save() {
@@ -661,6 +835,20 @@ function scheduleList(st) {
 function scheduleFor(st, iso) { return scheduleList(st).find(r => r.date === iso) || null; }
 const NO_HOUSES = () => ({ Athlone: '', Alexander: '', Goodhart: '', Dewar: '' });
 const housesOf = r => ({ Athlone: r.Athlone || '', Alexander: r.Alexander || '', Goodhart: r.Goodhart || '', Dewar: r.Dewar || '' });
+
+/* The first real lesson of the day: skips registration, assemblies, breaks and the like */
+const NOT_A_LESSON = /^(reg(istration)?|assembly|chapel|tutor( time)?|form( time)?|house( meetings?)?|congers|wellbeing|morning task)\b/i;
+function ttRows(st, wd) { return (st.timetable[wd] || []).filter(r => (r.time || r.subject || r.room)); }
+function autoFirstIndex(rows) {
+  return rows.findIndex(r => (r.subject || '').trim() && !NOT_A_LESSON.test(r.subject.trim()) && !HIGHLIGHT.test(r.subject.trim()));
+}
+function firstLessonOf(st, wd) {
+  const rows = ttRows(st, wd);
+  const pick = (st.firstRow || {})[wd];
+  const i = pick != null && rows[pick] ? pick : autoFirstIndex(rows);
+  return i >= 0 ? rows[i] : null;
+}
+function ttViewOf(st, wd) { return (st.ttView || {})[wd] || ((st.ttShow || {})[wd] === false ? 'off' : 'full'); }
 
 /* What the slide shows for a given date */
 function resolveDay(st, date) {
@@ -692,7 +880,9 @@ function resolveDay(st, date) {
     notes: st.notes[wd] || '',
     panelText: panel === 'lunch' ? (st.lunch[wd] || '') : panel === 'info' ? (st.info[wd] || '') : '',
     panelTitle: panel === 'info' ? (((st.infoTitle || {})[wd] || '').trim() || PANEL_TITLES.info) : (PANEL_TITLES[panel] || ''),
-    showTT: (st.ttShow || {})[wd] !== false
+    ttView: ttViewOf(st, wd),
+    showTT: ttViewOf(st, wd) === 'full',
+    firstLesson: ttViewOf(st, wd) === 'first' ? firstLessonOf(st, wd) : null
   };
 }
 
@@ -825,8 +1015,8 @@ function musicRows(st, wd) {
     .sort((a, b) => nameCmp(a.name, b.name) || (a.mins ?? 9999) - (b.mins ?? 9999));
 }
 
-function musicHTML(rows) {
-  if (!rows.length) return '<div class="music-empty">No music lessons today</div>';
+function musicHTML(rows, emptyText) {
+  if (!rows.length) return '<div class="music-empty">' + (emptyText || 'No music lessons today') + '</div>';
   let html = '', i = 0;
   while (i < rows.length) {
     let j = i;
@@ -839,6 +1029,11 @@ function musicHTML(rows) {
     i = j;
   }
   return html;
+}
+
+function firstLessonHTML(r) {
+  const label = ['First lesson'].concat(r && (r.time || '').trim() ? [r.time.trim()] : [], r && (r.room || '').trim() ? [r.room.trim()] : []).join(' \u00b7 ');
+  return '<div class="info"><div class="info-label">' + esc(label) + '</div><div class="info-value" data-fit="44,26">' + esc(r ? r.subject : 'No timetable yet') + '</div></div>';
 }
 
 function panelHTML(st, day) {
@@ -857,7 +1052,7 @@ function renderSlide(host, st, date) {
   const rows = musicRows(st, day.wd);
   host.style.background = t.bg;
   host.innerHTML =
-    '<div class="slide' + (day.showTT ? '' : ' no-tt') + (st.design === 'modern' ? ' modern' : '') + '" style="' + themeVars(t) + '">' +
+    '<div class="slide' + (day.showTT ? '' : ' no-tt') + (day.ttView === 'first' ? ' first' : '') + (st.design === 'modern' ? ' modern' : '') + '" style="' + themeVars(t) + '">' +
       '<div class="circle" style="width:900px;height:900px;left:-300px;bottom:-480px"></div>' +
       '<div class="circle" style="width:700px;height:700px;right:-260px;top:-360px"></div>' +
       '<div class="grid">' +
@@ -866,9 +1061,10 @@ function renderSlide(host, st, date) {
           '<div class="card music' + (day.panel === 'info' || day.panel === 'lunch' ? ' natural' : '') + '"><div class="heading">Music Lessons</div><div class="music-body">' + musicHTML(rows) + '</div></div>' +
           panelHTML(st, day) +
         '</div>' +
-        '<div class="pair' + (day.showTask ? '' : ' single') + '">' +
+        '<div class="pair' + (day.showTask || day.ttView === 'first' ? '' : ' single') + '" style="--boxes:' + ((day.showTask ? 1 : 0) + 1 + (day.ttView === 'first' ? 1 : 0)) + '">' +
           (day.showTask ? '<div class="info"><div class="info-label">Today\u2019s morning task</div><div class="info-value" data-fit="44,30">' + esc(day.task) + '</div></div>' : '') +
           '<div class="info"><div class="info-label">' + (day.showTask ? 'then at 8:30\u2026' : 'At 8:30\u2026') + '</div><div class="info-value" data-fit="44,30">' + esc(day.at830) + '</div></div>' +
+          (day.ttView === 'first' ? firstLessonHTML(day.firstLesson) : '') +
         '</div>' +
         '<div class="left">' +
           '<div class="card notes"><div class="heading">What\u2019s happening today?</div><div class="rich" data-fit="32,20">' + richHTML(day.notes) + '</div></div>' +
@@ -894,7 +1090,7 @@ function fitSlide(slide, panel) {
   }
   slide.querySelectorAll('[data-fit]').forEach(el => {
     const [max, min] = el.dataset.fit.split(',').map(Number);
-    const oneLine = el.classList.contains('info-value');   // task / 8:30: one line, shrinks to fit its width
+    const oneLine = el.classList.contains('info-value') || el.classList.contains('prep-subj');   // one line, shrinks to fit its width
     const over = () => el.scrollWidth > el.clientWidth + 1 || (!oneLine && el.scrollHeight > el.clientHeight + 1);
     let size = max;
     el.style.fontSize = size + 'px';
@@ -928,6 +1124,193 @@ function fitSlide(slide, panel) {
   });
 }
 
+/* =====================================================================
+   PREP SLIDE
+   ===================================================================== */
+const TIMER_KEY = 'morningSlide.prepTimer.v1';
+function loadTimer() { try { return JSON.parse(localStorage.getItem(TIMER_KEY)) || null; } catch (e) { return null; } }
+function storeTimer(t) { try { if (t) localStorage.setItem(TIMER_KEY, JSON.stringify(t)); else localStorage.removeItem(TIMER_KEY); } catch (e) {} }
+let timer = loadTimer();
+
+function hexMix(hex, k) {        // k < 1 darkens towards black
+  const n = parseInt(hex.slice(1), 16), c = [n >> 16, (n >> 8) & 255, n & 255].map(v => Math.round(v * k));
+  return '#' + c.map(v => v.toString(16).padStart(2, '0')).join('');
+}
+function prepList(st, wd) {
+  return ((st.preps || {})[wd] || []).filter(p => (p.subject || '').trim())
+    .map(p => ({ subject: p.subject.trim(), mins: Math.max(0, parseFloat(p.mins) || 0) }));
+}
+function planOf(st, wd) {
+  const set = st.prepTimer || {};
+  if (set.mode === 'tens') return { kind: 'tens', segs: Array.from({ length: Number(set.total) === 40 ? 4 : 3 }, () => ({ label: '', mins: 10 })) };
+  return { kind: 'preps', segs: prepList(st, wd).filter(p => p.mins > 0).map(p => ({ label: p.subject, mins: p.mins })) };
+}
+const fmtMins = m => (Math.round(m * 100) / 100) + (m === 1 ? ' min' : ' mins');
+function segFull(seg) { return seg.mins * 60000 + (seg.extra || 0); }
+
+/* Move a running timer on if its time is up. Works from fixed end times, so it can't fall behind
+   when the tab is in the background; several windows can call it and they all agree. */
+function advanceTimer(t, now) {
+  if (!t || !t.running || now < t.endAt) return false;
+  while (t.running && now >= t.endAt) {
+    if (t.idx < t.segs.length - 1) {
+      t.idx++;
+      const ms = segFull(t.segs[t.idx]);
+      if (t.between === 'wait') { t.running = false; t.waiting = true; t.remaining = ms; }
+      else t.endAt += ms;
+    } else { t.running = false; t.finished = true; t.remaining = 0; }
+  }
+  t.chime = (t.chime || 0) + 1;
+  return true;
+}
+function timerView(t, plan, now) {
+  const kind = t ? t.kind : plan.kind, segs = t ? t.segs : plan.segs;
+  if (!segs.length) return { label: kind === 'preps' ? 'Add prep times' : '', time: '--:--', bars: [], hl: -1, done: 0, sub: '' };
+  const idx = t ? Math.min(t.idx, segs.length - 1) : 0, seg = segs[idx], full = segFull(seg);
+  const left = !t ? full : t.finished ? 0 : t.running ? Math.max(0, t.endAt - now) : t.remaining;
+  const frac = full ? Math.min(1, Math.max(0, 1 - left / full)) : 1;
+  const fin = !!(t && t.finished);
+  const bars = kind === 'custom' ? [{ flex: 1, fill: fin ? 1 : frac }]
+    : segs.map((g, i) => ({ flex: g.mins, fill: fin || i < idx ? 1 : i === idx ? frac : 0 }));
+  const secs = Math.ceil(left / 1000);
+  return {
+    label: kind === 'preps' ? seg.label + ' · ' + fmtMins(seg.mins) : fmtMins(seg.mins) + ' timer',
+    time: String(Math.floor(secs / 60)).padStart(2, '0') + ':' + String(secs % 60).padStart(2, '0'),
+    bars,
+    hl: t && kind === 'preps' && !fin ? idx : -1,          // the 10-minute chime mode never highlights a prep
+    done: t && kind === 'preps' ? (fin ? segs.length : idx) : 0,
+    sub: fin ? 'Time’s up' : t && t.waiting ? 'Ready when you are' : t && !t.running ? 'Paused' : ''
+  };
+}
+function clockText(d) { return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+
+function renderPrep(host, st, date) {
+  const wd = dayCode(date) === 'SUN' ? 'MON' : dayCode(date);
+  const morning = isMorningPrep(st, wd);
+  const base = themeFor(st, wd);
+  const t = morning ? base : Object.assign({}, base, { bg: hexMix(base.main, 0.62), circle: hexMix(base.main, 0.72) });
+  const show = (st.prepTimer || {}).show || 'both';
+  const showClock = show !== 'timer', showTimer = show !== 'clock';
+  const list = prepList(st, wd);
+  let k = 0;
+  const rows = list.map(p => Object.assign({ seg: p.mins > 0 ? k++ : -1 }, p));
+  const n = date.getDate();
+  const shortD = String(n).padStart(2, '0') + '/' + String(date.getMonth() + 1).padStart(2, '0') + '/' + date.getFullYear();
+  let second, secondTitle, musicTitle, musicDay, musicEmpty;
+  if (morning) {
+    second = resolveDay(st, date).notes; secondTitle = 'What’s happening today?';
+    musicDay = wd; musicTitle = 'Music Lessons'; musicEmpty = 'No music lessons today';
+  } else {
+    second = (st.prepTomorrow || {})[toISO(date)] || ''; secondTitle = 'Tomorrow Morning';
+    musicDay = dayCode(nextSchoolDay(date)); musicTitle = 'Tomorrow’s Music Lessons'; musicEmpty = 'No music lessons tomorrow';
+  }
+  const info = (st.prepInfo || {})[wd] || '';
+  host.style.background = t.bg;
+  host.innerHTML =
+    '<div class="slide prep' + (morning ? '' : ' evening') + (st.design === 'modern' ? ' modern' : '') + '" data-wd="' + wd + '" style="' + themeVars(t) + '">' +
+      '<div class="circle" style="width:900px;height:900px;left:-300px;bottom:-480px"></div>' +
+      '<div class="circle" style="width:700px;height:700px;right:-260px;top:-360px"></div>' +
+      '<div class="grid">' +
+        '<div class="banner' + (showClock ? '' : ' no-clock') + '">' +
+          (showClock ? '<div class="pt-clock">' + clockText(new Date()) + '</div>' : '') +
+          '<div class="banner-main">' + DAY_NAMES[wd] + ' Prep</div><div class="banner-sub">' + shortD + '</div>' +
+        '</div>' +
+        '<div class="card preps' + (rows.length >= 3 ? ' many' : '') + '">' +
+          (rows.length ? rows.map(r =>
+            '<div class="prep-row" data-seg="' + r.seg + '"><span class="prep-subj" data-fit="' + (rows.length >= 3 ? '44,28' : '52,30') + '">' + esc(r.subject) + '</span><span class="prep-tag"></span>' +
+            '<span class="prep-mins">' + (r.mins ? Math.round(r.mins * 100) / 100 + ' <small>mins</small>' : '') + '</span></div>').join('')
+            : '<div class="prep-none">No preps set for ' + DAY_NAMES[wd] + ' yet</div>') +
+        '</div>' +
+        '<div class="prep-low">' +
+          '<div class="card prep-box"><div class="heading">Prep Info</div>' + (info ? '<div class="rich" data-fit="30,18">' + richHTML(info) + '</div>' : '<div class="prep-empty"></div>') + '</div>' +
+          '<div class="card prep-box"><div class="heading">' + secondTitle + '</div>' + (second ? '<div class="rich" data-fit="30,18">' + richHTML(second) + '</div>' : '<div class="prep-empty"></div>') + '</div>' +
+        '</div>' +
+        '<div class="right">' +
+          (showTimer ? '<div class="pt"><div class="pt-label"></div><div class="pt-time"></div><div class="pt-bars"></div><div class="pt-sub"></div></div>' : '') +
+          '<div class="card music"><div class="heading">' + musicTitle + '</div><div class="music-body">' + musicHTML(musicRows(st, musicDay), musicEmpty) + '</div></div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  const slide = host.querySelector('.slide');
+  fitSlide(slide, 'none');
+  paintTimer(slide, st);
+  return slide;
+}
+
+/* Update just the clock, timer and highlighted prep (called several times a second) */
+function paintTimer(slide, st) {
+  if (!slide || !slide.classList.contains('prep')) return;
+  const now = Date.now();
+  const clock = slide.querySelector('.pt-clock');
+  if (clock) { const c = clockText(new Date(now)); if (clock.textContent !== c) clock.textContent = c; }
+  const v = timerView(timer, planOf(st, slide.dataset.wd), now);
+  slide.querySelectorAll('.prep-row').forEach(r => {
+    const seg = +r.dataset.seg, isNow = seg >= 0 && seg === v.hl, isDone = seg >= 0 && seg < v.done && seg !== v.hl;
+    r.classList.toggle('now', isNow);
+    const tag = isNow ? 'Now' : isDone ? 'Done' : '';
+    const el = r.querySelector('.prep-tag'); if (el.textContent !== tag) el.textContent = tag;
+  });
+  const pt = slide.querySelector('.pt');
+  if (!pt) return;
+  const set = (sel, txt) => { const e = pt.querySelector(sel); if (e.textContent !== txt) e.textContent = txt; };
+  set('.pt-label', v.label); set('.pt-time', v.time); set('.pt-sub', v.sub);
+  const bars = pt.querySelector('.pt-bars');
+  const sig = v.bars.map(b => b.flex).join(',');
+  if (bars.dataset.sig !== sig) {
+    bars.dataset.sig = sig;
+    bars.innerHTML = v.bars.map(b => '<div class="pt-bar" style="flex-grow:' + b.flex + '"><i></i></div>').join('');
+  }
+  bars.querySelectorAll('i').forEach((i, n) => { i.style.width = (v.bars[n].fill * 100).toFixed(2) + '%'; });
+}
+
+function renderView(host, st, mode, date) {
+  return mode === 'prep' ? renderPrep(host, st, date) : renderSlide(host, st, date);
+}
+
+/* A steady tick that keeps going in background tabs (a tiny worker isn't slowed down like page timers are) */
+function makeTicker(fn, ms) {
+  try {
+    const w = new Worker(URL.createObjectURL(new Blob(['setInterval(function(){postMessage(0)},' + ms + ')'], { type: 'text/javascript' })));
+    w.onmessage = fn;
+    return;
+  } catch (e) { /* fall back to a normal timer */ }
+  setInterval(fn, ms);
+}
+
+/* The wheel of names chime: soft, warm rounded tones with a little room reverb */
+let audio = null;
+function unlockAudio() {
+  try {
+    if (!audio) audio = new (window.AudioContext || window.webkitAudioContext)();
+    if (audio.state === 'suspended') audio.resume();
+  } catch (e) {}
+}
+document.addEventListener('pointerdown', unlockAudio, { once: true });
+function chime() {
+  unlockAudio(); if (!audio) return;
+  const ac = audio, t0 = ac.currentTime + 0.06;
+  const out = ac.createGain(); out.gain.value = 0.6;
+  const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2800; lp.Q.value = 0.5;
+  const verb = ac.createConvolver(), len = Math.floor(ac.sampleRate * 2.4), ir = ac.createBuffer(2, len, ac.sampleRate);
+  for (let ch = 0; ch < 2; ch++) { const d = ir.getChannelData(ch); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3.2); }
+  verb.buffer = ir;
+  const wet = ac.createGain(); wet.gain.value = 0.22;
+  lp.connect(out); lp.connect(verb); verb.connect(wet); wet.connect(out); out.connect(ac.destination);
+  const note = (freq, at, vol) => {
+    [[1, 1, 3.2], [2, 0.16, 1.4], [3, 0.05, 0.8]].forEach(([mult, g, decay]) => {
+      const o = ac.createOscillator(), gn = ac.createGain();
+      o.type = 'sine'; o.frequency.value = freq * mult;
+      gn.gain.setValueAtTime(0.0001, at);
+      gn.gain.linearRampToValueAtTime(vol * g, at + 0.012);
+      gn.gain.exponentialRampToValueAtTime(0.0001, at + decay);
+      o.connect(gn); gn.connect(lp); o.start(at); o.stop(at + decay + 0.05);
+    });
+  };
+  const arp = [392.00, 493.88, 587.33, 783.99];
+  [0, 1.9].forEach((off, r) => arp.forEach((f, i) => note(f, t0 + off + i * 0.2, r ? 0.22 : 0.26)));
+  note(392.00, t0 + 1.9 + 0.8, 0.14); note(587.33, t0 + 1.9 + 0.8, 0.12);
+}
+
 function scaleInto(host) {
   const slide = host.querySelector('.slide');
   if (!slide) return;
@@ -944,13 +1327,26 @@ if (location.hash === '#slide') {
   $('app').remove();
   const stage = $('stage');
   stage.hidden = false;
-  let viewDate = schoolDay(new Date());
-  const draw = () => { renderSlide(stage, state, viewDate); scaleInto(stage); };
+  let viewDate = schoolDay(new Date()), mode = 'morning';
+  const draw = () => { renderView(stage, state, mode, viewDate); scaleInto(stage); };
+  const paint = () => paintTimer(stage.querySelector('.slide'), state);
   window.addEventListener('message', e => {
     const d = e.data;
-    if (d && d.type === 'ms-state') { state = d.state; viewDate = fromISO(d.date) || viewDate; draw(); }
+    if (d && d.type === 'ms-state') { state = d.state; mode = d.mode || 'morning'; viewDate = fromISO(d.date) || viewDate; if ('timer' in d) timer = d.timer; draw(); }
+    if (d && d.type === 'ms-timer') { timer = d.timer; paint(); }
   });
-  window.addEventListener('storage', e => { if (e.key === STORE_KEY) { state = loadState(); draw(); } });
+  window.addEventListener('storage', e => {
+    if (e.key === STORE_KEY) { state = loadState(); draw(); }
+    if (e.key === TIMER_KEY) { timer = loadTimer(); paint(); }
+  });
+  // The projector keeps time too, so the timer moves on even if the laptop tab is in the background
+  makeTicker(() => {
+    if (advanceTimer(timer, Date.now())) {
+      storeTimer(timer);
+      if (window.opener && !window.opener.closed) { try { window.opener.postMessage({ type: 'ms-timer', timer }, '*'); } catch (e) {} }
+    }
+    paint();
+  }, 250);
   window.addEventListener('resize', () => scaleInto(stage));
   if (document.fonts) document.fonts.ready.then(draw);
   draw();
@@ -986,7 +1382,19 @@ const els = {
   formSelect: $('formSelect'), lessonsInfo: $('lessonsInfo'), ignoredNote: $('ignoredNote'),
   toast: $('toast'), stage: $('stage'), presentBtn: $('presentBtn'), endBtn: $('endBtn'), presentingPill: $('presentingPill')
 };
-let viewDate = schoolDay(new Date());
+/* Which slide should be up at a given moment: the morning slide until 9:00, then (on days with an
+   evening prep) the prep slide, then from 17:30 tomorrow's morning slide. */
+function autoTarget(now) {
+  const mins = now.getHours() * 60 + now.getMinutes();
+  if (now.getDay() === 0) return { mode: 'morning', date: toISO(schoolDay(now)) };
+  if (mins >= 17 * 60 + 30) return { mode: 'morning', date: toISO(nextSchoolDay(now)) };
+  if (mins >= 9 * 60 && hasEveningPrep(state, now)) return { mode: 'prep', date: toISO(now) };
+  return { mode: 'morning', date: toISO(now) };
+}
+const startTarget = autoTarget(new Date());
+let editMode = startTarget.mode;                       // what you're editing
+let proj = Object.assign({}, startTarget);             // what the projector shows
+let viewDate = fromISO(startTarget.date);
 let ttDay = dayCode(viewDate) === 'SUN' ? 'MON' : dayCode(viewDate);
 
 let toastTimer;
@@ -1197,7 +1605,7 @@ function setDate(d) {
   viewDate = schoolDay(d);
   els.dateInput.value = toISO(viewDate);
   ttDay = wdOf(viewDate); refreshTT();
-  refreshDay(); renderAll();
+  refreshDay(); refreshPrep(); renderAll();
 }
 $('prevDay').addEventListener('click', () => { let d = addDays(viewDate, -1); if (d.getDay() === 0) d = addDays(d, -1); setDate(d); });
 $('nextDay').addEventListener('click', () => setDate(addDays(viewDate, 1)));
@@ -1213,10 +1621,21 @@ document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click
 /* ---------- Timetable tab ---------- */
 function refreshTT() {
   $('ttDays').innerHTML = DAYS.map(d => '<button type="button" data-d="' + d + '" aria-pressed="' + (d === ttDay) + '">' + DAY_NAMES[d].slice(0, 3) + '</button>').join('');
-  const on = (state.ttShow || {})[ttDay] !== false;
-  $('ttShowToggle').checked = on;
-  $('ttShowLabel').textContent = 'Show the timetable on ' + DAY_NAMES[ttDay] + 's';
-  $('ttOffHint').hidden = on;
+  const view = ttViewOf(state, ttDay);
+  $('ttViewHeading').textContent = 'On the slide on ' + DAY_NAMES[ttDay] + 's';
+  $('ttViewSeg').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === view)));
+  $('ttOffHint').hidden = view === 'full';
+  $('ttOffHint').textContent = view === 'off'
+    ? 'The timetable is hidden. \u201cWhat\u2019s happening today?\u201d takes its space and spreads across two columns.'
+    : 'Only the first lesson shows, in a box next to the 8:30 one. \u201cWhat\u2019s happening today?\u201d spreads across two columns.';
+  $('firstPick').hidden = view !== 'first';
+  if (view === 'first') {
+    const rows = ttRows(state, ttDay), auto = autoFirstIndex(rows), pick = (state.firstRow || {})[ttDay];
+    const label = r => [r.time, r.subject, r.room].map(x => (x || '').trim()).filter(Boolean).join(' \u00b7 ');
+    $('firstSelect').innerHTML = '<option value="">Work it out' + (auto >= 0 ? ' (' + esc(label(rows[auto])) + ')' : '') + '</option>' +
+      rows.map((r, i) => '<option value="' + i + '">' + esc(label(r)) + '</option>').join('');
+    $('firstSelect').value = pick != null && rows[pick] ? String(pick) : '';
+  }
   const mode = state.ttMode[ttDay] || 'grid';
   $('ttModeSeg').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === mode)));
   $('ttGridEdit').hidden = mode !== 'grid';
@@ -1232,10 +1651,16 @@ function refreshTT() {
       '<td class="act"><button type="button" class="mini" data-m="up" aria-label="Move up">\u2191</button><button type="button" class="mini" data-m="down" aria-label="Move down">\u2193</button><button type="button" class="mini" data-m="del" aria-label="Delete row">\u2715</button></td>' +
     '</tr>').join('');
 }
-$('ttShowToggle').addEventListener('change', () => {
-  state.ttShow = state.ttShow || {};
-  state.ttShow[ttDay] = $('ttShowToggle').checked;
+$('ttViewSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  state.ttView = state.ttView || {}; state.ttShow = state.ttShow || {};
+  state.ttView[ttDay] = b.dataset.v; state.ttShow[ttDay] = b.dataset.v !== 'off';
   changed(); refreshTT();
+});
+$('firstSelect').addEventListener('change', () => {
+  state.firstRow = state.firstRow || {};
+  state.firstRow[ttDay] = $('firstSelect').value === '' ? null : +$('firstSelect').value;
+  changed();
 });
 $('ttDays').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { ttDay = b.dataset.d; refreshTT(); } });
 $('ttModeSeg').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; state.ttMode[ttDay] = b.dataset.v; changed(); refreshTT(); });
@@ -1560,9 +1985,208 @@ $('resetAll').addEventListener('click', () => {
   state = defaultState(); afterLoad(); toast('Everything has been reset.');
 });
 
+/* ---------- Morning / Prep switch ---------- */
+function setMode(m, quiet) {
+  editMode = m;
+  $('modeSwitch').classList.toggle('prep', m === 'prep');
+  $('modeSwitch').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === m)));
+  document.querySelectorAll('.tabs button').forEach(b => { b.hidden = !!b.dataset.mode && b.dataset.mode !== m; });
+  const cur = document.querySelector('.tabs button[aria-selected="true"]');
+  if (!quiet || !cur || cur.hidden) document.querySelector('.tabs button[data-mode="' + m + '"]').click();
+  refreshPrep();
+  if (!quiet) renderAll();
+}
+$('modeSwitch').addEventListener('click', e => { const b = e.target.closest('button'); if (b && b.dataset.m !== editMode) setMode(b.dataset.m); });
+
+/* ---------- Prep tab ---------- */
+const prepInfoEditor = makeRich(document.querySelector('[data-rich="prepinfo"]'),
+  () => (state.prepInfo || {})[wdOf(viewDate)] || '',
+  v => { state.prepInfo[wdOf(viewDate)] = v; changed(); });
+const tomorrowEditor = makeRich(document.querySelector('[data-rich="tomorrow"]'),
+  () => (state.prepTomorrow || {})[toISO(viewDate)] || '',
+  v => { const iso = toISO(viewDate); if (v) state.prepTomorrow[iso] = v; else delete state.prepTomorrow[iso]; changed(); },
+  { placeholder: 'Blank until you add something, or copy it from tomorrow’s morning slide' });
+
+let prepRowsKey = '';
+function buildPrepRows(force) {
+  const wd = wdOf(viewDate);
+  const list = state.preps[wd] || (state.preps[wd] = []);
+  const key = wd + '|' + list.length;
+  if (!force && key === prepRowsKey) return;
+  prepRowsKey = key;
+  $('prepRows').innerHTML = list.map((p, i) =>
+    '<div class="preprow" data-i="' + i + '">' +
+      '<input class="text" data-f="subject" placeholder="Subject" aria-label="Prep ' + (i + 1) + ' subject" value="' + esc(p.subject) + '">' +
+      '<label class="minsbox"><input data-f="mins" inputmode="decimal" placeholder="20" aria-label="Prep ' + (i + 1) + ' minutes" value="' + esc(p.mins) + '"><span>mins</span></label>' +
+      '<button type="button" class="mini" data-m="del" aria-label="Remove prep ' + (i + 1) + '">✕</button>' +
+    '</div>').join('');
+  $('prepAdd').disabled = list.length >= 4;
+}
+function refreshPrep() {
+  const wd = wdOf(viewDate), morning = isMorningPrep(state, wd);
+  $('prepHeading').textContent = morning ? 'Morning prep' : 'Preps';
+  $('prepTag').textContent = 'Every ' + DAY_NAMES[wd];
+  $('prepInfoTag').textContent = 'Every ' + DAY_NAMES[wd];
+  $('tomTag').textContent = 'Just for ' + shortDate(viewDate);
+  $('tomSec').hidden = morning;
+  $('mpNote').hidden = !morning;
+  buildPrepRows();
+  prepInfoEditor.refresh();
+  tomorrowEditor.refresh();
+  const set = state.prepTimer;
+  const press = (id, v) => $(id).querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === String(v))));
+  press('tModeSeg', set.mode); press('tTotalSeg', Number(set.total) === 40 ? 40 : 30); press('tBetweenSeg', set.between); press('tShowSeg', set.show);
+  $('tTotalBox').hidden = set.mode !== 'tens';
+  refreshTimerUi();
+}
+$('prepRows').addEventListener('input', e => {
+  const inp = e.target, row = inp.closest('.preprow'); if (!row || !inp.dataset.f) return;
+  state.preps[wdOf(viewDate)][+row.dataset.i][inp.dataset.f] = inp.value;
+  changed();
+});
+$('prepRows').addEventListener('click', e => {
+  const b = e.target.closest('button[data-m="del"]'); if (!b) return;
+  state.preps[wdOf(viewDate)].splice(+b.closest('.preprow').dataset.i, 1);
+  changed(); buildPrepRows(true);
+});
+$('prepAdd').addEventListener('click', () => {
+  const list = state.preps[wdOf(viewDate)];
+  if (list.length >= 4) return;
+  list.push({ subject: '', mins: '' }); changed(); buildPrepRows(true);
+  const last = $('prepRows').querySelector('.preprow:last-child input'); if (last) last.focus();
+});
+[['tModeSeg', 'mode'], ['tTotalSeg', 'total'], ['tBetweenSeg', 'between'], ['tShowSeg', 'show']].forEach(([id, key]) => {
+  $(id).addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    state.prepTimer[key] = key === 'total' ? Number(b.dataset.v) : b.dataset.v;
+    changed(); refreshPrep();
+  });
+});
+$('tomCopy').addEventListener('click', () => {
+  const tm = nextSchoolDay(viewDate), text = resolveDay(state, tm).notes;
+  if (!text.trim()) { toast(DAY_NAMES[dayCode(tm)] + '’s “What’s happening today?” is empty.'); return; }
+  const iso = toISO(viewDate), cur = state.prepTomorrow[iso] || '';
+  if (cur.trim() && cur !== text && !confirm('Replace what’s in “Tomorrow morning” with a fresh copy?')) return;
+  state.prepTomorrow[iso] = text;
+  tomorrowEditor.ta.value = text;
+  changed();
+  toast('Copied. Trim it as much as you like: tomorrow’s morning slide won’t change.');
+});
+
+/* ---------- Morning prep days (Settings) ---------- */
+function refreshMorningPrepDays() {
+  $('mpDays').innerHTML = DAYS.map(d => '<button type="button" data-d="' + d + '" aria-pressed="' + isMorningPrep(state, d) + '">' + DAY_NAMES[d].slice(0, 3) + '</button>').join('');
+}
+$('mpDays').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const set = new Set(state.prepDays || []);
+  if (set.has(b.dataset.d)) set.delete(b.dataset.d); else set.add(b.dataset.d);
+  state.prepDays = DAYS.filter(d => set.has(d));
+  changed(); refreshMorningPrepDays(); refreshPrep();
+});
+
+/* ---------- Prep timer ---------- */
+let heard = { id: timer && timer.id, chime: (timer && timer.chime) || 0 };
+function heardTimer() {               // chime once for each timer that ends, whichever window noticed it
+  if (!timer) return;
+  if (timer.id !== heard.id) { heard = { id: timer.id, chime: timer.chime || 0 }; return; }
+  if ((timer.chime || 0) > heard.chime) { heard.chime = timer.chime; chime(); }
+}
+function paintAll() {
+  paintTimer(els.preview.querySelector('.slide'), state);
+  if (!els.stage.hidden) paintTimer(els.stage.querySelector('.slide'), state);
+}
+function pushTimer() {
+  storeTimer(timer);
+  if (slideWin && !slideWin.closed) { try { slideWin.postMessage({ type: 'ms-timer', timer }, '*'); } catch (e) {} }
+  paintAll(); refreshTimerUi();
+}
+function refreshTimerUi() {
+  const t = timer;
+  const v = timerView(t, planOf(state, wdOf(viewDate)), Date.now());
+  $('tPause').disabled = !t || t.finished;
+  $('tPause').textContent = !t ? 'Pause' : t.running ? 'Pause' : t.waiting ? 'Start next' : 'Resume';
+  $('tPlus').disabled = !t || t.finished;
+  $('tNext').disabled = !t || t.finished || t.kind === 'custom';
+  $('tReset').disabled = !t;
+  $('tStart').textContent = t && !t.finished ? 'Restart prep' : 'Start prep';
+  $('timerState').innerHTML = !t ? 'Not started. The slide shows the first timer ready to go.'
+    : '<b>' + esc(v.time) + '</b> · ' + esc(v.label) + (v.sub ? ' · ' + esc(v.sub) : t.running ? ' · running' : '');
+}
+function startTimer(plan) {
+  unlockAudio();
+  if (!plan.segs.length) { toast(plan.kind === 'preps' ? 'Add the preps and their minutes first.' : 'Type a time for the timer.'); return; }
+  const segs = plan.segs.map(g => ({ label: g.label, mins: g.mins }));
+  timer = { id: Date.now().toString(36), kind: plan.kind, segs, idx: 0, running: true, waiting: false, finished: false,
+            endAt: Date.now() + segFull(segs[0]), remaining: 0, between: state.prepTimer.between, date: toISO(viewDate), chime: 0 };
+  heardTimer();
+  if (isPresenting() && editMode === 'prep') proj = { mode: 'prep', date: toISO(viewDate) };
+  pushTimer(); renderAll();
+}
+$('tStart').addEventListener('click', () => {
+  if (timer && !timer.finished && !confirm('Start the prep timer again from the beginning?')) return;
+  startTimer(planOf(state, wdOf(viewDate)));
+});
+$('tPause').addEventListener('click', () => {
+  const t = timer; if (!t || t.finished) return;
+  unlockAudio();
+  if (t.running) { t.remaining = Math.max(0, t.endAt - Date.now()); t.running = false; }
+  else { t.endAt = Date.now() + t.remaining; t.running = true; t.waiting = false; }
+  pushTimer();
+});
+$('tPlus').addEventListener('click', () => {
+  const t = timer; if (!t || t.finished) return;
+  const seg = t.segs[t.idx]; seg.extra = (seg.extra || 0) + 60000;
+  if (t.running) t.endAt += 60000; else t.remaining += 60000;
+  pushTimer();
+});
+$('tNext').addEventListener('click', () => {
+  const t = timer; if (!t || t.finished) return;
+  if (t.idx < t.segs.length - 1) {
+    t.idx++;
+    const ms = segFull(t.segs[t.idx]);
+    if (t.running) t.endAt = Date.now() + ms; else t.remaining = ms;
+  } else { t.running = false; t.waiting = false; t.finished = true; t.remaining = 0; }
+  pushTimer();
+});
+$('tReset').addEventListener('click', () => { timer = null; pushTimer(); });
+function parseDuration(str) {
+  str = String(str).trim().toLowerCase().replace(/\s*(mins?|minutes?|m)$/, '');
+  let m;
+  if ((m = str.match(/^(\d+):([0-5]?\d)$/))) return Number(m[1]) + Number(m[2]) / 60;
+  if ((m = str.match(/^\d+(\.\d+)?$/))) return Number(str);
+  return null;
+}
+$('tCustomGo').addEventListener('click', () => {
+  const mins = parseDuration($('tCustom').value);
+  if (!mins || mins <= 0 || mins > 180) { toast('Type minutes like 15, or minutes and seconds like 7:30.'); $('tCustom').focus(); return; }
+  if (timer && !timer.finished && !confirm('Replace the timer that’s running?')) return;
+  startTimer({ kind: 'custom', segs: [{ label: '', mins }] });
+});
+$('tCustom').addEventListener('keydown', e => { if (e.key === 'Enter') $('tCustomGo').click(); });
+$('tTest').addEventListener('click', () => { unlockAudio(); chime(); });
+
+// Several times a second: move the timer on (from its fixed end time) and repaint the clock and timer
+makeTicker(() => {
+  if (advanceTimer(timer, Date.now())) { heardTimer(); pushTimer(); }
+  paintAll();
+  if (editMode === 'prep' && timer && timer.running) refreshTimerUi();
+}, 250);
+
 /* ---------- Status line under the preview ---------- */
 function refreshStatus() {
   const wd = wdOf(viewDate), parts = [];
+  if (editMode === 'prep') {
+    const morning = isMorningPrep(state, wd), n = prepList(state, wd).length;
+    parts.push((morning ? 'Morning prep' : 'Evening prep') + ': ' + n + (n === 1 ? ' prep' : ' preps'));
+    if (state.lessons && state.form) {
+      const md = morning ? wd : dayCode(nextSchoolDay(viewDate)), m = musicRows(state, md).length;
+      parts.push(m + ' music ' + (m === 1 ? 'lesson' : 'lessons') + (morning ? ' today' : ' tomorrow'));
+    }
+    if (toISO(viewDate) !== toISO(new Date())) parts.push('Preparing ' + DAY_NAMES[dayCode(viewDate)] + ' ' + viewDate.getDate() + ' ' + MONTHS[viewDate.getMonth()].slice(0, 3));
+    els.status.innerHTML = parts.map(p => '<span>' + p + '</span>').join('');
+    return;
+  }
   if (!state.lessons) parts.push('<span class="warn">No lessons file yet (Settings tab)</span>');
   else if (!state.form) parts.push('<span class="warn">Choose your form (Settings tab)</span>');
   else {
@@ -1579,10 +2203,14 @@ function refreshStatus() {
    ===================================================================== */
 let slideWin = null;
 let renderTimer = null;
+const isPresenting = () => (slideWin && !slideWin.closed) || !els.stage.hidden;
 function renderAll() {
-  renderSlide(els.preview, state, viewDate); scaleInto(els.preview);
-  if (!els.stage.hidden) { renderSlide(els.stage, state, viewDate); scaleInto(els.stage); }
+  // When nothing's on the projector, or it's showing the same kind of slide, it follows what you're editing
+  if (!isPresenting() || proj.mode === editMode) proj = { mode: editMode, date: toISO(viewDate) };
+  renderView(els.preview, state, editMode, viewDate); scaleInto(els.preview);
+  if (!els.stage.hidden) { renderView(els.stage, state, proj.mode, fromISO(proj.date)); scaleInto(els.stage); }
   refreshStatus();
+  updatePresenting();
   sendToSlide();
 }
 function changed() {
@@ -1592,14 +2220,20 @@ function changed() {
 }
 function sendToSlide() {
   if (slideWin && !slideWin.closed) {
-    try { slideWin.postMessage({ type: 'ms-state', state, date: toISO(viewDate) }, '*'); } catch (e) {}
+    try { slideWin.postMessage({ type: 'ms-state', state, mode: proj.mode, date: proj.date, timer }, '*'); } catch (e) {}
   }
 }
-window.addEventListener('message', e => { if (e.data && e.data.type === 'ms-hello') sendToSlide(); });
+window.addEventListener('message', e => {
+  if (e.data && e.data.type === 'ms-hello') sendToSlide();
+  if (e.data && e.data.type === 'ms-timer') { timer = e.data.timer; heardTimer(); paintAll(); refreshTimerUi(); }
+});
+window.addEventListener('storage', e => { if (e.key === TIMER_KEY) { timer = loadTimer(); heardTimer(); paintAll(); refreshTimerUi(); } });
 new ResizeObserver(() => scaleInto(els.preview)).observe(els.preview);
 
 async function present() {
   if (slideWin && !slideWin.closed) { slideWin.focus(); sendToSlide(); return; }
+  proj = { mode: editMode, date: toISO(viewDate) };
+  unlockAudio();
   let target = null, extended = !!(window.screen && window.screen.isExtended);
   if ('getScreenDetails' in window) {
     try {
@@ -1623,7 +2257,7 @@ async function present() {
 }
 function presentHere() {
   els.stage.hidden = false;
-  renderSlide(els.stage, state, viewDate); scaleInto(els.stage);
+  renderView(els.stage, state, proj.mode, fromISO(proj.date)); scaleInto(els.stage);
   const done = () => { els.stage.hidden = true; updatePresenting(); };
   els.stage.requestFullscreen().then(() => setTimeout(() => scaleInto(els.stage), 60)).catch(() => {});
   els.stage.onclick = null;
@@ -1638,10 +2272,17 @@ function endPresenting() {
   els.stage.hidden = true;
   updatePresenting();
 }
-function updatePresenting() {
-  const on = (slideWin && !slideWin.closed) || !els.stage.hidden;
-  els.presentingPill.hidden = !on; els.endBtn.hidden = !on;
+function describe(v) {
+  const d = fromISO(v.date);
+  return v.mode === 'prep' ? DAY_NAMES[dayCode(d)] + ' Prep' : 'Morning slide, ' + shortDate(d);
 }
+function updatePresenting() {
+  const on = isPresenting();
+  els.presentingPill.hidden = !on; els.endBtn.hidden = !on;
+  if (on) els.presentingPill.textContent = 'On the projector: ' + describe(proj);
+  $('projSwap').hidden = !on || (proj.mode === editMode && proj.date === toISO(viewDate));
+}
+$('projSwap').addEventListener('click', () => { proj = { mode: editMode, date: toISO(viewDate) }; renderAll(); });
 setInterval(updatePresenting, 1000);
 window.addEventListener('resize', () => { if (!els.stage.hidden) scaleInto(els.stage); });
 els.presentBtn.addEventListener('click', present);
@@ -1655,6 +2296,36 @@ setInterval(() => {
   if (now !== lastDay) { const wasToday = toISO(viewDate) === toISO(schoolDay(fromISO(lastDay))); lastDay = now; if (wasToday) setDate(new Date()); }
 }, 60000);
 
+/* At 9:00 and 17:30, offer to move on to the next slide */
+let lastAutoKey = startTarget.mode + startTarget.date;
+let askTarget = null;
+function askSwitch(target) {
+  const d = fromISO(target.date);
+  askTarget = target;
+  $('askTitle').textContent = target.mode === 'prep' ? 'Switch to ' + DAY_NAMES[dayCode(d)] + '\u2019s prep slide?' : 'Switch to tomorrow\u2019s morning slide?';
+  $('askText').textContent = target.mode === 'prep'
+    ? 'The morning is over. This shows the prep slide, both here and on the projector.'
+    : 'Prep is over. This shows the morning slide for ' + DAY_NAMES[dayCode(d)] + ' ' + d.getDate() + ' ' + MONTHS[d.getMonth()] + ', both here and on the projector.';
+  $('askBox').hidden = false;
+  $('askYes').focus();
+}
+$('askYes').addEventListener('click', () => {
+  $('askBox').hidden = true;
+  if (!askTarget) return;
+  proj = Object.assign({}, askTarget);
+  editMode = askTarget.mode; viewDate = fromISO(askTarget.date);
+  setMode(editMode, true); setDate(viewDate);
+  proj = Object.assign({}, askTarget); renderAll();
+});
+$('askNo').addEventListener('click', () => { $('askBox').hidden = true; });
+setInterval(() => {
+  const target = autoTarget(new Date()), key = target.mode + target.date;
+  if (key === lastAutoKey) return;
+  lastAutoKey = key;
+  const here = editMode + toISO(viewDate), there = proj.mode + proj.date;
+  if (here !== key || (isPresenting() && there !== key)) askSwitch(target);
+}, 15000);
+
 function afterLoad() {
   pruneOverrides();
   panelEditorKey = '';
@@ -1663,6 +2334,8 @@ function afterLoad() {
   refreshThemes();
   refreshSchedule();
   $('showTaskToggle').checked = state.showTask !== false;
+  refreshMorningPrepDays();
+  setMode(editMode, true);
 }
 if (document.fonts) document.fonts.ready.then(renderAll);
 afterLoad();
