@@ -162,6 +162,8 @@
 .slide .pt-bars { display: flex; gap: 10px; }
 .slide .pt-bar { flex: 1 1 0; height: 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.22); overflow: hidden; }
 .slide .pt-bar i { display: block; height: 100%; width: 0; border-radius: 8px; background: #fff; }
+.slide .rich[data-always]:empty::before { content: attr(data-always); color: var(--muted); }
+.slide .prep-add { display: none; }
 /* Evening: a deeper version of the day's colours */
 .slide.evening .banner { background: var(--tint); color: var(--ink); }
 .slide.evening .banner-sub { color: var(--label); }
@@ -169,475 +171,587 @@
 .slide.evening .card { box-shadow: 0 14px 36px -16px rgba(0, 0, 0, 0.4); }
 
 /* =====================================================================
-   DASHBOARD
+   EDITING SCREENS (calm utility look; the slide is the colourful part)
    ===================================================================== */
 :root {
-  --ink: #1C3048; --steel: #3E6489; --slate: #64798F; --line: #CBD7E4; --mist: #EAF0F6; --frost: #F5F8FB;
-  --sky: #CFEAF8; --white: #fff; --ui: "Atkinson Hyperlegible", "Segoe UI", Arial, sans-serif;
+  --ink: #1C3048; --steel: #3E6489; --slate: #64798F; --line: #CBD7E4; --soft-line: #E3EAF2; --mist: #EAF0F6; --frost: #F5F8FB;
+  --white: #fff; --ui: "Atkinson Hyperlegible", "Segoe UI", Arial, sans-serif;
+  --disp: "Playpen Sans", "Comic Sans MS", cursive;
+  --top: #B65C93; --top-bg: #FBF3F8; --top-line: #EBCFE0;
+  --main: #4E9670; --main-bg: #F1F8F4; --main-line: #CBE3D4;
+  --side: #7F6BC0; --side-bg: #F6F3FC; --side-line: #DCD3F2;
+  --ovr: #E08A1E;
 }
+body.modern { --disp: "Bricolage Grotesque", "Segoe UI", sans-serif; }
 * { box-sizing: border-box; }
 html, body { margin: 0; }
 body { font-family: var(--ui); color: var(--ink); background: #F3F7FB; font-size: 15px; line-height: 1.45; }
 button, input, select, textarea { font: inherit; color: inherit; }
 :focus-visible { outline: 3px solid #4F86B8; outline-offset: 2px; }
 [hidden] { display: none !important; }
-
-.topbar { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; padding: 0.75rem 1.25rem; background: var(--white); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 30; }
-.brand { font-family: "Bricolage Grotesque", "Segoe UI", sans-serif; font-weight: 700; font-size: 1.25rem; color: var(--ink); margin: 0 auto 0 0; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.modeswitch { position: relative; display: grid; grid-template-columns: 1fr 1fr; background: var(--mist); border-radius: 999px; padding: 4px; margin-right: auto; }
-.modeswitch::before { content: ""; position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); border-radius: 999px; background: var(--steel); box-shadow: 0 3px 8px -3px rgba(28, 48, 72, 0.5); transition: transform 0.22s ease; }
-.modeswitch.prep::before { transform: translateX(100%); }
-.modeswitch button { position: relative; z-index: 1; border: 0; background: none; border-radius: 999px; padding: 0.45rem 1.1rem; cursor: pointer; font-family: "Bricolage Grotesque", "Segoe UI", sans-serif; font-weight: 700; font-size: 1.05rem; color: var(--slate); white-space: nowrap; transition: color 0.22s; }
-.modeswitch button[aria-pressed="true"] { color: #fff; }
-.preprow { display: grid; grid-template-columns: minmax(0, 1fr) 7rem auto; gap: 0.4rem; align-items: center; margin-bottom: 0.4rem; }
-.minsbox { display: flex; align-items: center; border: 1px solid var(--line); border-radius: 6px; background: #fff; overflow: hidden; }
-.minsbox input { width: 100%; min-width: 0; border: 0; padding: 0.5rem 0.2rem 0.5rem 0.6rem; text-align: right; }
-.minsbox span { padding: 0 0.6rem 0 0.25rem; color: var(--slate); font-size: 0.85rem; }
-.minsbox:focus-within { border-color: #4F86B8; box-shadow: 0 0 0 2px rgba(79,134,184,0.25); }
-.minsbox input:focus { outline: none; }
-.subsec { margin-top: 0.7rem; }
-.subsec > label { display: block; font-weight: 700; font-size: 0.8rem; color: var(--slate); margin-bottom: 0.25rem; }
-.timer-state { margin-top: 0.55rem; font-size: 0.88rem; color: var(--slate); }
-.timer-state b { color: var(--ink); font-variant-numeric: tabular-nums; }
-.modal-back { position: fixed; inset: 0; background: rgba(28, 48, 72, 0.35); display: grid; place-items: center; z-index: 150; padding: 1rem; }
-.modal { background: #fff; border-radius: 14px; padding: 1.3rem 1.4rem; max-width: 26rem; box-shadow: 0 20px 50px -20px rgba(28, 48, 72, 0.5); }
-.modal h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
-.modal p { margin: 0 0 1rem; color: var(--slate); }
-.datenav { display: flex; align-items: center; gap: 0.35rem; }
-.datenav input { padding: 0.4rem 0.5rem; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
-.iconbtn { width: 2.2rem; height: 2.2rem; border: 1px solid var(--line); background: #fff; border-radius: 6px; cursor: pointer; display: grid; place-items: center; }
-.iconbtn:hover { background: var(--mist); }
-.btn { padding: 0.5rem 0.95rem; border-radius: 6px; border: 1px solid var(--steel); background: #fff; color: var(--steel); font-weight: 700; cursor: pointer; }
+#app { min-height: 100vh; }
+.screen { min-height: 100vh; display: flex; flex-direction: column; }
+
+/* Buttons and controls */
+.btn { padding: 0.5rem 0.95rem; border-radius: 8px; border: 1px solid var(--steel); background: #fff; color: var(--steel); font-weight: 700; cursor: pointer; }
 .btn:hover:not(:disabled) { background: var(--mist); }
 .btn.primary { background: var(--steel); color: #fff; }
 .btn.primary:hover:not(:disabled) { background: #345677; }
-.btn.small { padding: 0.3rem 0.65rem; font-size: 0.85rem; font-weight: 400; }
+.btn.small { padding: 0.35rem 0.7rem; font-size: 0.88rem; font-weight: 400; border-color: var(--line); color: var(--ink); }
+.btn.small.strong { border-color: var(--steel); color: var(--steel); font-weight: 700; }
 .btn.danger { border-color: #B54848; color: #B54848; }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.present-btn { padding: 0.6rem 1.4rem; font-size: 1.02rem; display: inline-flex; align-items: center; gap: 0.5rem; }
-.presenting-pill { white-space: nowrap; display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; color: #1D6B3C; background: #E3F5EA; border-radius: 999px; padding: 0.25rem 0.7rem; }
-.presenting-pill::before { content: ""; width: 0.55rem; height: 0.55rem; border-radius: 50%; background: #2E9D5A; }
-
-.main { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(360px, 1fr); gap: 1.25rem; padding: 1.25rem; max-width: 1700px; margin: 0 auto; align-items: start; }
-@media (max-width: 1000px) { .main { grid-template-columns: 1fr; } .preview-col { position: static !important; } }
-.preview-col { position: sticky; top: 4.6rem; }
-.preview { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 12px rgba(28,48,72,0.12); background: #eaf2fa; }
-.status { margin-top: 0.7rem; display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; font-size: 0.88rem; color: var(--slate); }
-.status .warn { color: #9B2C2C; }
-
-.editor { background: #fff; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
-.tabs { display: flex; border-bottom: 1px solid var(--line); background: var(--frost); }
-.tabs button { flex: 1; padding: 0.75rem 0.5rem; background: none; border: 0; border-bottom: 3px solid transparent; cursor: pointer; font-weight: 700; color: var(--slate); }
-.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--steel); background: #fff; }
-.tabpanel { padding: 1.1rem 1.15rem 1.3rem; }
-
-.sec { margin-bottom: 1.35rem; }
-.sec:last-child { margin-bottom: 0; }
-.sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.4rem; }
-.sec-head h3 { margin: 0; font-size: 0.98rem; }
-.tag { font-size: 0.78rem; color: var(--slate); }
-input.text, select.text { width: 100%; padding: 0.5rem 0.6rem; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
-.hint { font-size: 0.8rem; color: var(--slate); margin: 0.35rem 0 0; }
-.check { display: flex; gap: 0.45rem; align-items: center; font-size: 0.86rem; margin-top: 0.45rem; cursor: pointer; }
-.check input { accent-color: var(--steel); width: 1rem; height: 1rem; }
-.override { margin-top: 0.45rem; padding: 0.55rem; background: #FFF8E1; border: 1px solid #F0DFA6; border-radius: 6px; }
-.override label { font-size: 0.8rem; color: #7A5D12; display: block; margin-bottom: 0.25rem; }
-
-.richbox { border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: #fff; }
-.toolbar { display: flex; gap: 0.25rem; padding: 0.3rem; background: var(--frost); border-bottom: 1px solid var(--line); align-items: center; }
-.toolbar button { border: 1px solid transparent; background: none; border-radius: 4px; padding: 0.2rem 0.55rem; cursor: pointer; font-size: 0.85rem; }
-.toolbar button:hover { background: #fff; border-color: var(--line); }
-.toolbar .spacer { flex: 1; }
-.richbox textarea { display: block; width: 100%; min-height: 7.5rem; border: 0; padding: 0.55rem 0.65rem; resize: vertical; font-family: var(--ui); line-height: 1.5; }
-.richbox textarea:focus { outline: none; }
-.richbox:focus-within { border-color: #4F86B8; box-shadow: 0 0 0 2px rgba(79,134,184,0.25); }
-
-.seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: #fff; }
-.seg button { border: 0; background: none; padding: 0.5rem 0.3rem; cursor: pointer; font-size: 0.84rem; line-height: 1.2; position: relative; }
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #fff; }
+.seg button { border: 0; background: none; padding: 0.45rem 0.3rem; cursor: pointer; font-size: 0.84rem; line-height: 1.2; color: var(--slate); }
 .seg button + button { border-left: 1px solid var(--line); }
 .seg button[aria-pressed="true"] { background: var(--steel); color: #fff; font-weight: 700; }
-.seg .def { display: block; font-size: 0.68rem; opacity: 0.75; font-weight: 400; }
-
-.housegrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-top: 0.6rem; }
-.houseinput { border-radius: 6px; overflow: hidden; border: 1px solid var(--line); }
-.houseinput span { display: block; padding: 0.3rem 0.6rem; font-weight: 700; font-size: 0.85rem; }
-.houseinput input { width: 100%; border: 0; padding: 0.5rem 0.6rem; background: #fff; }
-
-.daychips { display: flex; gap: 0.3rem; flex-wrap: wrap; margin-bottom: 0.9rem; }
-.daychips button { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 0.3rem 0.8rem; cursor: pointer; font-weight: 700; font-size: 0.85rem; }
+.switch { position: relative; width: 42px; height: 24px; flex: none; border: 0; border-radius: 999px; background: #B9C6D4; cursor: pointer; transition: background 0.15s; }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform 0.15s; }
+.switch[aria-checked="true"] { background: var(--steel); }
+.switch[aria-checked="true"]::after { transform: translateX(18px); }
+select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+.hint { font-size: 0.82rem; color: var(--slate); margin: 0.35rem 0 0; }
+.check { display: flex; gap: 0.45rem; align-items: center; font-size: 0.88rem; cursor: pointer; }
+.check input { accent-color: var(--steel); width: 1rem; height: 1rem; }
+.daychips { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+.daychips button { border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 0.35rem 0.9rem; cursor: pointer; font-weight: 700; font-size: 0.88rem; }
 .daychips button[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
-.tt-table { width: 100%; border-collapse: collapse; }
-.tt-table th { text-align: left; font-size: 0.78rem; color: var(--slate); font-weight: 700; padding: 0 0.25rem 0.3rem; }
-.tt-table td { padding: 0.18rem 0.2rem; }
-.tt-table input { width: 100%; padding: 0.38rem 0.45rem; border: 1px solid var(--line); border-radius: 5px; }
-.tt-table td.time-c { width: 5.2rem; }
-.tt-table td.room-c { width: 5.6rem; }
-.tt-table td.act { width: 5.4rem; white-space: nowrap; }
 .mini { border: 1px solid transparent; background: none; border-radius: 4px; cursor: pointer; padding: 0.15rem 0.35rem; color: var(--slate); }
 .mini:hover { background: var(--mist); color: var(--ink); }
-.tt-table tr.hi input.subj { background: #E1F0FF; }
-.imgprev { max-width: 100%; max-height: 220px; display: block; margin-top: 0.5rem; border: 1px solid var(--line); border-radius: 6px; }
-.bitprev { height: 90px; display: block; margin-top: 0.5rem; }
 .row { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
-.themegrid { display: grid; grid-template-columns: 6.5rem auto minmax(0, 1fr) auto; gap: 0.45rem 0.6rem; align-items: center; }
-.themegrid .dname { font-weight: 700; font-size: 0.9rem; }
-.swatches { display: inline-flex; border-radius: 999px; overflow: hidden; border: 1px solid var(--line); }
-.swatches i { display: block; width: 1rem; height: 1.3rem; }
-.pastebox { margin-top: 0.7rem; padding: 0.75rem; border: 1px solid var(--line); border-radius: 8px; background: var(--frost); }
+
+/* Top bar */
+.topbar { display: flex; align-items: center; gap: 0.9rem; padding: 0 1.1rem; height: 64px; background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 30; }
+.modeswitch { position: relative; display: grid; grid-template-columns: 1fr 1fr; background: var(--mist); border-radius: 12px; padding: 4px; flex: none; }
+.modeswitch::before { content: ""; position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); border-radius: 8px; background: var(--steel); box-shadow: 0 3px 8px -3px rgba(28, 48, 72, 0.5); transition: transform 0.22s ease; }
+.modeswitch.prep::before { transform: translateX(100%); }
+.modeswitch button { position: relative; z-index: 1; border: 0; background: none; border-radius: 8px; padding: 0.45rem 1rem; cursor: pointer; font-family: var(--disp); font-weight: 700; font-size: 1rem; color: var(--slate); white-space: nowrap; transition: color 0.22s; }
+.modeswitch button[aria-pressed="true"] { color: #fff; }
+.formchip { flex: none; font-family: var(--disp); font-weight: 700; font-size: 1.05rem; padding: 0.35rem 0.75rem; border-radius: 10px; background: var(--mist); color: var(--ink); border: 0; cursor: pointer; }
+.formchip:hover { background: #DCE6F0; }
+.formchip.empty { font-family: var(--ui); font-size: 0.85rem; color: var(--steel); }
+.week { flex: 1; display: flex; justify-content: center; align-items: center; gap: 2px; min-width: 0; }
+.week .arrow { width: 30px; height: 30px; border: 0; border-radius: 8px; background: none; color: var(--slate); display: grid; place-items: center; cursor: pointer; }
+.week .arrow:hover { background: var(--mist); }
+.week .day { position: relative; border: 0; border-radius: 10px; padding: 0.3rem 0.55rem 0.4rem; min-width: 54px; background: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; line-height: 1.15; font-size: 0.88rem; }
+.week .day small { font-size: 0.75rem; opacity: 0.8; }
+.week .day:hover { background: var(--mist); }
+.week .day.today { box-shadow: inset 0 0 0 1px var(--line); }
+.week .day[aria-pressed="true"] { background: var(--ink); color: #fff; font-weight: 700; box-shadow: none; }
+.week .day .dot { position: absolute; bottom: 3px; width: 5px; height: 5px; border-radius: 50%; background: var(--ovr); }
+.week .todaybtn { margin-left: 0.4rem; border: 1px solid var(--line); border-radius: 8px; padding: 0.35rem 0.7rem; background: #fff; font-weight: 700; font-size: 0.88rem; color: var(--steel); cursor: pointer; }
+.topbtn { flex: none; display: inline-flex; align-items: center; gap: 0.5rem; border: 1px solid var(--line); border-radius: 10px; padding: 0.45rem 0.85rem; background: #fff; font-weight: 700; cursor: pointer; color: var(--ink); }
+.topbtn:hover { background: var(--frost); }
+.present-btn { flex: none; display: inline-flex; align-items: center; gap: 0.5rem; border: 0; border-radius: 10px; padding: 0.55rem 1.15rem; background: var(--steel); color: #fff; font-weight: 700; font-size: 1rem; cursor: pointer; }
+.present-btn:hover { background: #345677; }
+.end-btn { flex: none; border: 1px solid #B54848; border-radius: 10px; padding: 0.5rem 1.1rem; background: #fff; color: #B54848; font-weight: 700; font-size: 1rem; cursor: pointer; }
+
+/* Main screen */
+.mainview { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 20px; padding: 20px; max-width: 1700px; width: 100%; margin: 0 auto; align-items: start; }
+.preview-col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.preview-wrap { position: relative; }
+.preview { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden; overflow: clip; box-shadow: 0 0 0 3px var(--frame, #24527f), 0 10px 30px -14px rgba(28, 48, 72, 0.4); background: #eaf2fa; }
+.preview-hint { display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; color: var(--slate); }
+.side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.box { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 10px; }
+.box h3 { margin: 0; font-family: var(--disp); font-size: 0.98rem; }
+.areabox.top { background: var(--top-bg); border-color: var(--top-line); }
+.areabox.main { background: var(--main-bg); border-color: var(--main-line); }
+.areabox.side-p { background: var(--side-bg); border-color: var(--side-line); }
+.areabox.lit { box-shadow: 0 0 0 2px currentColor; }
+.areabox.top.lit { color: var(--top); } .areabox.main.lit { color: var(--main); } .areabox.side-p.lit { color: var(--side); }
+.areabox > * { color: var(--ink); }
+.areahead { margin: 0; padding: 0.4rem 0.75rem; border-radius: 8px; color: #fff; font-family: var(--disp); font-size: 0.95rem; display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
+.areahead span { font-family: var(--ui); font-weight: 400; font-size: 0.75rem; opacity: 0.92; }
+.top .areahead { background: var(--top); } .main .areahead { background: var(--main); } .side-p .areahead { background: var(--side); }
+.areabox.off { opacity: 0.55; }
+.labelrow { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; font-size: 0.9rem; }
+.map { display: grid; grid-template-columns: 2.25fr 1.6fr 2.15fr; grid-template-rows: 20px 20px minmax(0, 1fr); gap: 4px; height: 128px; padding: 8px; border-radius: 10px; background: #F4F7FA; }
+.map i { display: block; border-radius: 4px; background: #E1E7EE; transition: filter 0.15s; }
+.map .m-top { background: var(--top); } .map .m-main { background: var(--main); } .map .m-side { background: var(--side); }
+.map i.dim { filter: saturate(0.35) brightness(1.18); }
+.changes { display: flex; align-items: center; gap: 0.6rem; font-size: 0.82rem; color: var(--slate); padding: 0 4px; }
+.changes .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--ovr); flex: none; }
+.changes.none .dot { background: #C9D3DE; }
+.changes .linkbtn { white-space: nowrap; }
+.linkbtn { border: 0; background: none; padding: 0; color: var(--steel); font-weight: 700; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.divider { height: 1px; background: var(--soft-line); margin: 2px -14px; }
+.subtle { font-size: 0.82rem; color: var(--slate); margin: 0; }
+
+/* Getting started */
+.steps { display: flex; flex-direction: column; gap: 8px; }
+.step { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px; border-radius: 12px; border: 1px solid var(--soft-line); background: #fff; }
+.step .num { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 0.8rem; background: var(--mist); color: var(--slate); }
+.step.done { background: #F2FAF5; border-color: #CDE8D7; }
+.step.done .num { background: #2E7D4F; color: #fff; }
+.step.done b { text-decoration: line-through; }
+.step.next { background: #F3F8FD; border-color: #9FBEDD; }
+.step.next .num { background: var(--steel); color: #fff; }
+.step span { display: flex; flex-direction: column; font-size: 0.82rem; color: var(--slate); }
+.step b { font-size: 0.92rem; color: var(--ink); }
+.progress { height: 8px; border-radius: 4px; background: var(--mist); overflow: hidden; }
+.progress i { display: block; height: 100%; background: #2E7D4F; border-radius: 4px; }
+
+/* Editing on the preview */
+.slide.editor-preview, .slide.editor-preview .grid { overflow: clip; }
+.slide.editor-preview [data-field] { outline: none; cursor: text; border-radius: 10px; transition: box-shadow 0.12s; }
+.slide.editor-preview [data-field]:hover { outline: 4px solid rgba(62, 100, 137, 0.35); outline-offset: 6px; }
+.slide.editor-preview [data-field]:focus { outline: 5px solid #3E6489; outline-offset: 6px; }
+.slide.editor-preview .rich[data-field]:hover, .slide.editor-preview .rich[data-field]:focus { outline-offset: 10px; }
+.slide.editor-preview [data-field]:empty::before { content: attr(data-ph); color: var(--muted); opacity: 0.75; }
+.slide.editor-preview .info, .slide.editor-preview .card, .slide.editor-preview .house-tile { position: relative; }
+.slide.editor-preview .ovr-dot { position: absolute; top: 14px; right: 16px; width: 24px; height: 24px; border-radius: 50%; background: #E08A1E; box-shadow: 0 0 0 5px #fff; z-index: 2; }
+.slide.editor-preview .prep-add { display: block; width: 100%; border: 3px dashed var(--line, #c5d3df); border-radius: 18px; background: none; padding: 10px; font: inherit; font-size: 30px; font-weight: 600; color: var(--muted); cursor: pointer; }
+.slide.editor-preview .prep-add:hover { background: var(--soft); }
+.slide.editor-preview .prep-num { display: inline-block; min-width: 1.2em; text-align: right; }
+.slide.editor-preview .prep-num:empty::before { content: "?"; }
+.slide.editor-preview .region-lit { outline: 8px dashed rgba(62, 100, 137, 0.75); outline-offset: 10px; border-radius: 40px; }
+.fmtbar { position: absolute; z-index: 20; display: flex; align-items: center; gap: 4px; padding: 6px; border-radius: 12px; background: var(--ink); color: #fff; box-shadow: 0 10px 24px -10px rgba(28, 48, 72, 0.6); font-size: 0.82rem; white-space: nowrap; }
+.fmtbar button { border: 0; border-radius: 6px; background: none; color: #fff; cursor: pointer; padding: 0.35rem 0.55rem; }
+.fmtbar button:hover { background: rgba(255, 255, 255, 0.14); }
+.fmtbar .sq { width: 30px; height: 30px; padding: 0; font-size: 0.95rem; }
+.fmtbar .sep { width: 1px; height: 22px; margin: 0 4px; background: rgba(255, 255, 255, 0.25); }
+.fmtbar .scope { display: grid; grid-auto-flow: column; background: rgba(255, 255, 255, 0.12); border-radius: 8px; padding: 3px; gap: 2px; }
+.fmtbar .scope button[aria-pressed="true"] { background: #fff; color: var(--ink); font-weight: 700; }
+.fmtbar .note { padding: 0 0.4rem; color: #CFDAE6; }
+.ovrtip { position: absolute; z-index: 19; display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0.6rem 0.45rem 0.75rem; border-radius: 10px; background: #fff; box-shadow: 0 10px 24px -10px rgba(28, 48, 72, 0.5); font-size: 0.82rem; white-space: nowrap; }
+.ovrtip .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--ovr); }
+
+/* Bottom bar */
+.bottombar { position: sticky; bottom: 0; z-index: 30; display: flex; align-items: center; gap: 0.75rem; padding: 0 1.1rem; min-height: 58px; background: var(--ink); color: #fff; font-size: 0.9rem; }
+.bottombar .grow { flex: 1; }
+.bottombar .vsep { width: 1px; height: 24px; background: rgba(255, 255, 255, 0.2); }
+.bb-btn { border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 8px; padding: 0.4rem 0.75rem; background: none; color: #fff; cursor: pointer; white-space: nowrap; }
+.bb-btn:hover:not(:disabled) { background: rgba(255, 255, 255, 0.1); }
+.bb-btn.solid { border: 0; background: #fff; color: var(--ink); font-weight: 700; padding: 0.45rem 0.9rem; }
+.bb-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.bb-icon { width: 34px; height: 34px; padding: 0; display: grid; place-items: center; }
+.timebox { width: 96px; border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 10px; padding: 0.3rem 0.4rem; background: transparent; color: #fff; font-size: 1.35rem; font-weight: 700; letter-spacing: 0.5px; text-align: center; font-variant-numeric: tabular-nums; cursor: pointer; }
+.timebox.editable { border: 2px solid #9FC2E6; background: rgba(255, 255, 255, 0.12); cursor: text; }
+.timebox:focus { outline: none; border: 2px solid #fff; background: rgba(255, 255, 255, 0.16); }
+.tlabel { display: flex; flex-direction: column; gap: 4px; font-size: 0.75rem; color: #B9C8D8; min-width: 140px; max-width: 200px; }
+.tbars { display: flex; gap: 4px; width: 150px; }
+.tbars i { display: block; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.2); overflow: hidden; flex-basis: 0; }
+.tbars i b { display: block; height: 100%; width: 0; background: #fff; }
+.thint { font-size: 0.75rem; color: #B9C8D8; }
+.projstatus { display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap; }
+.projstatus .led { width: 9px; height: 9px; border-radius: 50%; background: #64798F; }
+.projstatus.on .led { background: #43C27A; box-shadow: 0 0 0 4px rgba(67, 194, 122, 0.25); }
+.projstatus.off { color: #B9C8D8; }
+.savestate { display: inline-flex; align-items: center; gap: 0.35rem; color: #9FDDB8; white-space: nowrap; }
+.savestate.bad { color: #FFB4A8; font-weight: 700; }
+@media (max-width: 1500px) { .thint { display: none; } }
+
+/* Setup page */
+.setupview { flex: 1; display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 28px; padding: 24px 28px; max-width: 1300px; width: 100%; margin: 0 auto; align-items: start; }
+.setupbar { display: flex; align-items: center; gap: 1rem; padding: 0 1.1rem; height: 64px; background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 30; }
+.setupbar h1 { margin: 0; font-family: var(--disp); font-size: 1.4rem; }
+.setupbar .savestate { color: #2E7D4F; font-size: 0.85rem; }
+.setupnav { display: flex; flex-direction: column; gap: 4px; position: sticky; top: 88px; }
+.setupnav button { text-align: left; border: 0; background: none; border-radius: 10px; padding: 0.6rem 0.85rem; cursor: pointer; display: flex; flex-direction: column; gap: 2px; color: #3E5770; }
+.setupnav button b { font-size: 0.95rem; }
+.setupnav button span { font-size: 0.75rem; color: var(--slate); }
+.setupnav button[aria-current="true"] { background: #fff; color: var(--ink); box-shadow: 0 0 0 1px var(--line); }
+.setupnav button:hover { background: #fff; }
+.setsec { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.setsec > h2 { margin: 0; font-family: var(--disp); font-size: 1.65rem; }
+.setsec > p.lead { margin: -10px 0 0; color: var(--slate); }
+.card2 { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+.card2 h3 { margin: 0; font-family: var(--disp); font-size: 1.08rem; }
+.card2.danger { background: #FFF7F7; border-color: #EBC4C4; flex-direction: row; align-items: center; gap: 18px; }
+.card2.danger h3 { color: #8E2F2F; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.filecard { display: flex; align-items: center; gap: 14px; padding: 14px; border-radius: 12px; background: #F2FAF5; border: 1px solid #CDE8D7; }
+.filecard.empty { background: var(--frost); border-color: var(--line); }
+.filecard .ficon { width: 40px; height: 40px; border-radius: 10px; background: #2E7D4F; color: #fff; display: grid; place-items: center; flex: none; }
+.filecard.empty .ficon { background: #9AAABB; }
+.filecard .fmeta { display: flex; flex-direction: column; min-width: 0; }
+.filecard .fmeta span { font-size: 0.82rem; color: #4b6b5d; }
+.dropzone { border: 2px dashed #B7C7D8; border-radius: 12px; padding: 16px; text-align: center; color: var(--slate); font-size: 0.9rem; }
+.dropzone.over { border-color: var(--steel); background: #F3F8FD; }
+.fontcards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.fontcard { text-align: left; border: 1px solid var(--line); border-radius: 14px; padding: 16px; background: #fff; cursor: pointer; display: flex; flex-direction: column; gap: 8px; }
+.fontcard[aria-pressed="true"] { border: 2px solid var(--steel); padding: 15px; background: #F3F8FD; }
+.fontcard .sample { font-size: 1.55rem; font-weight: 700; color: #2f6b52; line-height: 1.2; }
+.fontcard .chosen { display: none; font-size: 0.72rem; font-weight: 700; color: #fff; background: var(--steel); border-radius: 6px; padding: 2px 8px; }
+.fontcard[aria-pressed="true"] .chosen { display: inline-block; }
+.themecards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.themecard { display: flex; align-items: center; gap: 10px; border: 1px solid var(--soft-line); border-radius: 12px; padding: 8px 10px; }
+.themecard .sw { width: 44px; height: 30px; border-radius: 8px; flex: none; }
+.themecard select { border: 0; background: none; padding: 0; font-size: 0.82rem; color: var(--slate); cursor: pointer; width: 100%; }
+.themecard b { font-size: 0.9rem; display: block; }
+.times { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; font-size: 0.92rem; }
+
+/* Timetable editor (Setup) */
+.tt-table { width: 100%; border-collapse: collapse; }
+.tt-table th { text-align: left; font-size: 0.75rem; color: var(--slate); font-weight: 700; padding: 0 0.25rem 0.3rem; }
+.tt-table td { padding: 0.18rem 0.2rem; }
+.tt-table input { width: 100%; padding: 0.42rem 0.5rem; border: 1px solid var(--line); border-radius: 6px; }
+.tt-table td.time-c { width: 6.5rem; }
+.tt-table td.room-c { width: 7.5rem; }
+.tt-table td.act { width: 5.4rem; white-space: nowrap; }
+.tt-table tr.hi input.subj { background: #E8F1FA; }
+.imgprev { max-width: 100%; max-height: 260px; display: block; margin-top: 0.5rem; border: 1px solid var(--line); border-radius: 8px; }
+.pastebox { padding: 0.85rem; border: 1px solid var(--line); border-radius: 10px; background: var(--frost); }
 .pastebox textarea { width: 100%; min-height: 9rem; padding: 0.55rem 0.65rem; border: 1px solid var(--line); border-radius: 6px; font-family: ui-monospace, Consolas, monospace; font-size: 0.82rem; line-height: 1.45; resize: vertical; background: #fff; }
 .pastebox .row { margin-top: 0.55rem; }
 .ttprev { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 0.6rem; margin-top: 0.5rem; max-height: 260px; overflow: auto; }
 .ttprev > div { background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 0.4rem 0.5rem; font-size: 0.8rem; }
-.ttprev-row { display: grid; grid-template-columns: 3rem minmax(0, 1fr) auto; gap: 0.4rem; color: var(--ink); }
+.ttprev-row { display: grid; grid-template-columns: 3rem minmax(0, 1fr) auto; gap: 0.4rem; }
 .ttprev-row span:last-child { color: var(--slate); }
 .warnline { font-size: 0.8rem; color: #9B2C2C; margin: 0.4rem 0 0; }
-.sched-wrap { overflow-x: auto; margin-top: 0.4rem; }
-.sched { width: 100%; border-collapse: collapse; min-width: 520px; }
+.note { font-size: 0.82rem; color: var(--slate); background: var(--frost); border-radius: 8px; padding: 0.5rem 0.7rem; margin: 0; }
+
+/* House meeting schedule (Setup) */
+.sched-wrap { overflow-x: auto; }
+.sched { width: 100%; border-collapse: collapse; min-width: 640px; }
 .sched th { text-align: left; font-size: 0.75rem; font-weight: 700; padding: 0.3rem 0.25rem; }
-.sched th.hh { border-radius: 4px 4px 0 0; }
+.sched th.hh { border-radius: 6px; }
 .sched td { padding: 0.15rem 0.2rem; }
-.sched input:not([type=checkbox]) { width: 100%; padding: 0.35rem 0.3rem; border: 1px solid var(--line); border-radius: 5px; font-size: 0.85rem; }
-.sched td.sd { width: 8.6rem; }
-.sched td.sd input { padding-right: 0.15rem; }
-.sched td.cgc { width: 3.6rem; text-align: center; }
+.sched input:not([type=checkbox]) { width: 100%; padding: 0.38rem 0.35rem; border: 1px solid var(--line); border-radius: 6px; font-size: 0.86rem; }
+.sched td.sd { width: 9rem; }
+.sched td.cgc { width: 4rem; text-align: center; }
 .sched td.cgc input { width: 1rem; height: 1rem; accent-color: var(--steel); }
 .sched tr.cg input:disabled { background: var(--mist); }
-.sched td.srcc { width: 4.4rem; white-space: nowrap; }
+.sched td.srcc { width: 9.5rem; white-space: nowrap; }
 .sched tr.mine td.sd input { border-color: #E2B654; }
-.mine-pill { border: 1px solid #E2B654; background: #FFF6DE; color: #7A5D12; border-radius: 999px; padding: 0.12rem 0.5rem; font-size: 0.72rem; cursor: pointer; font-family: inherit; }
+.mine-pill { border: 1px solid #E2B654; background: #FFF6DE; color: #7A5D12; border-radius: 999px; padding: 0.12rem 0.55rem; font-size: 0.74rem; cursor: pointer; font-family: inherit; }
 .mine-pill:hover { background: #FCE9B8; }
 .mine-pill.plain { cursor: default; display: inline-block; }
 .sched input:disabled { background: var(--frost); color: var(--slate); }
-.houseinput input:disabled { background: var(--frost); color: var(--ink); }
-.housegrid.locked .houseinput { opacity: 0.85; }
-.srcnote { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; color: var(--slate); background: var(--mist); border-radius: 999px; padding: 0.15rem 0.6rem; }
-.note { font-size: 0.82rem; color: var(--slate); background: var(--frost); border-left: 3px solid var(--line); padding: 0.45rem 0.6rem; margin-top: 0.5rem; }
 
-.toast { position: fixed; left: 50%; bottom: 1.4rem; transform: translate(-50%, 1rem); background: var(--ink); color: #fff; padding: 0.6rem 1.05rem; border-radius: 8px; font-size: 0.9rem; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 100; max-width: calc(100% - 2rem); }
+.toast { position: fixed; left: 50%; bottom: 5rem; transform: translate(-50%, 1rem); background: var(--ink); color: #fff; padding: 0.6rem 1.05rem; border-radius: 8px; font-size: 0.9rem; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 100; max-width: calc(100% - 2rem); box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.5); }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
+.modal-back { position: fixed; inset: 0; background: rgba(28, 48, 72, 0.35); display: grid; place-items: center; z-index: 150; padding: 1rem; }
+.modal { background: #fff; border-radius: 14px; padding: 1.3rem 1.4rem; max-width: 27rem; box-shadow: 0 20px 50px -20px rgba(28, 48, 72, 0.5); }
+.modal h3 { margin: 0 0 0.4rem; font-family: var(--disp); font-size: 1.15rem; }
+.modal p { margin: 0 0 1rem; color: var(--slate); }
 
-/* In-page presenting (single screen / duplicate mode) and the slide window */
+/* Presenting on this screen, and the projector window */
 .stage { position: fixed; inset: 0; background: #eaf2fa; z-index: 200; overflow: hidden; cursor: none; }
 .stage .fs-hint { position: absolute; right: 18px; bottom: 14px; background: rgba(10,33,66,0.85); color: #fff; font-family: var(--ui); font-size: 15px; padding: 8px 14px; border-radius: 8px; transition: opacity 0.6s; cursor: pointer; }
 body.slide-only { background: #eaf2fa; overflow: hidden; }
+@media (max-width: 1100px) { .mainview { grid-template-columns: 1fr; } }
+.week .day:disabled { opacity: 0.35; cursor: not-allowed; }
+
 </style>
 </head>
 <body>
 
 <div id="app">
+<!-- ===================== MAIN SCREEN ===================== -->
+<div id="mainScreen" class="screen">
   <header class="topbar">
     <h1 class="sr-only">Morning Slide</h1>
     <div class="modeswitch" id="modeSwitch" role="group" aria-label="Which slide you are editing">
       <button type="button" data-m="morning" aria-pressed="true">Morning Slide</button>
       <button type="button" data-m="prep" aria-pressed="false">Prep Slide</button>
     </div>
-    <div class="datenav" aria-label="Slide date">
-      <button type="button" class="iconbtn" id="prevDay" aria-label="Previous school day">
-        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M9 2L4 7l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      <input type="date" id="dateInput" aria-label="Slide date">
-      <button type="button" class="iconbtn" id="nextDay" aria-label="Next school day">
-        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M5 2l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      <button type="button" class="btn small" id="todayBtn">Today</button>
-    </div>
-    <span class="presenting-pill" id="presentingPill" hidden>Presenting</span>
-    <button type="button" class="btn small" id="projSwap" hidden>Show this instead</button>
-    <button type="button" class="btn" id="endBtn" hidden>End</button>
-    <button type="button" class="btn primary present-btn" id="presentBtn">
-      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 11.5v2.5M5 14h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-      Present
+    <button type="button" class="formchip" id="formChip" title="Your form (change it in Setup)"></button>
+    <nav class="week" id="week" aria-label="Choose a day"></nav>
+    <button type="button" class="topbtn" id="setupBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"></path></svg>Setup
+    </button>
+    <button type="button" class="end-btn" id="endBtn" hidden>End</button>
+    <button type="button" class="present-btn" id="presentBtn">
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"></rect><path d="M8 11.5v2.5M5 14h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path></svg>Present
     </button>
   </header>
 
-  <main class="main">
+  <main class="mainview">
     <section class="preview-col" aria-label="Slide preview">
-      <div class="preview" id="preview"></div>
-      <div class="status" id="status"></div>
+      <div class="preview-wrap" id="previewWrap">
+        <div class="preview" id="preview"></div>
+        <div class="fmtbar" id="fmtbar" role="toolbar" aria-label="Formatting" hidden>
+          <span class="fmt-rich">
+            <button type="button" class="sq" data-cmd="bold" title="Bold (Ctrl+B)"><b>B</b></button>
+            <button type="button" class="sq" data-cmd="italic" title="Italic (Ctrl+I)"><i>I</i></button>
+            <button type="button" class="sq" data-cmd="underline" title="Underline (Ctrl+U)"><u>U</u></button>
+            <button type="button" data-cmd="bullet" title="Bullet">• Bullet</button>
+            <button type="button" data-cmd="sub" title="Sub-bullet (Tab)">◦ Sub-bullet</button>
+          </span>
+          <span class="sep fmt-sep"></span>
+          <span class="scope" id="fmtScope">
+            <button type="button" data-scope="week"></button>
+            <button type="button" data-scope="today">Change for today</button>
+          </span>
+          <span class="note" id="fmtNote"></span>
+        </div>
+        <div class="ovrtip" id="ovrtip" role="note" hidden><span class="dot"></span><span id="ovrText"></span><button type="button" class="btn small strong" id="ovrUndo">Undo</button></div>
+      </div>
+      <p class="preview-hint">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg>
+        <span id="previewHint"></span>
+      </p>
     </section>
 
-    <section class="editor">
-      <div class="tabs" role="tablist">
-        <button type="button" role="tab" aria-selected="true" data-tab="day" data-mode="morning" id="tabDayBtn">Day</button>
-        <button type="button" role="tab" aria-selected="false" data-tab="tt" data-mode="morning">Timetable</button>
-        <button type="button" role="tab" aria-selected="false" data-tab="prep" data-mode="prep" hidden>Prep</button>
-        <button type="button" role="tab" aria-selected="false" data-tab="setup">Settings</button>
+    <!-- Morning side column -->
+    <aside class="side" id="sideMorning" aria-label="This day">
+      <div class="box" id="checklist" hidden>
+        <div>
+          <h3 style="font-size:1.3rem;margin-bottom:4px">Let’s get your slide ready</h3>
+          <p class="subtle">Four quick steps. Everything stays on this laptop.</p>
+        </div>
+        <div class="progress"><i id="checkBar"></i></div>
+        <div class="steps" id="checkSteps"></div>
+        <p class="subtle">You can type straight onto the slide at any time: try the morning task.</p>
+        <p class="subtle"><button type="button" class="linkbtn" id="checkSkip">Skip for now</button></p>
       </div>
 
-      <!-- DAY -->
-      <div class="tabpanel" data-panel="day">
-        <div class="sec" id="taskSec">
-          <div class="sec-head"><h3>Morning task</h3><span class="tag" id="taskTag"></span></div>
-          <input class="text" id="taskInput">
-          <label class="check"><input type="checkbox" id="taskOvrToggle"><span id="taskOvrLabel"></span></label>
-          <div class="override" id="taskOvrBox" hidden><label for="taskOvr">Just for this date</label><input class="text" id="taskOvr"></div>
+      <div id="regions">
+        <div class="box" style="padding:12px;margin-bottom:14px"><div class="map" id="map" aria-hidden="true"></div></div>
+
+        <div class="box areabox top" data-region="top" style="margin-bottom:14px">
+          <h3 class="areahead">Top boxes</h3>
+          <div class="labelrow"><span id="taskLbl">Morning task box</span><button type="button" class="switch" id="taskSwitch" role="switch" aria-checked="true" aria-labelledby="taskLbl"></button></div>
+          <p class="subtle">The 8:30 box always shows. A first lesson box joins it when the main area shows “First lesson only”.</p>
         </div>
 
-        <div class="sec">
-          <div class="sec-head"><h3 id="atHeading">Then at 8:30…</h3><span class="tag" id="atTag"></span></div>
-          <input class="text" id="atInput">
-          <p class="hint" id="atThuHint" hidden>This shows <strong>House Meetings</strong> or <strong>Congers</strong> automatically on Thursdays and on dates in the house meeting schedule. Otherwise it shows what you type here.</p>
-          <label class="check"><input type="checkbox" id="atOvrToggle"><span id="atOvrLabel"></span></label>
-          <div class="override" id="atOvrBox" hidden><label for="atOvr">Just for this date</label><input class="text" id="atOvr"></div>
+        <div class="box areabox main" data-region="main" style="margin-bottom:14px">
+          <h3 class="areahead">Main area<span id="mainSrc"></span></h3>
+          <select class="text" id="ttViewSel" aria-label="What the main area shows">
+            <option value="full">Full timetable</option>
+            <option value="first">First lesson only</option>
+            <option value="off">Nothing (notes use the space)</option>
+          </select>
+          <label id="firstPick" class="labelrow" hidden><span style="white-space:nowrap">First lesson</span><select class="text" id="firstSelect"></select></label>
+          <div class="seg" id="mainScope"><button type="button" data-scope="week"></button><button type="button" data-scope="today">Change for today</button></div>
         </div>
 
-        <div class="sec">
-          <div class="sec-head"><h3>What's happening today?</h3><span class="tag" id="notesTag"></span></div>
-          <div class="richbox" data-rich="notes"></div>
-          <p class="hint">Saved for this weekday, so it reappears next week until you change or clear it.</p>
+        <div class="box areabox side-p" data-region="side" style="margin-bottom:14px">
+          <h3 class="areahead">Side panel<span id="sideSrc"></span></h3>
+          <select class="text" id="panelSel" aria-label="What the side panel shows">
+            <option value="none">Nothing (music uses the full height)</option>
+            <option value="house">House meetings</option>
+            <option value="lunch">Lunchtime arrangements</option>
+            <option value="info">Custom panel</option>
+          </select>
+          <div class="seg" id="sideScope"><button type="button" data-scope="week"></button><button type="button" data-scope="today">Change for today</button></div>
         </div>
 
-        <div class="sec">
-          <div class="sec-head"><h3>Bottom-right panel</h3><span class="tag" id="panelTag"></span></div>
-          <div class="seg" id="panelSeg" role="group" aria-label="Bottom-right panel">
-            <button type="button" data-v="none">None</button>
-            <button type="button" data-v="info">Additional information</button>
-            <button type="button" data-v="lunch">Lunchtime arrangements</button>
-            <button type="button" data-v="house">House meetings</button>
-          </div>
-          <div id="panelEdit" style="margin-top:0.7rem"></div>
-        </div>
+        <div class="changes" id="changes"><span class="dot"></span><span id="changesText"></span><button type="button" class="linkbtn" id="undoDay">Undo them</button></div>
       </div>
+    </aside>
 
-      <!-- TIMETABLE -->
-      <div class="tabpanel" data-panel="tt" hidden>
-        <div class="daychips" id="ttDays"></div>
-        <div class="sec">
-          <div class="sec-head"><h3 id="ttViewHeading">On the slide</h3></div>
-          <div class="seg" id="ttViewSeg" role="group" aria-label="What the slide shows from the timetable">
-            <button type="button" data-v="full">Full timetable</button>
-            <button type="button" data-v="first">First lesson only</button>
-            <button type="button" data-v="off">Off</button>
-          </div>
-          <div id="firstPick" class="subsec" hidden>
-            <label for="firstSelect">Which lesson counts as the first lesson</label>
-            <select class="text" id="firstSelect"></select>
-          </div>
-          <p class="hint" id="ttOffHint" hidden></p>
-        </div>
-        <div class="sec" id="ttStyleSec">
-          <div class="seg" id="ttModeSeg" role="group" aria-label="Timetable style">
-            <button type="button" data-v="grid">Built-in design</button>
-            <button type="button" data-v="image">Use my own image</button>
-          </div>
-        </div>
-        <div id="ttGridEdit">
-          <table class="tt-table">
-            <thead><tr><th>Time</th><th>Subject</th><th>Room</th><th></th></tr></thead>
-            <tbody id="ttBody"></tbody>
-          </table>
-          <div class="row" style="margin-top:0.6rem">
-            <button type="button" class="btn small" id="ttAdd">Add row</button>
-            <button type="button" class="btn small" id="ttSort">Sort by time</button>
+    <!-- Prep side column -->
+    <aside class="side" id="sidePrep" aria-label="Prep settings" hidden>
+      <div class="box">
+        <div class="labelrow"><b>Timer chime</b><div class="seg" id="chimeSeg" style="width:150px"><button type="button" data-v="on">On</button><button type="button" data-v="off">Off</button></div></div>
+        <div class="divider"></div>
+        <b>Timer follows</b>
+        <div class="seg" id="tModeSeg"><button type="button" data-v="preps">Each prep’s time</button><button type="button" data-v="tens">Every 10 mins</button><button type="button" data-v="custom">Custom</button></div>
+        <p class="subtle" id="tModeHelp"></p>
+        <div class="divider"></div>
+        <b>When a timer ends</b>
+        <div class="seg" id="tBetweenSeg"><button type="button" data-v="auto">Start the next one</button><button type="button" data-v="wait">Wait for me</button></div>
+        <b>On the slide</b>
+        <div class="seg" id="tShowSeg"><button type="button" data-v="timer">Timer</button><button type="button" data-v="clock">Clock</button><button type="button" data-v="both">Both</button></div>
+      </div>
+      <div class="box" id="tomBox">
+        <h3>Tomorrow Morning box</h3>
+        <p class="subtle">Starts blank each evening. Copy tomorrow’s “What’s happening today?”, then trim it on the slide.</p>
+        <button type="button" class="btn" id="tomCopy">Copy from tomorrow’s slide</button>
+      </div>
+      <div class="box" id="mpNote" hidden>
+        <h3>Morning prep today</h3>
+        <p class="subtle">The prep slide shows today’s “What’s happening today?” and music lessons. Change your morning prep days in Setup.</p>
+      </div>
+      <p class="subtle" id="prepNote" style="padding:0 4px"></p>
+    </aside>
+  </main>
+
+  <footer class="bottombar">
+    <div class="row" id="timerGroup" hidden style="gap:0.6rem;flex-wrap:nowrap">
+      <input class="timebox" id="timeBox" readonly aria-label="Timer: click to type a time" title="Click to type a time" autocomplete="off" spellcheck="false">
+      <div class="tlabel"><span id="tLabel"></span><div class="tbars" id="tBars"></div></div>
+      <button type="button" class="bb-btn solid" id="tPlay">Start prep</button>
+      <button type="button" class="bb-btn" id="tPlus">+1 min</button>
+      <button type="button" class="bb-btn" id="tSkip">Skip</button>
+      <button type="button" class="bb-btn" id="tReset">Reset</button>
+      <span class="thint" id="tHint" hidden>Paused: click the time to type a new one</span>
+    </div>
+    <span class="grow"></span>
+    <span class="projstatus off" id="projStatus"><span class="led"></span><span id="projText">Not on the projector</span></span>
+    <button type="button" class="bb-btn" id="projSwap" hidden>Show this instead</button>
+    <span class="vsep"></span>
+    <span class="savestate" id="saveState"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7.5l2.6 2.5L11 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span>Saved in browser</span></span>
+    <button type="button" class="bb-btn bb-icon" id="openCopy" aria-label="Open a saved copy" title="Open a saved copy"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></button>
+    <button type="button" class="bb-btn bb-icon" id="saveCopy" aria-label="Save a copy" title="Save a copy"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg></button>
+  </footer>
+</div>
+
+<!-- ===================== SETUP ===================== -->
+<div id="setupScreen" class="screen" hidden>
+  <header class="setupbar">
+    <button type="button" class="topbtn" id="setupBack"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M9 2L4 7l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>Back to the slides</button>
+    <h1>Setup</h1>
+    <span class="grow" style="flex:1"></span>
+    <span class="savestate" id="saveState2"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7.5l2.6 2.5L11 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span>Saved in browser</span></span>
+  </header>
+  <div class="setupview">
+    <nav class="setupnav" id="setupNav" aria-label="Setup sections">
+      <button type="button" data-sec="form"><b>Form &amp; music</b><span>Weekly spreadsheet, your form</span></button>
+      <button type="button" data-sec="timetable"><b>Timetable</b><span>Your lessons for each day</span></button>
+      <button type="button" data-sec="design"><b>Design</b><span>Fonts and day colours</span></button>
+      <button type="button" data-sec="prep"><b>Prep</b><span>Morning prep days, timer</span></button>
+      <button type="button" data-sec="house"><b>House meetings</b><span>This term’s schedule</span></button>
+      <button type="button" data-sec="backup"><b>Backup &amp; reset</b><span>Save, open or start again</span></button>
+    </nav>
+    <div>
+      <!-- Form & music -->
+      <section class="setsec" data-sec="form">
+        <h2>Form &amp; music lessons</h2>
+        <p class="lead">Upload the weekly Music &amp; LAMDA spreadsheet. The slide shows each day’s lessons for your form.</p>
+        <div class="card2">
+          <h3>This week’s spreadsheet</h3>
+          <div class="filecard" id="fileCard">
+            <span class="ficon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><path d="M14 3v6h6"></path></svg></span>
+            <span class="fmeta"><b id="lessonsInfo">No file yet</b><span id="lessonsSub"></span></span>
             <span style="flex:1"></span>
-            <button type="button" class="btn small" id="ttPasteOpen">Paste timetable</button>
-            <button type="button" class="btn small" id="ttCopy">Copy timetable</button>
+            <button type="button" class="btn primary" id="lessonsBtn">Upload a new week</button>
+            <input type="file" id="lessonsInput" accept=".xlsx,.xls,.csv" hidden>
           </div>
-          <div class="pastebox" id="ttPasteBox" hidden>
-            <label for="ttPasteText" style="font-weight:700;font-size:0.9rem">Paste a timetable</label>
-            <p class="hint" style="margin:0.2rem 0 0.5rem">One line per lesson: <strong>Day | Time | Subject | Room</strong>, e.g. <code>MON | 09:00 | Science | S1</code>. Columns copied from Excel work too. To convert someone's timetable, copy the instructions below, then paste them into Claude with a photo or copy of the timetable.</p>
-            <textarea id="ttPasteText" spellcheck="false" aria-label="Pasted timetable"></textarea>
-            <div id="ttPastePreview"></div>
-            <div class="row">
-              <button type="button" class="btn small primary" id="ttPasteUse" disabled>Use this timetable</button>
-              <button type="button" class="btn small" id="ttPasteCancel">Cancel</button>
+          <div class="dropzone" id="dropzone">Or drop next week’s file here</div>
+          <p class="hint" id="ignoredNote" hidden></p>
+        </div>
+        <div class="card2">
+          <h3>Your form</h3>
+          <select class="text" id="formSelect" style="max-width:320px"></select>
+          <p class="hint">Only your form’s lessons appear on the slide. Your form also shows at the top of the main screen.</p>
+        </div>
+      </section>
+
+      <!-- Timetable -->
+      <section class="setsec" data-sec="timetable" hidden>
+        <h2>Your timetable</h2>
+        <div class="card2">
+          <div class="row" style="justify-content:space-between">
+            <div class="daychips" id="ttDays"></div>
+            <div class="seg" id="ttModeSeg" style="width:300px"><button type="button" data-v="grid">Built-in design</button><button type="button" data-v="image">Use my own image</button></div>
+          </div>
+          <div id="ttGridEdit">
+            <table class="tt-table">
+              <thead><tr><th>Time</th><th>Subject</th><th>Room</th><th></th></tr></thead>
+              <tbody id="ttBody"></tbody>
+            </table>
+            <div class="row" style="margin-top:0.6rem">
+              <button type="button" class="btn small strong" id="ttAdd">Add a lesson</button>
+              <button type="button" class="btn small" id="ttSort">Sort by time</button>
               <span style="flex:1"></span>
-              <button type="button" class="btn small" id="ttPromptCopy">Copy instructions for Claude</button>
+              <button type="button" class="btn small" id="ttPasteOpen">Paste a timetable</button>
+              <button type="button" class="btn small" id="ttCopy">Copy to share</button>
+            </div>
+            <p class="hint">Break, Lunch and Prep are shaded automatically.</p>
+            <div class="pastebox" id="ttPasteBox" hidden style="margin-top:0.6rem">
+              <p class="hint" style="margin-top:0">Paste lines like <code>MON | 09:00 | Maths | M2</code>, from Claude, Excel or another teacher. To turn a photo or PDF of your timetable into these lines, give it to Claude with <button type="button" class="linkbtn" id="ttPromptCopy">these instructions</button>.</p>
+              <textarea id="ttPasteText" spellcheck="false" aria-label="Pasted timetable"></textarea>
+              <div id="ttPastePreview"></div>
+              <div class="row"><button type="button" class="btn primary" id="ttPasteUse" disabled>Use this timetable</button><button type="button" class="btn" id="ttPasteCancel">Cancel</button></div>
             </div>
           </div>
-          <p class="hint">Break, Lunch and Prep are highlighted automatically. Leave the room blank where pupils go elsewhere.</p>
-        </div>
-        <div id="ttImageEdit" hidden>
-          <div class="row">
-            <button type="button" class="btn small" id="ttImgBtn">Choose image</button>
-            <button type="button" class="btn small" id="ttImgRemove">Remove image</button>
-          </div>
-          <img id="ttImgPrev" class="imgprev" alt="Timetable image preview" hidden>
-          <p class="hint">The image is fitted into the timetable box under the "Timetable" heading.</p>
-        </div>
-        <input type="file" id="ttImgInput" accept="image/*" hidden>
-      </div>
-
-      <!-- PREP -->
-      <div class="tabpanel" data-panel="prep" hidden>
-        <div class="sec">
-          <div class="sec-head"><h3 id="prepHeading">Preps</h3><span class="tag" id="prepTag"></span></div>
-          <div id="prepRows"></div>
-          <div class="row"><button type="button" class="btn small" id="prepAdd">Add a prep</button></div>
-          <p class="hint">Saved for this weekday. Type the minutes as a number, like 20. Leave a row blank to hide it.</p>
-        </div>
-
-        <div class="sec">
-          <div class="sec-head"><h3>Timer</h3></div>
-          <div class="row">
-            <button type="button" class="btn small primary" id="tStart">Start prep</button>
-            <button type="button" class="btn small" id="tPause" disabled>Pause</button>
-            <button type="button" class="btn small" id="tPlus" disabled>+1 min</button>
-            <button type="button" class="btn small" id="tNext" disabled>Skip to next</button>
-            <button type="button" class="btn small" id="tReset" disabled>Reset</button>
-          </div>
-          <div class="timer-state" id="timerState"></div>
-          <div class="row subsec">
-            <label for="tCustom" style="font-weight:700;font-size:0.85rem">Custom timer</label>
-            <input class="text" id="tCustom" style="width:6.5rem" placeholder="mins" aria-describedby="tCustomHint">
-            <button type="button" class="btn small" id="tCustomGo">Start</button>
-            <span style="flex:1"></span>
-            <button type="button" class="btn small" id="tTest">Test chime</button>
-          </div>
-          <p class="hint" id="tCustomHint">Minutes like 15, or minutes and seconds like 7:30.</p>
-          <div class="subsec">
-            <label>Timer follows</label>
-            <div class="seg" id="tModeSeg" role="group" aria-label="Timer follows">
-              <button type="button" data-v="preps">Each prep’s time</button>
-              <button type="button" data-v="tens">A chime every 10 mins</button>
-            </div>
-          </div>
-          <div class="subsec" id="tTotalBox">
-            <label>Whole prep session</label>
-            <div class="seg" id="tTotalSeg" role="group" aria-label="Whole prep session">
-              <button type="button" data-v="30">30 mins</button>
-              <button type="button" data-v="40">40 mins</button>
-            </div>
-          </div>
-          <div class="subsec" id="tBetweenBox">
-            <label>When a timer ends</label>
-            <div class="seg" id="tBetweenSeg" role="group" aria-label="When a timer ends">
-              <button type="button" data-v="auto">Start the next one</button>
-              <button type="button" data-v="wait">Wait for me</button>
-            </div>
-          </div>
-          <div class="subsec">
-            <label>Show on the slide</label>
-            <div class="seg" id="tShowSeg" role="group" aria-label="Show on the slide">
-              <button type="button" data-v="timer">Timer</button>
-              <button type="button" data-v="clock">Clock</button>
-              <button type="button" data-v="both">Both</button>
-            </div>
+          <div id="ttImageEdit" hidden>
+            <div class="row"><button type="button" class="btn" id="ttImgBtn">Choose an image</button><button type="button" class="btn small" id="ttImgRemove">Remove image</button></div>
+            <input type="file" id="ttImgInput" accept="image/*" hidden>
+            <img class="imgprev" id="ttImgPrev" alt="Your timetable image" hidden>
+            <p class="hint">The image fills the timetable box on the slide for this day.</p>
           </div>
         </div>
+      </section>
 
-        <div class="sec">
-          <div class="sec-head"><h3>Prep info</h3><span class="tag" id="prepInfoTag"></span></div>
-          <div class="richbox" data-rich="prepinfo"></div>
-          <p class="hint">Anything teachers have said about tonight’s prep. Saved for this weekday.</p>
-        </div>
-
-        <div class="sec" id="tomSec">
-          <div class="sec-head"><h3>Tomorrow morning</h3><span class="tag" id="tomTag"></span></div>
-          <div class="richbox" data-rich="tomorrow"></div>
-          <div class="row" style="margin-top:0.5rem"><button type="button" class="btn small" id="tomCopy">Copy from tomorrow’s morning slide</button></div>
-          <p class="hint">Just for this evening. Copying makes a separate copy, so trimming it here never changes tomorrow’s morning slide.</p>
-        </div>
-        <p class="note" id="mpNote" hidden>This is a morning prep day, so the slide shows today’s “What’s happening today?” and today’s music lessons. Edit those on the Morning Slide.</p>
-      </div>
-
-      <!-- SETUP -->
-      <div class="tabpanel" data-panel="setup" hidden>
-        <div class="sec">
-          <div class="sec-head"><h3>Music &amp; LAMDA lessons spreadsheet</h3></div>
-          <div class="row">
-            <button type="button" class="btn small" id="lessonsBtn">Upload this week's file</button>
-            <span class="tag" id="lessonsInfo">No file yet</span>
+      <!-- Design -->
+      <section class="setsec" data-sec="design" hidden>
+        <h2>Design</h2>
+        <div class="card2">
+          <h3>Font</h3>
+          <div class="fontcards" id="fontCards">
+            <button type="button" class="fontcard" data-v="playful"><span class="row" style="justify-content:space-between"><b>Playful</b><span class="chosen">Chosen</span></span><span class="sample" style="font-family:'Playpen Sans',cursive">What’s happening today?</span><span class="hint" style="margin:0">One rounded, handwritten-style font throughout.</span></button>
+            <button type="button" class="fontcard" data-v="modern"><span class="row" style="justify-content:space-between"><b>Modern</b><span class="chosen">Chosen</span></span><span class="sample" style="font-family:'Bricolage Grotesque',sans-serif">What’s happening today?</span><span class="hint" style="margin:0">Bolder headings with a clean text font.</span></button>
           </div>
-          <p class="hint">The file is read and stored on this laptop only. Each day's slide shows that day's lessons for your form.</p>
-          <div class="note" id="ignoredNote" hidden></div>
-          <input type="file" id="lessonsInput" accept=".xlsx,.xls,.xlsm,.csv" hidden>
+          <p class="hint">The font also sets the headings on these editing screens.</p>
         </div>
-
-        <div class="sec">
-          <div class="sec-head"><h3>Your form</h3></div>
-          <select class="text" id="formSelect"><option value="">Upload the lessons file first</option></select>
+        <div class="card2">
+          <h3>Day colours</h3>
+          <div class="themecards" id="themeGrid"></div>
         </div>
+      </section>
 
-        <div class="sec">
-          <div class="sec-head"><h3>Slide design</h3></div>
-          <div class="seg" id="designSeg" role="group" aria-label="Slide design">
-            <button type="button" data-v="playful">Playful</button>
-            <button type="button" data-v="modern">Modern</button>
-          </div>
-          <p class="hint">Playful uses one rounded handwriting-style font throughout. Modern uses bolder, more grown-up headings with a clean text font.</p>
+      <!-- Prep -->
+      <section class="setsec" data-sec="prep" hidden>
+        <h2>Prep</h2>
+        <div class="card2">
+          <h3>Choose your morning prep day(s)</h3>
+          <div class="daychips" id="mpDays"></div>
+          <p class="hint">On these days prep happens in the morning: the prep slide shows today’s notes and music lessons, and there’s no evening prep.</p>
         </div>
-
-        <div class="sec">
-          <div class="sec-head"><h3>Morning task</h3></div>
-          <label class="check" style="margin-top:0"><input type="checkbox" id="showTaskToggle" checked><span>Show the “Today’s morning task” box</span></label>
-          <p class="hint">Turn this off if your form doesn’t do a morning task. The slide then shows “At 8:30…” across the top on its own.</p>
+        <div class="card2">
+          <h3>How much prep do you have in total?</h3>
+          <div class="seg" id="tTotalSeg" style="width:240px"><button type="button" data-v="30">30 mins</button><button type="button" data-v="40">40 mins</button></div>
+          <p class="hint">Used by the “Every 10 mins” timer: 3 or 4 chimes.</p>
         </div>
-
-        <div class="sec">
-          <div class="sec-head"><h3>Morning prep</h3></div>
-          <div class="daychips" id="mpDays" style="margin-bottom:0"></div>
-          <p class="hint">Tick the days when prep happens in the morning instead of the evening. On those days the prep slide shows today’s notes and music lessons, and there’s no evening prep.</p>
+        <div class="card2">
+          <h3>Switching slides</h3>
+          <div class="times"><b>09:00</b><span>Offer to switch to the prep slide (days with an evening prep)</span><b>17:30</b><span>Offer to switch to tomorrow’s morning slide</span></div>
+          <p class="hint">A pop-up asks first, so nothing changes on the projector without you.</p>
         </div>
+      </section>
 
-        <div class="sec">
-          <div class="sec-head"><h3>Day colours</h3></div>
-          <div class="themegrid" id="themeGrid"></div>
-        </div>
-
-        <div class="sec">
-          <div class="sec-head"><h3>Bitmoji</h3></div>
-          <div class="row">
-            <button type="button" class="btn small" id="bitBtn">Choose image</button>
-            <button type="button" class="btn small" id="bitRemove">Remove</button>
-          </div>
-          <img id="bitPrev" class="bitprev" alt="Bitmoji preview" hidden>
-          <input type="file" id="bitInput" accept="image/*" hidden>
-          <p class="hint">A PNG with a transparent background looks best.</p>
-        </div>
-
-        <div class="sec">
-          <div class="sec-head"><h3>House meeting schedule</h3><span class="tag" id="schedSource"></span></div>
-          <p class="hint" style="margin-top:0">Dates listed here set the house meeting locations (or Congers) automatically. Anything you change here is kept as your own, and you still get updates to the built-in schedule for every other date. You can also change a single date on the Day tab.</p>
+      <!-- House meetings -->
+      <section class="setsec" data-sec="house" hidden>
+        <h2>House meetings</h2>
+        <p class="lead">The school’s schedule is added to your slide automatically, and on these dates the side panel switches to house meetings by itself. You can change any date: your change is kept for that date only, and every other date still gets the school’s updates. Undo a change to go back to the school’s version.</p>
+        <div class="card2">
           <div class="sched-wrap">
             <table class="sched">
-              <thead><tr><th>Date</th><th class="hh" style="background:#3f8f5a;color:#fff">Athlone</th><th class="hh" style="background:#c8473f;color:#fff">Alexander</th><th class="hh" style="background:#f2c230;color:#17324f">Goodhart</th><th class="hh" style="background:#2f6db5;color:#fff">Dewar</th><th style="text-align:center">Congers</th><th colspan="2"></th></tr></thead>
+              <thead><tr><th>Date</th>
+                <th class="hh" style="background:#3f8f5a;color:#fff">Athlone</th><th class="hh" style="background:#c8473f;color:#fff">Alexander</th><th class="hh" style="background:#f2c230;color:#17324f">Goodhart</th><th class="hh" style="background:#2f6db5;color:#fff">Dewar</th>
+                <th style="text-align:center">Congers</th><th></th><th></th></tr></thead>
               <tbody id="schedBody"></tbody>
             </table>
           </div>
-          <div class="row" style="margin-top:0.6rem">
-            <button type="button" class="btn small" id="schedAdd">Add date</button>
-            <label class="check" style="margin:0"><input type="checkbox" id="schedPast"><span id="schedPastLabel">Show past dates</span></label>
+          <div class="row">
+            <button type="button" class="btn small strong" id="schedAdd">Add a date</button>
+            <label class="check"><input type="checkbox" id="schedPast"><span id="schedPastLabel">Show past dates</span></label>
             <span style="flex:1"></span>
-            <button type="button" class="btn small" id="schedPasteOpen">Paste schedule</button>
-            <button type="button" class="btn small" id="schedCopy">Copy schedule</button>
+            <button type="button" class="btn small" id="schedPasteOpen">Paste in schedule</button>
+            <button type="button" class="btn small" id="schedCopy">Copy to share</button>
           </div>
+          <div class="row"><span class="hint" id="schedSource" style="margin:0"></span><button type="button" class="linkbtn" id="schedRestore" hidden></button><button type="button" class="linkbtn" id="schedReset" hidden>Undo all my changes</button></div>
           <div class="pastebox" id="schedPasteBox" hidden>
-            <label for="schedPasteText" style="font-weight:700;font-size:0.9rem">Paste a schedule</label>
-            <p class="hint" style="margin:0.2rem 0 0.5rem">Copy the school’s house meeting sheet straight from Excel (rooms across the top, houses in the cells), or write one line per date: <strong>Date | Athlone | Alexander | Goodhart | Dewar</strong>, or <strong>Date | Congers</strong>. Dates like 06/11/2026. Half-term rows are skipped.</p>
+            <p class="hint" style="margin-top:0">Paste from Excel: either <b>Date | Athlone | Alexander | Goodhart | Dewar</b>, or the school’s sheet with a row of rooms and a house in each cell. Write Congers for a Congers week.</p>
             <textarea id="schedPasteText" spellcheck="false" aria-label="Pasted schedule"></textarea>
             <div id="schedPastePreview"></div>
-            <div class="row">
-              <button type="button" class="btn small primary" id="schedPasteAdd" disabled>Add these dates</button>
-              <button type="button" class="btn small" id="schedPasteCancel">Cancel</button>
-            </div>
+            <div class="row"><button type="button" class="btn primary" id="schedPasteAdd" disabled>Add these dates</button><button type="button" class="btn" id="schedPasteCancel">Cancel</button></div>
           </div>
-          <div class="row" style="margin-top:0.6rem"><button type="button" class="btn small" id="schedRestore" hidden></button><button type="button" class="btn small" id="schedReset" hidden>Undo all my changes</button></div>
         </div>
+      </section>
 
-        <div class="sec">
-          <div class="sec-head"><h3>Weekly defaults</h3></div>
-          <p class="hint" style="margin-top:0">Morning task, 8:30 and notes are set per weekday on the Day tab. Pick any date to edit that weekday.</p>
-        </div>
-
-        <div class="sec">
-          <div class="sec-head"><h3>Backup</h3></div>
-          <div class="row">
-            <button type="button" class="btn small" id="exportBtn">Export settings</button>
-            <button type="button" class="btn small" id="importBtn">Import settings</button>
+      <!-- Backup -->
+      <section class="setsec" data-sec="backup" hidden>
+        <h2>Backup &amp; reset</h2>
+        <p class="lead">Everything is automatically saved in this browser, so it’s unlikely you’ll need a backup. You can still save a copy to keep it safe or to move to another device.</p>
+        <div class="grid2">
+          <div class="card2">
+            <h3>Save a copy</h3>
+            <p class="hint" style="margin:0">Downloads one small file with everything, including all of your settings and preferences.</p>
+            <div class="row"><button type="button" class="btn primary" id="exportBtn">Save a copy</button><span class="hint" id="lastBackup" style="margin:0"></span></div>
+            <p class="note">Keep it in OneDrive and you can open it on any school laptop.</p>
+          </div>
+          <div class="card2">
+            <h3>Open a copy</h3>
+            <p class="hint" style="margin:0">Loads a saved copy, replacing what’s on this laptop. You’ll be asked to confirm first.</p>
+            <div class="row"><button type="button" class="btn" id="importBtn">Open a copy</button></div>
             <input type="file" id="importInput" accept=".json,application/json" hidden>
           </div>
-          <p class="hint">Saves everything (timetable, notes, Bitmoji, lessons, house meeting schedule) to a file you can keep or move to another laptop.</p>
         </div>
-
-        <div class="sec">
-          <div class="sec-head"><h3>Start again</h3></div>
-          <button type="button" class="btn small danger" id="resetAll">Reset everything</button>
+        <div class="card2 danger">
+          <div style="flex:1"><h3 style="margin-bottom:4px">Start again</h3><p class="hint" style="margin:0">Clears everything in this browser: timetable, notes, preps, design and music lessons. Save a copy first if you might want it back.</p></div>
+          <button type="button" class="btn danger" id="resetAll">Reset everything</button>
         </div>
-      </div>
-    </section>
-  </main>
+      </section>
+    </div>
+  </div>
+</div>
 </div>
 
 <div class="stage" id="stage" hidden></div>
@@ -714,13 +828,15 @@ function defaultState() {
     schedEdits: {},                      // this user's changes to the built-in schedule, by date
     overrides: {},                       // { 'YYYY-MM-DD': { task, at830, panel } }
     dayTheme: Object.assign({}, DEFAULT_THEMES),
-    bitmoji: null,
+    panelDefault: Object.assign({}, PANEL_DEFAULT),   // bottom-right panel for each weekday (you can change these)
+    checklistHidden: false,              // "Let's get your slide ready" dismissed
+    designChosen: false,                 // ticks off the checklist's last step
     design: 'playful',                   // slide design: 'playful' or 'modern'
     preps: per(() => [{ subject: '', mins: '' }, { subject: '', mins: '' }]),   // per weekday
     prepInfo: per(''),                   // prep info, per weekday
     prepTomorrow: {},                    // "Tomorrow morning" box, by prep date
     prepDays: [],                        // weekdays when prep happens in the morning
-    prepTimer: { mode: 'preps', total: 30, between: 'auto', show: 'both' }
+    prepTimer: { mode: 'preps', total: 30, between: 'auto', show: 'both', chime: true, customMins: 0 }
   };
 }
 
@@ -754,7 +870,10 @@ function richHTML(src) {
   });
   while (items.length && items[0].t === 'gap') items.shift();
   while (items.length && items[items.length - 1].t === 'gap') items.pop();
-  const inline = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  const inline = s => esc(s)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/__(.+?)__/g, '<u>$1</u>')
+    .replace(/(^|[^*])\*(?!\s)(.+?)\*(?!\*)/g, '$1<em>$2</em>');
   let out = '', i = 0;
   while (i < items.length) {
     const it = items[i];
@@ -820,8 +939,10 @@ let saveTimer = null;
 function save() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
+    let ok = true;
     try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
-    catch (e) { toast('Couldn\'t save: storage is full. Try a smaller image.'); }
+    catch (e) { ok = false; toast('Couldn\'t save: this browser\'s storage is full. Try a smaller timetable image.'); }
+    if (typeof onSaveResult === 'function') onSaveResult(ok);
   }, 250);
 }
 
@@ -857,15 +978,15 @@ function resolveDay(st, date) {
   const iso = toISO(date);
   const ovr = st.overrides[iso] || {};
   const sched = scheduleFor(st, iso);
-  let defaultPanel = PANEL_DEFAULT[wd];
+  let defaultPanel = (st.panelDefault || PANEL_DEFAULT)[wd] || PANEL_DEFAULT[wd];
   if (sched) defaultPanel = sched.congers ? (defaultPanel === 'house' ? 'none' : defaultPanel) : 'house';
   const panel = ovr.panel || defaultPanel;
 
-  let at830 = st.at830[wd] || '';
-  if (panel === 'house' && (wd === 'THU' || (sched && !sched.congers))) at830 = 'House Meetings';
-  else if (sched && sched.congers) at830 = 'Congers';
-  else if (wd === 'THU') at830 = st.at830.THU || 'Congers';
-  if (ovr.at830 != null) at830 = ovr.at830;
+  let at830 = st.at830[wd] || '', at830Source = 'weekly';
+  if (panel === 'house' && (wd === 'THU' || (sched && !sched.congers))) { at830 = 'House Meetings'; at830Source = 'auto'; }
+  else if (sched && sched.congers) { at830 = 'Congers'; at830Source = 'auto'; }
+  else if (wd === 'THU' && !st.at830.THU) { at830 = 'Congers'; at830Source = 'auto'; }
+  if (ovr.at830 != null) { at830 = ovr.at830; at830Source = 'override'; }
 
   // House meeting locations: a per-date change wins, then the schedule, otherwise blank
   let houses = NO_HOUSES(), houseSource = 'none';
@@ -877,12 +998,13 @@ function resolveDay(st, date) {
     task: ovr.task != null ? ovr.task : (st.task[wd] || ''),
     showTask: st.showTask !== false,
     at830, houses, houseSource,
-    notes: st.notes[wd] || '',
-    panelText: panel === 'lunch' ? (st.lunch[wd] || '') : panel === 'info' ? (st.info[wd] || '') : '',
-    panelTitle: panel === 'info' ? (((st.infoTitle || {})[wd] || '').trim() || PANEL_TITLES.info) : (PANEL_TITLES[panel] || ''),
-    ttView: ttViewOf(st, wd),
-    showTT: ttViewOf(st, wd) === 'full',
-    firstLesson: ttViewOf(st, wd) === 'first' ? firstLessonOf(st, wd) : null
+    at830Source, ovr,
+    notes: ovr.notes != null ? ovr.notes : (st.notes[wd] || ''),
+    panelText: ovr.panelText != null ? ovr.panelText : panel === 'lunch' ? (st.lunch[wd] || '') : panel === 'info' ? (st.info[wd] || '') : '',
+    panelTitle: panel === 'info' ? ((ovr.infoTitle != null ? ovr.infoTitle : ((st.infoTitle || {})[wd] || '')).trim() || PANEL_TITLES.info) : (PANEL_TITLES[panel] || ''),
+    ttView: ovr.ttView || ttViewOf(st, wd),
+    showTT: (ovr.ttView || ttViewOf(st, wd)) === 'full',
+    firstLesson: (ovr.ttView || ttViewOf(st, wd)) === 'first' ? firstLessonOf(st, wd) : null
   };
 }
 
@@ -1039,11 +1161,12 @@ function firstLessonHTML(r) {
 function panelHTML(st, day) {
   if (day.panel === 'none') return '';
   if (day.panel === 'house') {
-    return '<div class="card panel house"><div class="heading">House Meeting Locations</div><div class="houses">' +
+    return '<div class="card panel house region-side"><div class="heading">House Meeting Locations</div><div class="houses">' +
       HOUSES.map(h => '<div class="house-tile" style="background:' + h.tint + '"><div class="house-name" style="background:' + h.bg + ';color:' + h.fg + '">' + h.name + '</div>' +
-        '<div class="house-loc">' + esc(day.houses[h.name] || '') + '</div></div>').join('') + '</div></div>';
+        '<div class="house-loc" data-field="house:' + h.name + '">' + esc(day.houses[h.name] || '') + '</div></div>').join('') + '</div></div>';
   }
-  return '<div class="card panel bullets"><div class="heading">' + esc(day.panelTitle) + '</div><div class="rich" data-fit="30,18">' + richHTML(day.panelText) + '</div></div>';
+  return '<div class="card panel bullets region-side"><div class="heading"' + (day.panel === 'info' ? ' data-field="panelTitle"' : '') + '>' + esc(day.panelTitle) + '</div>' +
+    '<div class="rich" data-fit="30,18" data-field="panelText">' + richHTML(day.panelText) + '</div></div>';
 }
 
 function renderSlide(host, st, date) {
@@ -1052,24 +1175,24 @@ function renderSlide(host, st, date) {
   const rows = musicRows(st, day.wd);
   host.style.background = t.bg;
   host.innerHTML =
-    '<div class="slide' + (day.showTT ? '' : ' no-tt') + (day.ttView === 'first' ? ' first' : '') + (st.design === 'modern' ? ' modern' : '') + '" style="' + themeVars(t) + '">' +
+    '<div class="slide' + (day.showTT ? '' : ' no-tt') + (day.ttView === 'first' ? ' first' : '') + (st.design === 'modern' ? ' modern' : '') + (day.panel === 'none' ? ' no-panel' : '') + '" style="' + themeVars(t) + '">' +
       '<div class="circle" style="width:900px;height:900px;left:-300px;bottom:-480px"></div>' +
       '<div class="circle" style="width:700px;height:700px;right:-260px;top:-360px"></div>' +
       '<div class="grid">' +
-        '<div class="banner' + (st.bitmoji ? ' has-bitmoji' : '') + '">' + dateHTML(date) + (st.bitmoji ? '<img class="bitmoji" src="' + st.bitmoji + '" alt="">' : '') + '</div>' +
+        '<div class="banner">' + dateHTML(date) + '</div>' +
         '<div class="right">' +
           '<div class="card music' + (day.panel === 'info' || day.panel === 'lunch' ? ' natural' : '') + '"><div class="heading">Music Lessons</div><div class="music-body">' + musicHTML(rows) + '</div></div>' +
           panelHTML(st, day) +
         '</div>' +
-        '<div class="pair' + (day.showTask || day.ttView === 'first' ? '' : ' single') + '" style="--boxes:' + ((day.showTask ? 1 : 0) + 1 + (day.ttView === 'first' ? 1 : 0)) + '">' +
-          (day.showTask ? '<div class="info"><div class="info-label">Today\u2019s morning task</div><div class="info-value" data-fit="44,30">' + esc(day.task) + '</div></div>' : '') +
-          '<div class="info"><div class="info-label">' + (day.showTask ? 'then at 8:30\u2026' : 'At 8:30\u2026') + '</div><div class="info-value" data-fit="44,30">' + esc(day.at830) + '</div></div>' +
+        '<div class="pair region-top' + (day.showTask || day.ttView === 'first' ? '' : ' single') + '" style="--boxes:' + ((day.showTask ? 1 : 0) + 1 + (day.ttView === 'first' ? 1 : 0)) + '">' +
+          (day.showTask ? '<div class="info"><div class="info-label">Today\u2019s morning task</div><div class="info-value" data-fit="44,30" data-field="task">' + esc(day.task) + '</div></div>' : '') +
+          '<div class="info"><div class="info-label">' + (day.showTask ? 'then at 8:30\u2026' : 'At 8:30\u2026') + '</div><div class="info-value" data-fit="44,30" data-field="at830">' + esc(day.at830) + '</div></div>' +
           (day.ttView === 'first' ? firstLessonHTML(day.firstLesson) : '') +
         '</div>' +
-        '<div class="left">' +
-          '<div class="card notes"><div class="heading">What\u2019s happening today?</div><div class="rich" data-fit="32,20">' + richHTML(day.notes) + '</div></div>' +
+        '<div class="left' + (day.showTT ? '' : ' region-main') + '">' +
+          '<div class="card notes"><div class="heading">What\u2019s happening today?</div><div class="rich" data-fit="32,20" data-field="notes">' + richHTML(day.notes) + '</div></div>' +
         '</div>' +
-        (day.showTT ? '<div class="card tt"><div class="heading">Timetable</div>' + timetableHTML(st, day.wd) + '</div>' : '') +
+        (day.showTT ? '<div class="card tt region-main"><div class="heading">Timetable</div>' + timetableHTML(st, day.wd) + '</div>' : '') +
       '</div>' +
     '</div>';
   fitSlide(host.querySelector('.slide'), day.panel);
@@ -1142,10 +1265,11 @@ function prepList(st, wd) {
 }
 function planOf(st, wd) {
   const set = st.prepTimer || {};
+  if (set.mode === 'custom') return { kind: 'custom', segs: set.customMins > 0 ? [{ label: '', mins: set.customMins }] : [] };
   if (set.mode === 'tens') return { kind: 'tens', segs: Array.from({ length: Number(set.total) === 40 ? 4 : 3 }, () => ({ label: '', mins: 10 })) };
   return { kind: 'preps', segs: prepList(st, wd).filter(p => p.mins > 0).map(p => ({ label: p.subject, mins: p.mins })) };
 }
-const fmtMins = m => (Math.round(m * 100) / 100) + (m === 1 ? ' min' : ' mins');
+const fmtMins = m => { const s = Math.round(m * 60); return s % 60 ? Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0') + ' mins' : (s / 60) + (s === 60 ? ' min' : ' mins'); };
 function segFull(seg) { return seg.mins * 60000 + (seg.extra || 0); }
 
 /* Move a running timer on if its time is up. Works from fixed end times, so it can't fall behind
@@ -1184,16 +1308,18 @@ function timerView(t, plan, now) {
 }
 function clockText(d) { return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
 
-function renderPrep(host, st, date) {
+function renderPrep(host, st, date, editor) {
   const wd = dayCode(date) === 'SUN' ? 'MON' : dayCode(date);
   const morning = isMorningPrep(st, wd);
   const base = themeFor(st, wd);
   const t = morning ? base : Object.assign({}, base, { bg: hexMix(base.main, 0.62), circle: hexMix(base.main, 0.72) });
   const show = (st.prepTimer || {}).show || 'both';
-  const showClock = show !== 'timer', showTimer = show !== 'clock';
-  const list = prepList(st, wd);
+  const showClock = show === 'both', clockOnly = show === 'clock';
+  // Rows keep their place in the saved list so they can be typed on in the editor (blank rows only show there)
   let k = 0;
-  const rows = list.map(p => Object.assign({ seg: p.mins > 0 ? k++ : -1 }, p));
+  const rows = ((st.preps || {})[wd] || []).map((p, i) => ({ i, subject: (p.subject || '').trim(), mins: Math.max(0, parseFloat(p.mins) || 0), raw: p.mins || '' }))
+    .filter(r => editor || r.subject)
+    .map(r => Object.assign(r, { seg: r.subject && r.mins > 0 ? k++ : -1 }));
   const n = date.getDate();
   const shortD = String(n).padStart(2, '0') + '/' + String(date.getMonth() + 1).padStart(2, '0') + '/' + date.getFullYear();
   let second, secondTitle, musicTitle, musicDay, musicEmpty;
@@ -1217,16 +1343,18 @@ function renderPrep(host, st, date) {
         '</div>' +
         '<div class="card preps' + (rows.length >= 3 ? ' many' : '') + '">' +
           (rows.length ? rows.map(r =>
-            '<div class="prep-row" data-seg="' + r.seg + '"><span class="prep-subj" data-fit="' + (rows.length >= 3 ? '44,28' : '52,30') + '">' + esc(r.subject) + '</span><span class="prep-tag"></span>' +
-            '<span class="prep-mins">' + (r.mins ? Math.round(r.mins * 100) / 100 + ' <small>mins</small>' : '') + '</span></div>').join('')
-            : '<div class="prep-none">No preps set for ' + DAY_NAMES[wd] + ' yet</div>') +
+            '<div class="prep-row" data-seg="' + r.seg + '"><span class="prep-subj" data-fit="' + (rows.length >= 3 ? '44,28' : '52,30') + '" data-field="prep:' + r.i + ':subject">' + esc(r.subject) + '</span><span class="prep-tag"></span>' +
+            '<span class="prep-mins">' + (editor || r.mins ? '<span class="prep-num" data-field="prep:' + r.i + ':mins">' + esc(editor ? String(r.raw).trim() : String(Math.round(r.mins * 100) / 100)) + '</span> <small>mins</small>' : '') + '</span></div>').join('')
+            : (editor ? '' : '<div class="prep-none">No preps set for ' + DAY_NAMES[wd] + ' yet</div>')) +
+          (editor && rows.length < 4 ? '<button type="button" class="prep-add" data-add-prep>+ Add a prep</button>' : '') +
         '</div>' +
         '<div class="prep-low">' +
-          '<div class="card prep-box"><div class="heading">Prep Info</div>' + (info ? '<div class="rich" data-fit="30,18">' + richHTML(info) + '</div>' : '<div class="prep-empty"></div>') + '</div>' +
-          '<div class="card prep-box"><div class="heading">' + secondTitle + '</div>' + (second ? '<div class="rich" data-fit="30,18">' + richHTML(second) + '</div>' : '<div class="prep-empty"></div>') + '</div>' +
+          '<div class="card prep-box"><div class="heading">Prep Info</div><div class="rich" data-fit="30,18" data-field="prepInfo" data-always="No extra instructions">' + richHTML(info) + '</div></div>' +
+          '<div class="card prep-box"><div class="heading">' + secondTitle + '</div><div class="rich" data-fit="30,18"' + (morning ? '' : ' data-field="tomorrow"') + '>' + richHTML(second) + '</div></div>' +
         '</div>' +
         '<div class="right">' +
-          (showTimer ? '<div class="pt"><div class="pt-label"></div><div class="pt-time"></div><div class="pt-bars"></div><div class="pt-sub"></div></div>' : '') +
+          (clockOnly ? '<div class="pt clock-only"><div class="pt-label">Time now</div><div class="pt-time pt-bigclock"></div></div>'
+                     : '<div class="pt"><div class="pt-label"></div><div class="pt-time"></div><div class="pt-bars"></div><div class="pt-sub"></div></div>') +
           '<div class="card music"><div class="heading">' + musicTitle + '</div><div class="music-body">' + musicHTML(musicRows(st, musicDay), musicEmpty) + '</div></div>' +
         '</div>' +
       '</div>' +
@@ -1241,8 +1369,7 @@ function renderPrep(host, st, date) {
 function paintTimer(slide, st) {
   if (!slide || !slide.classList.contains('prep')) return;
   const now = Date.now();
-  const clock = slide.querySelector('.pt-clock');
-  if (clock) { const c = clockText(new Date(now)); if (clock.textContent !== c) clock.textContent = c; }
+  slide.querySelectorAll('.pt-clock, .pt-bigclock').forEach(clock => { const c = clockText(new Date(now)); if (clock.textContent !== c) clock.textContent = c; });
   const v = timerView(timer, planOf(st, slide.dataset.wd), now);
   slide.querySelectorAll('.prep-row').forEach(r => {
     const seg = +r.dataset.seg, isNow = seg >= 0 && seg === v.hl, isDone = seg >= 0 && seg < v.done && seg !== v.hl;
@@ -1250,7 +1377,7 @@ function paintTimer(slide, st) {
     const tag = isNow ? 'Now' : isDone ? 'Done' : '';
     const el = r.querySelector('.prep-tag'); if (el.textContent !== tag) el.textContent = tag;
   });
-  const pt = slide.querySelector('.pt');
+  const pt = slide.querySelector('.pt:not(.clock-only)');
   if (!pt) return;
   const set = (sel, txt) => { const e = pt.querySelector(sel); if (e.textContent !== txt) e.textContent = txt; };
   set('.pt-label', v.label); set('.pt-time', v.time); set('.pt-sub', v.sub);
@@ -1263,8 +1390,8 @@ function paintTimer(slide, st) {
   bars.querySelectorAll('i').forEach((i, n) => { i.style.width = (v.bars[n].fill * 100).toFixed(2) + '%'; });
 }
 
-function renderView(host, st, mode, date) {
-  return mode === 'prep' ? renderPrep(host, st, date) : renderSlide(host, st, date);
+function renderView(host, st, mode, date, editor) {
+  return mode === 'prep' ? renderPrep(host, st, date, editor) : renderSlide(host, st, date);
 }
 
 /* A steady tick that keeps going in background tabs (a tiny worker isn't slowed down like page timers are) */
@@ -1372,16 +1499,11 @@ if (location.hash === '#slide') {
 }
 
 /* =====================================================================
-   DASHBOARD
+   EDITING SCREENS
    ===================================================================== */
-const els = {
-  preview: $('preview'), status: $('status'), dateInput: $('dateInput'),
-  taskInput: $('taskInput'), taskTag: $('taskTag'), taskOvrToggle: $('taskOvrToggle'), taskOvrLabel: $('taskOvrLabel'), taskOvrBox: $('taskOvrBox'), taskOvr: $('taskOvr'),
-  atInput: $('atInput'), atTag: $('atTag'), atOvrToggle: $('atOvrToggle'), atOvrLabel: $('atOvrLabel'), atOvrBox: $('atOvrBox'), atOvr: $('atOvr'), atThuHint: $('atThuHint'),
-  notesTag: $('notesTag'), panelSeg: $('panelSeg'), panelEdit: $('panelEdit'), panelTag: $('panelTag'),
-  formSelect: $('formSelect'), lessonsInfo: $('lessonsInfo'), ignoredNote: $('ignoredNote'),
-  toast: $('toast'), stage: $('stage'), presentBtn: $('presentBtn'), endBtn: $('endBtn'), presentingPill: $('presentingPill')
-};
+const els = { preview: $('preview'), stage: $('stage'), toast: $('toast'), wrap: $('previewWrap') };
+const wdOf = d => (dayCode(d) === 'SUN' ? 'MON' : dayCode(d));
+
 /* Which slide should be up at a given moment: the morning slide until 9:00, then (on days with an
    evening prep) the prep slide, then from 17:30 tomorrow's morning slide. */
 function autoTarget(now) {
@@ -1395,277 +1517,894 @@ const startTarget = autoTarget(new Date());
 let editMode = startTarget.mode;                       // what you're editing
 let proj = Object.assign({}, startTarget);             // what the projector shows
 let viewDate = fromISO(startTarget.date);
-let ttDay = dayCode(viewDate) === 'SUN' ? 'MON' : dayCode(viewDate);
+let ttDay = wdOf(viewDate);
+let scopePending = {};                                 // "Change for today" picked but nothing changed yet
 
 let toastTimer;
 function toast(msg) {
   els.toast.textContent = msg; els.toast.classList.add('show');
-  clearTimeout(toastTimer); toastTimer = setTimeout(() => els.toast.classList.remove('show'), 3200);
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => els.toast.classList.remove('show'), 3400);
 }
-
-/* ---------- Rich text editor (textarea + toolbar) ---------- */
-function makeRich(container, get, set, opts = {}) {
-  container.innerHTML =
-    '<div class="toolbar">' +
-      '<button type="button" data-a="bold" title="Bold (Ctrl+B)"><strong>B</strong></button>' +
-      '<button type="button" data-a="bullet" title="Bullet">\u2022 Bullet</button>' +
-      '<button type="button" data-a="sub" title="Sub-bullet (Tab)">\u25E6 Sub-bullet</button>' +
-      '<span class="spacer"></span>' +
-      '<button type="button" data-a="clear" title="Clear">Clear</button>' +
-    '</div><textarea spellcheck="true" placeholder="' + esc(opts.placeholder || '') + '"></textarea>';
-  const ta = container.querySelector('textarea');
-  ta.value = get();
-  const commit = () => { set(ta.value); };
-  ta.addEventListener('input', commit);
-
-  const lineRange = () => {
-    const v = ta.value, s = ta.selectionStart, e = ta.selectionEnd;
-    const ls = v.lastIndexOf('\n', s - 1) + 1;
-    let le = v.indexOf('\n', e); if (le === -1) le = v.length;
-    return { v, ls, le };
-  };
-  const replaceLines = fn => {
-    const { v, ls, le } = lineRange();
-    const lines = v.slice(ls, le).split('\n').map(fn);
-    const text = lines.join('\n');
-    ta.setRangeText(text, ls, le, 'end');
-    ta.dispatchEvent(new Event('input'));
-  };
-  const strip = l => l.replace(/^(?:\t+|\s+)?[-*•]\s+/, '');
-  const isSub = l => /^(?:\t+|\s{2,})[-*•]\s+/.test(l);
-  const isLi = l => /^\s?[-*•]\s+/.test(l) && !isSub(l);
-  const act = a => {
-    if (a === 'bold') {
-      const s = ta.selectionStart, e = ta.selectionEnd, sel = ta.value.slice(s, e);
-      if (sel) { ta.setRangeText('**' + sel + '**', s, e, 'end'); }
-      else { ta.setRangeText('**bold**', s, e, 'end'); ta.setSelectionRange(s + 2, s + 6); }
-      ta.dispatchEvent(new Event('input'));
-    } else if (a === 'bullet') {
-      replaceLines(l => isLi(l) ? strip(l) : '- ' + strip(l));
-    } else if (a === 'sub') {
-      replaceLines(l => isSub(l) ? '- ' + strip(l) : '  - ' + strip(l));
-    } else if (a === 'clear') {
-      ta.value = ''; ta.dispatchEvent(new Event('input'));
-    }
-    ta.focus();
-  };
-  container.querySelector('.toolbar').addEventListener('click', e => { const b = e.target.closest('button'); if (b) act(b.dataset.a); });
-  ta.addEventListener('keydown', e => {
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') { e.preventDefault(); act('bold'); return; }
-    const { v, ls, le } = lineRange();
-    const line = v.slice(ls, le);
-    if (e.key === 'Tab' && (isLi(line) || isSub(line))) {
-      e.preventDefault();
-      replaceLines(l => e.shiftKey ? (isSub(l) ? '- ' + strip(l) : l) : (isLi(l) ? '  - ' + strip(l) : l));
-    } else if (e.key === 'Enter' && !e.shiftKey && ta.selectionStart === ta.selectionEnd && (isLi(line) || isSub(line))) {
-      e.preventDefault();
-      if (!strip(line).trim()) {                         // empty bullet → end the list
-        ta.setRangeText('', ls, le, 'end');
-      } else {
-        ta.setRangeText('\n' + (isSub(line) ? '  - ' : '- '), ta.selectionStart, ta.selectionEnd, 'end');
-      }
-      ta.dispatchEvent(new Event('input'));
-    }
-  });
-  return { refresh() { if (document.activeElement !== ta) ta.value = get(); }, ta };
-}
-
-/* ---------- Day tab ---------- */
-const wdOf = d => (dayCode(d) === 'SUN' ? 'MON' : dayCode(d));
-function ovr() { return state.overrides[toISO(viewDate)]; }
+const shortMonth = d => MONTHS[d.getMonth()].slice(0, 3);
+function shortDate(d) { return DAY_NAMES[dayCode(d)].slice(0, 3) + ' ' + d.getDate() + ' ' + shortMonth(d); }
+const dayMonth = d => d.getDate() + ' ' + shortMonth(d);
+function ovr() { return state.overrides[toISO(viewDate)] || {}; }
 function setOvr(key, val) {
   const iso = toISO(viewDate);
   const o = state.overrides[iso] || {};
   if (val == null) delete o[key]; else o[key] = val;
   if (Object.keys(o).length) state.overrides[iso] = o; else delete state.overrides[iso];
 }
-function shortDate(d) { return DAY_NAMES[dayCode(d)].slice(0, 3) + ' ' + d.getDate() + ' ' + MONTHS[d.getMonth()].slice(0, 3); }
-
-const notesEditor = makeRich(document.querySelector('[data-rich="notes"]'),
-  () => state.notes[wdOf(viewDate)] || '',
-  v => { state.notes[wdOf(viewDate)] = v; changed(); });
-let panelEditor = null;
-
-function refreshDay() {
-  const wd = wdOf(viewDate), name = DAY_NAMES[wd], o = ovr() || {};
-  const every = 'Every ' + name;
-  els.taskTag.textContent = every; els.atTag.textContent = every; els.notesTag.textContent = every;
-  if (document.activeElement !== els.taskInput) els.taskInput.value = state.task[wd] || '';
-  if (document.activeElement !== els.atInput) els.atInput.value = state.at830[wd] || '';
-  const dd = resolveDay(state, viewDate);
-  els.atThuHint.hidden = !(wd === 'THU' || dd.sched);
-  $('taskSec').hidden = !dd.showTask;
-  $('atHeading').textContent = dd.showTask ? 'Then at 8:30\u2026' : 'At 8:30\u2026';
-  els.taskOvrLabel.textContent = 'Different just for ' + shortDate(viewDate);
-  els.atOvrLabel.textContent = 'Different just for ' + shortDate(viewDate);
-  els.taskOvrToggle.checked = o.task != null; els.taskOvrBox.hidden = o.task == null;
-  els.atOvrToggle.checked = o.at830 != null; els.atOvrBox.hidden = o.at830 == null;
-  if (o.task != null && document.activeElement !== els.taskOvr) els.taskOvr.value = o.task;
-  if (o.at830 != null && document.activeElement !== els.atOvr) els.atOvr.value = o.at830;
-  notesEditor.refresh();
-
-  const day = dd;
-  const def = day.defaultPanel;
-  els.panelSeg.querySelectorAll('button').forEach(b => {
-    b.setAttribute('aria-pressed', String(b.dataset.v === day.panel));
-    const own = ((state.infoTitle || {})[wd] || '').trim();
-    const label = { none: 'None', info: own || 'Additional information', lunch: 'Lunchtime arrangements', house: 'House meetings' }[b.dataset.v];
-    b.innerHTML = esc(label) + (b.dataset.v === def ? '<span class="def">default</span>' : '');
-  });
-  els.panelTag.textContent = day.panel !== def ? 'Changed for ' + shortDate(viewDate) + ' only'
-    : day.sched ? 'From the house meeting schedule' : name + '\u2019s default';
-  buildPanelEditor(day.panel, wd, day);
+const OVR_NAMES = { task: 'morning task', at830: '8:30 box', notes: 'What’s happening', panel: 'side panel', panelText: 'side panel text', infoTitle: 'panel heading', house: 'house rooms', ttView: 'main area' };
+function plainFirst(s) {
+  const line = String(s || '').replace(/^\s*[-*•]\s+/gm, '').replace(/\*\*|__|\*/g, '').split('\n').map(x => x.trim()).find(Boolean) || '';
+  return line.length > 38 ? line.slice(0, 36).trim() + '…' : line;
 }
 
-let panelEditorKey = '';
-function buildPanelEditor(panel, wd, day) {
-  const key = panel + '|' + wd + (panel === 'house' ? '|' + day.iso + '|' + day.houseSource : '');
-  if (key === panelEditorKey) {
-    if (panelEditor) panelEditor.refresh();
-    else if (panel === 'house') els.panelEdit.querySelectorAll('input[data-house]').forEach(i => { if (document.activeElement !== i) i.value = day.houses[i.dataset.house] || ''; });
-    return;
-  }
-  panelEditorKey = key;
-  panelEditor = null;
-  const box = els.panelEdit;
-  if (panel === 'none') { box.innerHTML = '<p class="hint" style="margin:0">The music lessons panel uses the full height.</p>'; return; }
-  if (panel === 'house') {
-    // From the schedule: shown read-only until "Change for this date" is ticked.
-    // No schedule entry for this date: the box is ticked automatically and can't be unticked.
-    const hasSched = !!(day.sched && !day.sched.congers);
-    const editing = day.houseSource === 'override' || !hasSched;
-    const label = 'Change for ' + shortDate(viewDate);
-    box.innerHTML =
-      '<div class="row" style="justify-content:space-between">' +
-        '<label class="check" style="margin:0"><input type="checkbox" id="houseOvr"' + (editing ? ' checked' : '') + (hasSched ? '' : ' disabled') + '><span>' + esc(label) + '</span></label>' +
-        (hasSched ? (editing ? '<span class="srcnote">Changed from the schedule</span>' : '<span class="srcnote">From the schedule</span>')
-                  : '<span class="srcnote">' + (day.sched && day.sched.congers ? 'Schedule says Congers' : 'Not in the schedule') + '</span>') +
-      '</div>' +
-      '<div class="housegrid' + (editing ? '' : ' locked') + '">' + HOUSES.map(h =>
-        '<label class="houseinput"><span style="background:' + h.bg + ';color:' + h.fg + '">' + h.name + '</span>' +
-        '<input data-house="' + h.name + '" value="' + esc(day.houses[h.name] || '') + '"' + (editing ? '' : ' disabled') + '></label>').join('') + '</div>' +
-      '<p class="hint">' + (hasSched ? 'Tick the box to change the locations for this date only. The schedule itself isn\u2019t changed.'
-                                      : 'Type this date\u2019s locations. Add them to the schedule in Settings to fill them in automatically.') + '</p>';
-    const tick = box.querySelector('#houseOvr');
-    tick.addEventListener('change', () => {
-      setOvr('house', tick.checked ? housesOf(day.sched || {}) : null);
-      changed(); refreshDay();
-      if (tick.checked) { const f = els.panelEdit.querySelector('input[data-house]'); if (f) f.focus(); }
-    });
-    box.querySelectorAll('input[data-house]').forEach(inp => inp.addEventListener('input', () => {
-      const o = (ovr() || {}).house ? Object.assign({}, ovr().house) : housesOf(resolveDay(state, viewDate).houses);
-      o[inp.dataset.house] = inp.value; setOvr('house', o); changed();
-    }));
-    return;
-  }
-  const field = panel === 'lunch' ? 'lunch' : 'info';
-  box.innerHTML = (panel === 'info'
-      ? '<label for="infoTitleInput" style="display:block;font-weight:700;font-size:0.85rem;margin-bottom:0.25rem">Heading on ' + DAY_NAMES[wd] + 's</label>' +
-        '<input class="text" id="infoTitleInput" placeholder="' + PANEL_TITLES.info + '" value="' + esc((state.infoTitle || {})[wd] || '') + '" style="margin-bottom:0.6rem">'
-      : '') +
-    '<div class="richbox"></div><p class="hint">Saved for every ' + DAY_NAMES[wd] + ', like your notes.' +
-    (panel === 'info' ? ' Leave the heading blank to use \u201c' + PANEL_TITLES.info + '\u201d.' : '') + '</p>';
-  const titleInput = box.querySelector('#infoTitleInput');
-  if (titleInput) titleInput.addEventListener('input', () => {
-    state.infoTitle = state.infoTitle || {};
-    state.infoTitle[wdOf(viewDate)] = titleInput.value;
-    changed();
-    const b = els.panelSeg.querySelector('button[data-v="info"]');
-    if (b) b.firstChild.textContent = titleInput.value.trim() || 'Additional information';
+/* ---------- Saved indicator ---------- */
+let saveOk = true;
+function onSaveResult(ok) { saveOk = ok; paintSaveState(); }
+function paintSaveState() {
+  ['saveState', 'saveState2'].forEach(id => {
+    const el = $(id); if (!el) return;
+    el.classList.toggle('bad', !saveOk);
+    el.querySelector('span').textContent = saveOk ? 'Saved in browser' : 'Not saved: storage is full';
+    el.title = saveOk ? 'Everything you change is saved in this browser straight away.'
+      : 'This browser’s storage is full, so your latest changes aren’t saved. A smaller timetable image usually fixes it. Save a copy to be safe.';
   });
-  panelEditor = makeRich(box.querySelector('.richbox'),
-    () => state[field][wdOf(viewDate)] || '',
-    v => { state[field][wdOf(viewDate)] = v; changed(); });
 }
+function applyDesignClass() { document.body.classList.toggle('modern', state.design === 'modern'); }
 
-els.taskInput.addEventListener('input', () => { state.task[wdOf(viewDate)] = els.taskInput.value; changed(); });
-els.atInput.addEventListener('input', () => { state.at830[wdOf(viewDate)] = els.atInput.value; changed(); });
-els.taskOvrToggle.addEventListener('change', () => {
-  setOvr('task', els.taskOvrToggle.checked ? (els.taskInput.value || '') : null);
-  if (els.taskOvrToggle.checked) els.taskOvr.value = els.taskInput.value;
-  changed(); refreshDay(); if (els.taskOvrToggle.checked) els.taskOvr.select();
-});
-els.atOvrToggle.addEventListener('change', () => {
-  const cur = resolveDay(state, viewDate).at830;
-  setOvr('at830', els.atOvrToggle.checked ? cur : null);
-  if (els.atOvrToggle.checked) els.atOvr.value = cur;
-  changed(); refreshDay(); if (els.atOvrToggle.checked) els.atOvr.select();
-});
-els.taskOvr.addEventListener('input', () => { setOvr('task', els.taskOvr.value); changed(); });
-els.atOvr.addEventListener('input', () => { setOvr('at830', els.atOvr.value); changed(); });
-els.panelSeg.addEventListener('click', e => {
-  const b = e.target.closest('button'); if (!b) return;
-  const def = resolveDay(state, viewDate).defaultPanel;
-  setOvr('panel', b.dataset.v === def ? null : b.dataset.v);
-  changed(); refreshDay();
-});
+/* =====================================================================
+   Top bar: mode switch, form, week strip
+   ===================================================================== */
+function setMode(m) {
+  editMode = m;
+  $('modeSwitch').classList.toggle('prep', m === 'prep');
+  $('modeSwitch').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === m)));
+  $('sideMorning').hidden = m !== 'morning';
+  $('sidePrep').hidden = m !== 'prep';
+  $('timerGroup').hidden = m !== 'prep';
+  if (m === 'prep' && viewDate.getDay() === 6) viewDate = addDays(viewDate, -1);
+  endEditNow();
+  refreshUi(); renderAll();
+}
+$('modeSwitch').addEventListener('click', e => { const b = e.target.closest('button'); if (b && b.dataset.m !== editMode) setMode(b.dataset.m); });
 
-/* ---------- Date navigation ---------- */
 function setDate(d) {
   viewDate = schoolDay(d);
-  els.dateInput.value = toISO(viewDate);
-  ttDay = wdOf(viewDate); refreshTT();
-  refreshDay(); refreshPrep(); renderAll();
+  if (editMode === 'prep' && viewDate.getDay() === 6) viewDate = addDays(viewDate, -1);
+  scopePending = {};
+  ttDay = wdOf(viewDate);
+  endEditNow();
+  refreshUi(); renderAll();
 }
-$('prevDay').addEventListener('click', () => { let d = addDays(viewDate, -1); if (d.getDay() === 0) d = addDays(d, -1); setDate(d); });
-$('nextDay').addEventListener('click', () => setDate(addDays(viewDate, 1)));
-$('todayBtn').addEventListener('click', () => setDate(new Date()));
-els.dateInput.addEventListener('change', () => { const d = fromISO(els.dateInput.value); if (d) setDate(d); });
 
-/* ---------- Tabs ---------- */
-document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => {
-  document.querySelectorAll('.tabs button').forEach(x => x.setAttribute('aria-selected', String(x === b)));
-  document.querySelectorAll('.tabpanel').forEach(p => { p.hidden = p.dataset.panel !== b.dataset.tab; });
-}));
+function refreshWeek() {
+  const mon = addDays(viewDate, -((viewDate.getDay() + 6) % 7));
+  const todayIso = toISO(schoolDay(new Date())), cur = toISO(viewDate);
+  const arrow = (dir, label, path) => '<button type="button" class="arrow" data-w="' + dir + '" aria-label="' + label + '"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="' + path + '" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>';
+  let html = arrow(-1, 'Previous week', 'M9 2L4 7l5 5');
+  for (let i = 0; i < 6; i++) {
+    const d = addDays(mon, i), iso = toISO(d), keys = Object.keys(state.overrides[iso] || {});
+    const off = editMode === 'prep' && i === 5;
+    const tip = off ? 'No prep on Saturdays' : keys.length ? 'Changed just for this day: ' + keys.map(k => OVR_NAMES[k] || k).join(', ') : DAY_NAMES[dayCode(d)] + ' ' + d.getDate() + ' ' + MONTHS[d.getMonth()];
+    html += '<button type="button" class="day' + (iso === todayIso ? ' today' : '') + '" data-iso="' + iso + '" aria-pressed="' + (iso === cur) + '"' + (off ? ' disabled' : '') + ' title="' + esc(tip) + '">' +
+      DAY_NAMES[dayCode(d)].slice(0, 3) + '<small>' + dayMonth(d) + '</small>' + (keys.length && !off ? '<i class="dot"></i>' : '') + '</button>';
+  }
+  html += arrow(1, 'Next week', 'M5 2l5 5-5 5') + '<button type="button" class="todaybtn" id="todayBtn">Today</button>';
+  $('week').innerHTML = html;
+}
+$('week').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b || b.disabled) return;
+  if (b.id === 'todayBtn') setDate(editMode === 'prep' && new Date().getDay() === 6 ? addDays(new Date(), -1) : new Date());
+  else if (b.dataset.w) setDate(addDays(viewDate, 7 * +b.dataset.w));
+  else if (b.dataset.iso) setDate(fromISO(b.dataset.iso));
+});
+$('formChip').addEventListener('click', () => openSetup('form'));
+$('setupBtn').addEventListener('click', () => openSetup());
 
-/* ---------- Timetable tab ---------- */
-function refreshTT() {
-  $('ttDays').innerHTML = DAYS.map(d => '<button type="button" data-d="' + d + '" aria-pressed="' + (d === ttDay) + '">' + DAY_NAMES[d].slice(0, 3) + '</button>').join('');
-  const view = ttViewOf(state, ttDay);
-  $('ttViewHeading').textContent = 'On the slide on ' + DAY_NAMES[ttDay] + 's';
-  $('ttViewSeg').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === view)));
-  $('ttOffHint').hidden = view === 'full';
-  $('ttOffHint').textContent = view === 'off'
-    ? 'The timetable is hidden. \u201cWhat\u2019s happening today?\u201d takes its space and spreads across two columns.'
-    : 'Only the first lesson shows, in a box next to the 8:30 one. \u201cWhat\u2019s happening today?\u201d spreads across two columns.';
-  $('firstPick').hidden = view !== 'first';
-  if (view === 'first') {
-    const rows = ttRows(state, ttDay), auto = autoFirstIndex(rows), pick = (state.firstRow || {})[ttDay];
-    const label = r => [r.time, r.subject, r.room].map(x => (x || '').trim()).filter(Boolean).join(' \u00b7 ');
+function refreshUi() {
+  refreshWeek();
+  const fc = $('formChip');
+  fc.textContent = state.form || 'Choose your form';
+  fc.classList.toggle('empty', !state.form);
+  if (editMode === 'morning') refreshMorningSide(); else refreshPrepSide();
+  $('previewHint').textContent = editMode === 'morning'
+    ? 'Click the morning task, 8:30, What’s happening or the side panel to type on them'
+    : isMorningPrep(state, wdOf(viewDate)) ? 'Click the preps, minutes or Prep Info to type on them'
+    : 'Click the preps, minutes, Prep Info or Tomorrow Morning to type on them';
+  refreshTimerUi();
+  paintSaveState();
+}
+
+/* =====================================================================
+   Side column (morning): getting started, map and the three areas
+   ===================================================================== */
+function checklistSteps() {
+  return [
+    { done: !!state.lessons, title: 'Upload this week’s music lessons', text: state.lessons ? state.lessons.fileName : 'The Music & LAMDA spreadsheet', action: 'Upload', go: 'form' },
+    { done: !!state.form, title: 'Choose your form', text: state.form ? state.form : 'So the slide shows your pupils’ lessons', action: 'Choose', go: 'form' },
+    { done: DAYS.some(d => ttRows(state, d).length || state.ttImage[d]), title: 'Add your timetable', text: 'Paste it, or type it in', action: 'Add', go: 'timetable' },
+    { done: !!state.designChosen, title: 'Pick a look', text: 'Playful or Modern, and day colours', action: 'Pick', go: 'design' }
+  ];
+}
+function scopeSeg(id, today, wd) {
+  const seg = $(id);
+  seg.querySelector('[data-scope="week"]').textContent = 'Same every ' + DAY_NAMES[wd];
+  seg.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String((b.dataset.scope === 'today') === !!today)));
+}
+function refreshMorningSide() {
+  const day = resolveDay(state, viewDate), wd = day.wd;
+  const steps = checklistSteps();
+  const showCheck = !state.checklistHidden && steps.some(s => !s.done);
+  $('checklist').hidden = !showCheck; $('regions').hidden = showCheck;
+  if (showCheck) {
+    const next = steps.findIndex(s => !s.done);
+    $('checkBar').style.width = (steps.filter(s => s.done).length / steps.length * 100) + '%';
+    $('checkSteps').innerHTML = steps.map((s, i) =>
+      '<div class="step' + (s.done ? ' done' : i === next ? ' next' : '') + '"><span class="num">' + (s.done ? '✓' : i + 1) + '</span>' +
+      '<span><b>' + esc(s.title) + '</b>' + esc(s.text) + '</span>' +
+      (s.done ? '<span></span>' : '<button type="button" class="linkbtn" data-go="' + s.go + '">' + s.action + '</button>') + '</div>').join('');
+  }
+  $('taskSwitch').setAttribute('aria-checked', String(state.showTask !== false));
+
+  const sel = $('ttViewSel'); sel.value = day.ttView;
+  const mainOvr = day.ovr.ttView != null;
+  $('mainSrc').textContent = mainOvr ? 'Changed for ' + dayMonth(viewDate) : DAY_NAMES[wd] + '’s usual';
+  scopeSeg('mainScope', mainOvr || scopePending.main, wd);
+  $('firstPick').hidden = day.ttView !== 'first';
+  if (day.ttView === 'first') {
+    const rows = ttRows(state, wd), auto = autoFirstIndex(rows), pick = (state.firstRow || {})[wd];
+    const label = r => [r.time, r.subject, r.room].map(x => (x || '').trim()).filter(Boolean).join(' · ');
     $('firstSelect').innerHTML = '<option value="">Work it out' + (auto >= 0 ? ' (' + esc(label(rows[auto])) + ')' : '') + '</option>' +
       rows.map((r, i) => '<option value="' + i + '">' + esc(label(r)) + '</option>').join('');
     $('firstSelect').value = pick != null && rows[pick] ? String(pick) : '';
   }
+
+  $('panelSel').value = day.panel;
+  const own = ((state.infoTitle || {})[wd] || '').trim();
+  $('panelSel').querySelector('option[value="info"]').textContent = own ? 'Custom panel (' + own + ')' : 'Custom panel';
+  const sideOvr = day.ovr.panel != null;
+  $('sideSrc').textContent = sideOvr ? 'Changed for ' + dayMonth(viewDate) : day.sched ? 'From the house meeting schedule' : DAY_NAMES[wd] + '’s usual';
+  scopeSeg('sideScope', sideOvr || scopePending.side, wd);
+
+  const keys = Object.keys(day.ovr);
+  $('changes').classList.toggle('none', !keys.length);
+  $('changesText').textContent = keys.length
+    ? keys.length + (keys.length === 1 ? ' change' : ' changes') + ' just for ' + dayMonth(viewDate) + ' (' + keys.map(k => OVR_NAMES[k] || k).join(', ') + ')'
+    : 'No one-off changes for ' + dayMonth(viewDate);
+  $('undoDay').hidden = !keys.length;
+  $('undoDay').textContent = keys.length === 1 ? 'Undo it' : 'Undo them';
+  paintMap(day);
+}
+function paintMap(day) {
+  const cell = (cls, col, row, region) => '<i class="' + cls + '" style="grid-column:' + col + ';grid-row:' + row + '"' + (region ? ' data-r="' + region + '"' : '') + '></i>';
+  let html = cell('', '1 / 3', '1') + cell('m-top', '1 / 3', '2', 'top');
+  html += day.showTT ? cell('', '1', '3') + cell('m-main', '2', '3', 'main') : cell('m-main', '1 / 3', '3', 'main');
+  html += day.panel === 'none' ? cell('', '3', '1 / 4') : cell('', '3', '1 / 3') + cell('m-side', '3', '3', 'side');
+  $('map').innerHTML = html;
+}
+$('checkSteps').addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) openSetup(b.dataset.go); });
+$('checkSkip').addEventListener('click', () => { state.checklistHidden = true; changed(); refreshUi(); });
+
+// Hovering an area box outlines that part of the slide
+document.querySelectorAll('.areabox').forEach(box => {
+  const r = box.dataset.region;
+  box.addEventListener('mouseenter', () => {
+    box.classList.add('lit');
+    const el = els.preview.querySelector('.region-' + r); if (el) el.classList.add('region-lit');
+    $('map').querySelectorAll('i[data-r]').forEach(i => i.classList.toggle('dim', i.dataset.r !== r));
+  });
+  box.addEventListener('mouseleave', () => {
+    box.classList.remove('lit');
+    els.preview.querySelectorAll('.region-lit').forEach(el => el.classList.remove('region-lit'));
+    $('map').querySelectorAll('i.dim').forEach(i => i.classList.remove('dim'));
+  });
+});
+
+$('taskSwitch').addEventListener('click', () => { state.showTask = state.showTask === false; changed(); refreshUi(); });
+$('ttViewSel').addEventListener('change', () => {
+  const v = $('ttViewSel').value, wd = wdOf(viewDate), today = ovr().ttView != null || scopePending.main;
+  if (today) setOvr('ttView', v === ttViewOf(state, wd) ? null : v);
+  else { state.ttView[wd] = v; state.ttShow[wd] = v !== 'off'; setOvr('ttView', null); }
+  changed(); refreshUi();
+});
+$('firstSelect').addEventListener('change', () => {
+  state.firstRow = state.firstRow || {};
+  state.firstRow[wdOf(viewDate)] = $('firstSelect').value === '' ? null : +$('firstSelect').value;
+  changed();
+});
+$('panelSel').addEventListener('change', () => {
+  const v = $('panelSel').value, day = resolveDay(state, viewDate), wd = day.wd;
+  let today = ovr().panel != null || scopePending.side;
+  if (!today && day.sched && !day.sched.congers && v !== 'house') {
+    today = true; toast('Changed just for ' + dayMonth(viewDate) + ': the house meeting schedule sets this date.');
+  }
+  if (today) { setOvr('panel', null); setOvr('panel', v === resolveDay(state, viewDate).defaultPanel ? null : v); }
+  else { state.panelDefault[wd] = v; setOvr('panel', null); }
+  changed(); refreshUi();
+});
+function scopeClick(segId, key, ovrKey) {
+  $(segId).addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.scope === 'today') scopePending[key] = true;
+    else { scopePending[key] = false; if (ovr()[ovrKey] != null) { setOvr(ovrKey, null); changed(); } }
+    refreshUi();
+  });
+}
+scopeClick('mainScope', 'main', 'ttView');
+scopeClick('sideScope', 'side', 'panel');
+$('undoDay').addEventListener('click', () => {
+  const iso = toISO(viewDate), saved = state.overrides[iso];
+  if (!saved) return;
+  delete state.overrides[iso]; scopePending = {};
+  endEditNow(); changed(); refreshUi();
+  toast('Back to the usual ' + DAY_NAMES[wdOf(viewDate)] + '.');
+});
+
+/* =====================================================================
+   Side column (prep)
+   ===================================================================== */
+const MODE_HELP = {
+  preps: 'One timer for each prep, using its minutes. The prep being done is highlighted.',
+  tens: 'A chime every 10 minutes, whatever order pupils do their preps in. No prep is highlighted.',
+  custom: 'One timer of any length. Click the time on the bar at the bottom and type it in.'
+};
+function refreshPrepSide() {
+  const set = state.prepTimer, wd = wdOf(viewDate), morning = isMorningPrep(state, wd);
+  const press = (id, v) => $(id).querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === String(v))));
+  press('chimeSeg', set.chime === false ? 'off' : 'on');
+  press('tModeSeg', set.mode); press('tBetweenSeg', set.between); press('tShowSeg', set.show);
+  $('tModeHelp').textContent = MODE_HELP[set.mode] || '';
+  $('tomBox').hidden = morning; $('mpNote').hidden = !morning;
+  const n = ((state.preps || {})[wd] || []).length;
+  $('prepNote').textContent = 'Preps and their minutes are saved for every ' + DAY_NAMES[wd] + '.' + (n < 4 ? ' Add another prep by clicking under the last one on the slide.' : '');
+}
+$('chimeSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  state.prepTimer.chime = b.dataset.v === 'on'; changed(); refreshPrepSide();
+  if (state.prepTimer.chime) { unlockAudio(); chime(); }
+});
+$('tModeSeg').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b || b.dataset.v === state.prepTimer.mode) return;
+  if (timer && timer.running && !confirm('Stop the timer that’s running?')) return;
+  if (timer && !timer.finished) timer = null;
+  else if (timer && timer.finished) timer = null;
+  state.prepTimer.mode = b.dataset.v;
+  changed(); pushTimer(); refreshPrepSide();
+  if (b.dataset.v === 'custom' && !(state.prepTimer.customMins > 0)) setTimeout(() => $('timeBox').focus(), 0);
+});
+[['tBetweenSeg', 'between'], ['tShowSeg', 'show']].forEach(([id, key]) => {
+  $(id).addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    state.prepTimer[key] = b.dataset.v;
+    if (key === 'between' && timer) timer.between = b.dataset.v;
+    changed(); refreshPrepSide();
+  });
+});
+$('tomCopy').addEventListener('click', () => {
+  const tm = nextSchoolDay(viewDate), text = resolveDay(state, tm).notes;
+  if (!text.trim()) { toast(DAY_NAMES[dayCode(tm)] + '’s “What’s happening today?” is empty.'); return; }
+  const iso = toISO(viewDate), cur = state.prepTomorrow[iso] || '';
+  if (cur.trim() && cur !== text && !confirm('Replace what’s in “Tomorrow Morning” with a fresh copy?')) return;
+  state.prepTomorrow[iso] = text;
+  endEditNow(); changed();
+  toast('Copied. Trim it on the slide as much as you like: tomorrow’s morning slide won’t change.');
+});
+
+/* =====================================================================
+   Typing on the preview
+   ===================================================================== */
+const RICH = new Set(['notes', 'panelText', 'prepInfo', 'tomorrow']);
+const SCOPED = { task: 'task', at830: 'at830', notes: 'notes', panelTitle: 'infoTitle', panelText: 'panelText' };   // field → override key
+const PH = { task: 'Click to add', at830: 'Click to add', notes: 'Click to add', panelText: 'Click to add', panelTitle: PANEL_TITLES.info, tomorrow: 'Click to add, or copy from tomorrow’s slide' };
+let editing = null;            // { el, field, scope: 'week' | 'today', forceToday }
+let fitTimer = null;
+
+function decoratePreview(slide) {
+  if (!slide) return;
+  slide.classList.add('editor-preview');
+  slide.querySelectorAll('[data-field]').forEach(el => {
+    const f = el.dataset.field, rich = RICH.has(f);
+    el.setAttribute('contenteditable', rich ? 'true' : 'plaintext-only');
+    if (!rich && el.contentEditable !== 'plaintext-only') el.setAttribute('contenteditable', 'true');
+    el.setAttribute('role', 'textbox');
+    if (rich) el.setAttribute('aria-multiline', 'true');
+    el.spellcheck = !f.endsWith(':mins');
+    el.dataset.ph = el.dataset.always || PH[f] || (f.startsWith('house:') ? 'Click to add' : f.endsWith(':subject') ? 'Click to add a prep' : f.endsWith(':mins') ? '?' : '');
+  });
+  if (editMode === 'morning') addDots(slide, resolveDay(state, viewDate));
+}
+function fieldHasOvr(field, day) {
+  if (field.startsWith('house:')) return !!day.ovr.house;
+  const k = SCOPED[field];
+  return !!k && day.ovr[k] != null;
+}
+function addDots(slide, day) {
+  slide.querySelectorAll('.ovr-dot').forEach(d => d.remove());
+  slide.querySelectorAll('[data-field]').forEach(el => { if (fieldHasOvr(el.dataset.field, day)) placeDot(el); });
+}
+function placeDot(el) {
+  const host = el.closest('.info, .card'); if (!host) return;
+  if (host.querySelector(':scope > .ovr-dot')) return;
+  const d = document.createElement('span');
+  d.className = 'ovr-dot'; d.dataset.for = el.dataset.field;
+  host.appendChild(d);
+}
+function removeDot(el) { const host = el.closest('.info, .card'); const d = host && host.querySelector(':scope > .ovr-dot'); if (d) d.remove(); }
+
+/* The day as it would be without one of today's changes */
+function resolveWithout(key) {
+  const iso = toISO(viewDate), o = state.overrides[iso];
+  if (!o || !(key in o)) return resolveDay(state, viewDate);
+  const val = o[key]; delete o[key];
+  const r = resolveDay(state, viewDate);
+  o[key] = val;
+  return r;
+}
+function usualText(field) {
+  const k = SCOPED[field]; if (!k) return '';
+  const d = resolveWithout(k);
+  return field === 'panelTitle' ? d.panelTitle : d[field] || '';
+}
+function currentText(field) {
+  const d = resolveDay(state, viewDate);
+  return field === 'panelTitle' ? (d.panelTitle === PANEL_TITLES.info && !((state.infoTitle || {})[d.wd] || '').trim() && d.ovr.infoTitle == null ? '' : d.panelTitle) : d[field] || '';
+}
+
+/* Turn what's typed on the slide back into the saved format ("- bullet", "  - sub", **bold**, *italic*, __underline__) */
+function htmlToRich(root) {
+  const out = [];
+  const wrap = (n, inner) => {
+    const t = n.tagName, st = n.style || {};
+    const b = t === 'B' || t === 'STRONG' || /^(bold|[6-9]00)$/.test(st.fontWeight || '');
+    const i = t === 'I' || t === 'EM' || st.fontStyle === 'italic';
+    const u = t === 'U' || /underline/.test((st.textDecoration || '') + ' ' + (st.textDecorationLine || ''));
+    if (!inner.trim() || inner.includes('\n')) return inner;
+    const m = /^(\s*)([\s\S]*?)(\s*)$/.exec(inner);
+    let core = m[2];
+    if (u) core = '__' + core + '__';
+    if (i) core = '*' + core + '*';
+    if (b) core = '**' + core + '**';
+    return m[1] + core + m[3];
+  };
+  const inline = node => {
+    let s = '';
+    node.childNodes.forEach(n => {
+      if (n.nodeType === 3) s += n.nodeValue.replace(/ /g, ' ').replace(/\n/g, ' ');
+      else if (n.nodeType === 1) {
+        const t = n.tagName;
+        if (t === 'UL' || t === 'OL') return;
+        if (t === 'BR') { s += '\n'; return; }
+        if (t === 'DIV' || t === 'P') { s += '\n' + inline(n) + '\n'; return; }
+        s += wrap(n, inline(n));
+      }
+    });
+    return s;
+  };
+  const walkList = (ul, depth) => {
+    [...ul.children].forEach(c => {
+      if (c.tagName === 'UL' || c.tagName === 'OL') { walkList(c, depth + 1); return; }
+      if (c.tagName !== 'LI') return;
+      const text = inline(c).split('\n').map(x => x.trim()).filter(Boolean).join(' ');
+      if (text) out.push((depth ? '  - ' : '- ') + text);
+      [...c.children].filter(x => x.tagName === 'UL' || x.tagName === 'OL').forEach(sub => walkList(sub, depth + 1));
+    });
+  };
+  const walkBlock = node => {
+    let buf = '';
+    const flush = () => { buf.split('\n').forEach(x => { x = x.trim(); if (x) out.push(x); }); buf = ''; };
+    node.childNodes.forEach(n => {
+      if (n.nodeType === 1 && (n.tagName === 'UL' || n.tagName === 'OL')) { flush(); walkList(n, 0); }
+      else if (n.nodeType === 1 && (n.tagName === 'DIV' || n.tagName === 'P')) { flush(); if (n.classList.contains('gap')) out.push(''); else walkBlock(n); }
+      else if (n.nodeType === 1 && n.tagName === 'BR') { buf += '\n'; }
+      else if (n.nodeType === 3) buf += n.nodeValue.replace(/ /g, ' ');
+      else if (n.nodeType === 1) buf += wrap(n, inline(n));
+    });
+    flush();
+  };
+  walkBlock(root);
+  return out.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+}
+
+function setField(f, v) {
+  const wd = wdOf(viewDate), iso = toISO(viewDate);
+  const today = editing && editing.field === f && editing.scope === 'today';
+  if (SCOPED[f]) {
+    if (today) { setOvr(SCOPED[f], v); return; }
+    if (f === 'task') state.task[wd] = v;
+    else if (f === 'at830') state.at830[wd] = v;
+    else if (f === 'notes') state.notes[wd] = v;
+    else if (f === 'panelTitle') { state.infoTitle = state.infoTitle || {}; state.infoTitle[wd] = v; }
+    else if (f === 'panelText') { const p = resolveDay(state, viewDate).panel; state[p === 'lunch' ? 'lunch' : 'info'][wd] = v; }
+  } else if (f.startsWith('house:')) {
+    const h = Object.assign({}, resolveDay(state, viewDate).houses); h[f.slice(6)] = v; setOvr('house', h);
+  } else if (f.startsWith('prep:')) {
+    const [, i, k] = f.split(':'), list = state.preps[wd] || [];
+    if (list[+i]) list[+i][k] = v;
+  } else if (f === 'prepInfo') state.prepInfo[wd] = v;
+  else if (f === 'tomorrow') { if (v.trim()) state.prepTomorrow[iso] = v; else delete state.prepTomorrow[iso]; }
+}
+function commitField(el) {
+  const f = el.dataset.field;
+  let v;
+  if (RICH.has(f)) v = htmlToRich(el);
+  else {
+    v = el.textContent.replace(/\s*\n\s*/g, ' ');
+    if (f.endsWith(':mins')) {
+      const c = v.replace(/[^\d.]/g, '').slice(0, 5);
+      if (c !== v) { el.textContent = c; caretTo(el, false); }
+      v = c;
+    }
+    if (!el.textContent && el.innerHTML) el.innerHTML = '';
+  }
+  if (editing && editing.el === el && editing.forceToday && editing.scope !== 'today') { editing.scope = 'today'; }
+  setField(f, v);
+  if (editing && editing.el === el && (editing.scope === 'today' || f.startsWith('house:'))) { placeDot(el); if (tip.hidden) showBars(); }
+  changed({ keepPreview: true });
+  clearTimeout(fitTimer);
+  fitTimer = setTimeout(() => {
+    const slide = els.preview.querySelector('.slide');
+    if (slide) fitSlide(slide, editMode === 'prep' ? 'none' : resolveDay(state, viewDate).panel);
+    positionBars();
+  }, 120);
+}
+function caretTo(node, start) {
+  const r = document.createRange(); r.selectNodeContents(node); r.collapse(!!start);
+  const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+}
+function selLi(root) {
+  const s = getSelection(); if (!s.rangeCount) return null;
+  let n = s.anchorNode; if (n && n.nodeType === 3) n = n.parentNode;
+  const li = n && n.closest ? n.closest('li') : null;
+  return li && root.contains(li) ? li : null;
+}
+function listDepth(li, root) { let d = 0, n = li; while (n && n !== root) { if (n.tagName === 'UL' || n.tagName === 'OL') d++; n = n.parentNode; } return d; }
+function runCmd(cmd) {
+  const el = editing && editing.el; if (!el) return;
+  el.focus();
+  if (cmd === 'bullet') document.execCommand('insertUnorderedList');
+  else if (cmd === 'sub') {
+    let li = selLi(el);
+    if (!li) { document.execCommand('insertUnorderedList'); li = selLi(el); }
+    if (li && listDepth(li, el) < 2) document.execCommand('indent');
+  } else document.execCommand(cmd);
+  commitField(el);
+}
+
+function startEdit(el) {
+  const f = el.dataset.field;
+  const day = editMode === 'morning' ? resolveDay(state, viewDate) : null;
+  const has = day ? fieldHasOvr(f, day) : false;
+  editing = { el, field: f, scope: has ? 'today' : 'week', forceToday: false };
+  if (f === 'at830' && day && day.at830Source === 'auto') { editing.forceToday = true; }
+  if (RICH.has(f) && !el.textContent.trim() && !el.querySelector('li')) {
+    el.innerHTML = '<ul><li><br></li></ul>';
+    caretTo(el.querySelector('li'), true);
+  }
+  showBars();
+}
+function endEdit() {
+  if (!editing) return;
+  const el = editing.el;
+  editing = null; hideBars();
+  if (el && RICH.has(el.dataset.field) && !el.textContent.trim()) el.innerHTML = '';
+  if (editMode === 'prep') {
+    const wd = wdOf(viewDate), list = state.preps[wd] || [];
+    const kept = list.filter(p => (p.subject || '').trim() || String(p.mins || '').trim());
+    if (kept.length !== list.length) { state.preps[wd] = kept; save(); }
+  }
+  renderAll({ forcePreview: true }); refreshUi();
+}
+function endEditNow() {
+  if (!editing) return;
+  const el = editing.el; editing = null; hideBars();
+  if (document.activeElement === el) el.blur();
+}
+
+els.preview.addEventListener('focusin', e => { const el = e.target.closest && e.target.closest('[data-field]'); if (el) startEdit(el); });
+els.preview.addEventListener('focusout', e => {
+  if (!e.target.closest || !e.target.closest('[data-field]')) return;
+  setTimeout(() => {
+    const a = document.activeElement;
+    if (editing && !(a && els.preview.contains(a) && a.closest('[data-field]'))) endEdit();
+  }, 0);
+});
+els.preview.addEventListener('input', e => { const el = e.target.closest && e.target.closest('[data-field]'); if (el) commitField(el); });
+els.preview.addEventListener('keydown', e => {
+  const el = e.target.closest && e.target.closest('[data-field]'); if (!el) return;
+  const rich = RICH.has(el.dataset.field);
+  if (e.key === 'Escape') { e.preventDefault(); el.blur(); return; }
+  if (!rich && e.key === 'Enter') { e.preventDefault(); el.blur(); return; }
+  if (rich && e.key === 'Tab') {
+    const li = selLi(el); if (!li) return;
+    e.preventDefault();
+    if (e.shiftKey) { if (listDepth(li, el) > 1) document.execCommand('outdent'); }
+    else if (listDepth(li, el) < 2) document.execCommand('indent');
+    commitField(el); return;
+  }
+  if (!rich && (e.ctrlKey || e.metaKey) && /^[biu]$/i.test(e.key)) e.preventDefault();
+});
+els.preview.addEventListener('paste', e => {
+  const el = e.target.closest && e.target.closest('[data-field]'); if (!el) return;
+  e.preventDefault();
+  let t = (e.clipboardData || window.clipboardData).getData('text/plain') || '';
+  if (!RICH.has(el.dataset.field)) t = t.replace(/\s*\n\s*/g, ' ');
+  document.execCommand('insertText', false, t);
+});
+els.preview.addEventListener('drop', e => { if (e.target.closest && e.target.closest('[data-field]')) e.preventDefault(); });
+
+// "+ Add a prep" on the slide
+function addPrep() {
+  const wd = wdOf(viewDate), list = state.preps[wd] || (state.preps[wd] = []);
+  if (list.length >= 4) return;
+  list.push({ subject: '', mins: '' }); save();
+  editing = null; hideBars();
+  renderAll({ forcePreview: true }); refreshPrepSide();
+  const el = els.preview.querySelector('[data-field="prep:' + (list.length - 1) + ':subject"]');
+  if (el) el.focus();
+}
+els.preview.addEventListener('mousedown', e => { if (e.target.closest('[data-add-prep]')) { e.preventDefault(); addPrep(); } });
+els.preview.addEventListener('click', e => { if (e.detail === 0 && e.target.closest('[data-add-prep]')) addPrep(); });
+
+/* ---------- Toolbar and "changed just for today" note ---------- */
+const bar = $('fmtbar'), tip = $('ovrtip');
+[bar, tip].forEach(b => b.addEventListener('mousedown', e => { if (e.target.closest('button')) e.preventDefault(); }));
+bar.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b || !editing) return;
+  if (b.dataset.cmd) { runCmd(b.dataset.cmd); return; }
+  if (b.dataset.scope) setScope(b.dataset.scope);
+});
+function setScope(scope) {
+  const ed = editing; if (!ed || !SCOPED[ed.field] || scope === ed.scope) return;
+  const f = ed.field, el = ed.el, key = SCOPED[f];
+  if (scope === 'today') {
+    setOvr(key, f === 'panelTitle' ? currentText(f) : RICH.has(f) ? htmlToRich(el) : el.textContent);
+    ed.scope = 'today'; placeDot(el);
+  } else {
+    setOvr(key, null); ed.scope = 'week'; removeDot(el);
+    const v = currentText(f);
+    if (RICH.has(f)) { el.innerHTML = v.trim() ? richHTML(v) : '<ul><li><br></li></ul>'; caretTo(el, false); }
+    else { el.textContent = f === 'panelTitle' ? (state.infoTitle || {})[wdOf(viewDate)] || '' : v; caretTo(el, false); }
+  }
+  changed({ keepPreview: true });
+  showBars();
+}
+tip.querySelector('#ovrUndo').addEventListener('click', () => {
+  const f = tip.dataset.field; if (!f) return;
+  if (editing && editing.field === f && SCOPED[f]) { setScope('week'); return; }
+  setOvr(f.startsWith('house:') ? 'house' : SCOPED[f], null);
+  endEditNow(); changed(); refreshUi();
+});
+function rectIn(el) {
+  const a = el.getBoundingClientRect(), b = els.wrap.getBoundingClientRect();
+  return { l: a.left - b.left, t: a.top - b.top, r: a.right - b.left, b: a.bottom - b.top };
+}
+function showBars() {
+  const ed = editing; if (!ed) { hideBars(); return; }
+  const f = ed.field, rich = RICH.has(f), wd = DAY_NAMES[wdOf(viewDate)];
+  let scope = !!SCOPED[f] && editMode === 'morning', note = '';
+  if (f === 'at830' && ed.forceToday && ed.scope !== 'today') { scope = false; note = 'Set by the house meeting schedule: your change is just for ' + dayMonth(viewDate); }
+  if (f.startsWith('house:')) note = 'Just for ' + shortDate(viewDate);
+  else if (f.startsWith('prep:') || f === 'prepInfo') note = 'Same every ' + wd;
+  else if (f === 'tomorrow') note = 'Just this evening';
+  bar.querySelector('.fmt-rich').hidden = !rich;
+  $('fmtScope').hidden = !scope;
+  $('fmtScope').querySelector('[data-scope="week"]').textContent = 'Same every ' + wd;
+  $('fmtScope').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.scope === ed.scope)));
+  $('fmtNote').textContent = note; $('fmtNote').hidden = !note;
+  bar.querySelector('.fmt-sep').hidden = !(rich && (scope || note));
+  bar.hidden = false;
+  // The note under the box
+  const day = editMode === 'morning' ? resolveDay(state, viewDate) : null;
+  if (day && fieldHasOvr(f, day) && (ed.scope === 'today' || f.startsWith('house:'))) {
+    tip.dataset.field = f;
+    if (f.startsWith('house:')) $('ovrText').textContent = 'Rooms changed just for ' + dayMonth(viewDate) + (day.sched && !day.sched.congers ? ' (the school’s schedule has others)' : '');
+    else { const u = plainFirst(usualText(f)); $('ovrText').textContent = 'Changed just for ' + dayMonth(viewDate) + (u ? ' (usually “' + u + '”)' : ' (usually blank)'); }
+    tip.hidden = false;
+  } else tip.hidden = true;
+  positionBars();
+}
+function hideBars() { bar.hidden = true; tip.hidden = true; }
+function positionBars() {
+  if (!editing || bar.hidden) return;
+  const host = editing.el.closest('.info, .card, .prep-row') || editing.el;
+  const r = rectIn(host), W = els.wrap.clientWidth, H = els.preview.clientHeight;
+  const bw = bar.offsetWidth, bh = bar.offsetHeight;
+  bar.style.left = Math.max(6, Math.min(r.l, W - bw - 6)) + 'px';
+  // Over a card's own heading (so it never hides another box); above one-line boxes and headings
+  const overHeading = host.classList.contains('card') && editing.field !== 'panelTitle';
+  bar.style.top = (overHeading ? r.t + 4 : r.t - bh - 6 >= 4 ? r.t - bh - 6 : r.b + 6) + 'px';
+  if (!tip.hidden) {
+    const tw = tip.offsetWidth, th = tip.offsetHeight;
+    tip.style.left = Math.max(6, Math.min(r.l, W - tw - 6)) + 'px';
+    tip.style.top = (r.b + 6 + th <= H - 4 ? r.b + 6 : Math.max(4, r.b - th - 8)) + 'px';
+  }
+}
+// Hovering an orange dot shows what changed
+els.preview.addEventListener('mouseover', e => {
+  const d = e.target.closest && e.target.closest('.ovr-dot');
+  if (!d || editing) return;
+  const f = d.dataset.for, day = resolveDay(state, viewDate);
+  tip.dataset.field = f;
+  if (f.startsWith('house:')) $('ovrText').textContent = 'Rooms changed just for ' + dayMonth(viewDate);
+  else { const u = plainFirst(usualText(f)); $('ovrText').textContent = 'Changed just for ' + dayMonth(viewDate) + (u ? ' (usually “' + u + '”)' : ' (usually blank)'); }
+  tip.hidden = false;
+  const r = rectIn(d.parentElement), W = els.wrap.clientWidth;
+  tip.style.left = Math.max(6, Math.min(r.r - tip.offsetWidth, W - tip.offsetWidth - 6)) + 'px';
+  tip.style.top = Math.max(4, r.t - tip.offsetHeight - 6) + 'px';
+  void day;
+});
+els.wrap.addEventListener('mouseleave', () => { if (!editing) tip.hidden = true; });
+els.preview.addEventListener('mouseout', e => {
+  if (editing) return;
+  const to = e.relatedTarget;
+  if (e.target.closest && e.target.closest('.ovr-dot') && !(to && tip.contains(to))) setTimeout(() => { if (!editing && !tip.matches(':hover')) tip.hidden = true; }, 250);
+});
+
+/* =====================================================================
+   Prep timer (bottom bar)
+   ===================================================================== */
+let heard = { id: timer && timer.id, chime: (timer && timer.chime) || 0 };
+function heardTimer() {               // chime once for each timer that ends, whichever window noticed it
+  if (!timer) return;
+  if (timer.id !== heard.id) { heard = { id: timer.id, chime: timer.chime || 0 }; return; }
+  if ((timer.chime || 0) > heard.chime) { heard.chime = timer.chime; if (state.prepTimer.chime !== false) chime(); }
+}
+function paintAll() {
+  paintTimer(els.preview.querySelector('.slide'), state);
+  if (!els.stage.hidden) paintTimer(els.stage.querySelector('.slide'), state);
+}
+function pushTimer() {
+  storeTimer(timer);
+  if (slideWin && !slideWin.closed) { try { slideWin.postMessage({ type: 'ms-timer', timer }, '*'); } catch (e) {} }
+  paintAll(); refreshTimerUi();
+}
+const timePlan = () => planOf(state, wdOf(viewDate));
+let boxEditing = false, boxShown = '', pausedByClick = false;
+function refreshTimerUi() {
+  if (editMode !== 'prep') return;
+  const t = timer, plan = timePlan(), v = timerView(t, plan, Date.now());
+  const kind = t ? t.kind : plan.kind, custom = kind === 'custom';
+  const box = $('timeBox');
+  if (!boxEditing) { box.value = v.time; boxShown = v.time; }
+  const paused = !!(t && !t.running && !t.finished);
+  box.classList.toggle('editable', boxEditing || paused || !t);
+  let label = v.label + (v.sub ? ' · ' + v.sub : '');
+  if (!t && !plan.segs.length) label = custom ? 'Timer: click to type a time' : kind === 'preps' ? 'Add the preps’ minutes on the slide' : '';
+  else if (!t) label = (custom ? 'Timer' : kind === 'tens' ? 'Every 10 mins' : v.label) + ' · ready';
+  if ($('tLabel').textContent !== label) $('tLabel').textContent = label;
+  const bars = $('tBars'), sig = v.bars.map(b => b.flex).join(',');
+  if (bars.dataset.sig !== sig) { bars.dataset.sig = sig; bars.innerHTML = v.bars.map(b => '<i style="flex-grow:' + b.flex + '"><b></b></i>').join(''); }
+  bars.querySelectorAll('b').forEach((b, n) => { b.style.width = (v.bars[n].fill * 100).toFixed(1) + '%'; });
+  $('tPlay').textContent = !t ? (custom ? 'Start' : 'Start prep') : t.finished ? 'Start again' : t.running ? 'Pause' : t.waiting ? 'Start next' : 'Resume';
+  $('tPlus').disabled = !t || t.finished;
+  const segs = t ? t.segs : plan.segs, idx = t ? t.idx : 0;
+  $('tSkip').hidden = custom || segs.length < 2;
+  $('tSkip').disabled = !t || t.finished || idx >= segs.length - 1;
+  const nextSeg = segs[Math.min(idx + 1, segs.length - 1)];
+  $('tSkip').textContent = kind === 'preps' && nextSeg ? 'Skip to ' + nextSeg.label : 'Skip to next';
+  $('tReset').disabled = !t;
+  $('tHint').hidden = !(paused && !t.waiting) || boxEditing;
+}
+function startTimer(plan) {
+  unlockAudio();
+  if (!plan.segs.length) {
+    if (plan.kind === 'custom') { $('timeBox').focus(); return; }
+    toast(plan.kind === 'preps' ? 'Type each prep’s minutes on the slide first.' : 'Nothing to time yet.'); return;
+  }
+  const segs = plan.segs.map(g => ({ label: g.label, mins: g.mins }));
+  timer = { id: Date.now().toString(36), kind: plan.kind, segs, idx: 0, running: true, waiting: false, finished: false,
+            endAt: Date.now() + segFull(segs[0]), remaining: 0, between: state.prepTimer.between, date: toISO(viewDate), chime: 0 };
+  heardTimer();
+  if (isPresenting()) proj = { mode: 'prep', date: toISO(viewDate) };
+  pushTimer(); renderAll();
+}
+function pauseTimer() { const t = timer; if (t && t.running) { t.remaining = Math.max(0, t.endAt - Date.now()); t.running = false; pushTimer(); } }
+function resumeTimer() { const t = timer; if (t && !t.running && !t.finished) { unlockAudio(); t.endAt = Date.now() + t.remaining; t.running = true; t.waiting = false; pushTimer(); } }
+$('tPlay').addEventListener('click', () => {
+  const t = timer;
+  if (!t || t.finished) startTimer(timePlan());
+  else if (t.running) pauseTimer();
+  else resumeTimer();
+});
+$('tPlus').addEventListener('click', () => {
+  const t = timer; if (!t || t.finished) return;
+  const seg = t.segs[t.idx]; seg.extra = (seg.extra || 0) + 60000;
+  if (t.running) t.endAt += 60000; else t.remaining += 60000;
+  pushTimer();
+});
+$('tSkip').addEventListener('click', () => {
+  const t = timer; if (!t || t.finished || t.idx >= t.segs.length - 1) return;
+  t.idx++;
+  const ms = segFull(t.segs[t.idx]);
+  if (t.running) t.endAt = Date.now() + ms; else t.remaining = ms;
+  pushTimer();
+});
+$('tReset').addEventListener('click', () => { timer = null; pushTimer(); });
+function parseDuration(str) {
+  str = String(str).trim().toLowerCase().replace(/\s*(mins?|minutes?|m)$/, '');
+  let m;
+  if ((m = str.match(/^(\d+):([0-5]?\d)$/))) return Number(m[1]) + Number(m[2]) / 60;
+  if ((m = str.match(/^\d+(\.\d+)?$/))) return Number(str);
+  return null;
+}
+const box = $('timeBox');
+function beginBox() {
+  if (boxEditing) return;
+  boxEditing = true;
+  if (timer && timer.running) { pauseTimer(); pausedByClick = true; }
+  box.readOnly = false; box.classList.add('editable');
+  const plan = timePlan();
+  if (!timer && plan.kind === 'custom' && !plan.segs.length) box.value = '';
+  boxShown = box.value;
+  $('tHint').hidden = true;
+  setTimeout(() => box.select(), 0);
+}
+function finishBox(start) {
+  if (!boxEditing) return;
+  boxEditing = false; box.readOnly = true;
+  const raw = box.value.trim(), mins = parseDuration(raw), typed = raw !== boxShown;
+  pausedByClick = false;
+  if (!typed || !mins || mins <= 0 || mins > 180) {
+    if (typed && raw) toast('Type minutes like 15, or minutes and seconds like 7:30.');
+    if (start) { if (timer && !timer.finished) resumeTimer(); else startTimer(timePlan()); }
+    refreshTimerUi(); return;
+  }
+  const t = timer;
+  if (t && !t.finished && t.kind !== 'custom') {
+    // change the time left on this prep
+    const seg = t.segs[t.idx], ms = Math.round(mins * 60000);
+    if (ms > segFull(seg)) seg.extra = (seg.extra || 0) + ms - segFull(seg);
+    t.remaining = ms; t.waiting = false;
+    pushTimer();
+    if (start) resumeTimer();
+  } else {
+    state.prepTimer.mode = 'custom'; state.prepTimer.customMins = mins;
+    timer = null; changed(); pushTimer(); refreshPrepSide();
+    if (start) startTimer(timePlan());
+  }
+}
+function cancelBox() {
+  if (!boxEditing) return;
+  boxEditing = false; box.readOnly = true;
+  if (pausedByClick) resumeTimer();
+  pausedByClick = false;
+  refreshTimerUi(); box.blur();
+}
+box.addEventListener('focus', beginBox);
+box.addEventListener('mousedown', () => { if (document.activeElement === box && !boxEditing) beginBox(); });
+box.addEventListener('input', () => { const c = box.value.replace(/[^\d:.]/g, '').slice(0, 6); if (c !== box.value) box.value = c; });
+box.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); finishBox(true); box.blur(); }
+  else if (e.key === 'Escape') { e.preventDefault(); cancelBox(); }
+});
+box.addEventListener('blur', () => finishBox(false));
+
+// Several times a second: move the timer on (from its fixed end time) and repaint the clock and timer
+makeTicker(() => {
+  if (advanceTimer(timer, Date.now())) { heardTimer(); pushTimer(); }
+  paintAll();
+  if (editMode === 'prep' && timer && timer.running) refreshTimerUi();
+}, 250);
+
+/* =====================================================================
+   SETUP
+   ===================================================================== */
+let setupSec = 'form';
+function openSetup(sec) {
+  endEditNow();
+  if (sec) setupSec = sec;
+  $('mainScreen').hidden = true; $('setupScreen').hidden = false;
+  showSection(setupSec);
+  refreshSetupAll();
+  window.scrollTo(0, 0);
+}
+function closeSetup() {
+  $('setupScreen').hidden = true; $('mainScreen').hidden = false;
+  refreshUi(); renderAll();
+}
+function showSection(sec) {
+  setupSec = sec;
+  document.querySelectorAll('#setupNav button').forEach(b => b.setAttribute('aria-current', String(b.dataset.sec === sec)));
+  document.querySelectorAll('.setsec').forEach(s => { s.hidden = s.dataset.sec !== sec; });
+}
+$('setupNav').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { showSection(b.dataset.sec); window.scrollTo(0, 0); } });
+$('setupBack').addEventListener('click', closeSetup);
+function refreshSetupAll() { refreshSetupForm(); refreshTT(); refreshDesign(); refreshMorningPrepDays(); refreshSchedule(); refreshBackup(); paintSaveState(); }
+
+/* ---------- Form & music ---------- */
+function parseTime(v) {
+  if (typeof v === 'number' && isFinite(v)) { let m = Math.round((v % 1) * 1440); return m === 1440 ? 0 : m; }
+  if (v instanceof Date) return v.getHours() * 60 + v.getMinutes();
+  const m = /(\d{1,2})[:.](\d{2})\s*(am|pm)?/i.exec(String(v || '')); if (!m) return null;
+  let h = +m[1]; if (m[3]) { const pm = m[3].toLowerCase() === 'pm'; if (pm && h < 12) h += 12; if (!pm && h === 12) h = 0; }
+  return h * 60 + +m[2];
+}
+function normDay(v) { const s = String(v || '').trim().toUpperCase(); return ALL_DAYS.find(d => s.startsWith(d)) || s; }
+function formSort(a, b) { const na = parseInt(a, 10), nb = parseInt(b, 10); return na !== nb ? na - nb : a.localeCompare(b, 'en-GB', { numeric: true }); }
+async function loadLessonsFile(file) {
+  if (!file) return;
+  if (typeof XLSX === 'undefined') { toast('The spreadsheet reader didn’t load. Check your internet connection.'); return; }
+  try {
+    const wb = XLSX.read(await file.arrayBuffer(), { type: 'array' });
+    const grid = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: true, defval: '' });
+    const rows = [], ignored = {};
+    grid.forEach((r, i) => {
+      const form = String(r[0] ?? '').trim(), name = String(r[1] ?? '').trim();
+      if (!form && !name) return;
+      if (i === 0 && form.toLowerCase() === 'form') return;
+      if (!/^\d/.test(form)) { ignored[form || '(blank)'] = (ignored[form || '(blank)'] || 0) + 1; return; }
+      rows.push([form, name, normDay(r[2]), parseTime(r[3]), String(r[4] ?? '').trim()]);
+    });
+    if (!rows.length) { toast('No lessons found. Check it’s the right file.'); return; }
+    state.lessons = { fileName: file.name, savedAt: new Date().toISOString(), rows, ignored };
+    changed(); refreshSetupForm();
+    toast('Lessons loaded: ' + rows.length + ' across all forms.');
+  } catch (e) { toast('“' + file.name + '” couldn’t be read as a spreadsheet.'); }
+}
+$('lessonsBtn').addEventListener('click', () => { $('lessonsInput').value = ''; $('lessonsInput').click(); });
+$('lessonsInput').addEventListener('change', () => loadLessonsFile($('lessonsInput').files[0]));
+const dz = $('dropzone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('over'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over'); loadLessonsFile(e.dataTransfer.files[0]); });
+window.addEventListener('dragover', e => { if (e.dataTransfer && [...e.dataTransfer.types].includes('Files')) e.preventDefault(); });
+window.addEventListener('drop', e => { if (e.dataTransfer && e.dataTransfer.files.length) e.preventDefault(); });
+function refreshSetupForm() {
+  const L = state.lessons;
+  $('fileCard').classList.toggle('empty', !L);
+  if (L) {
+    const d = new Date(L.savedAt);
+    $('lessonsInfo').textContent = L.fileName;
+    $('lessonsSub').textContent = 'Added ' + shortDate(d) + ' · ' + L.rows.length + ' lessons' + (state.form ? ' · ' + L.rows.filter(r => r[0] === state.form).length + ' for ' + state.form + ' this week' : '');
+    $('lessonsBtn').textContent = 'Upload a new week';
+    const ig = Object.values(L.ignored || {}).reduce((a, b) => a + b, 0);
+    $('ignoredNote').hidden = false;
+    $('ignoredNote').textContent = 'Read on this laptop only; nothing is uploaded anywhere.' + (ig ? ' ' + ig + (ig === 1 ? ' row was' : ' rows were') + ' skipped because the form doesn’t start with a number.' : '');
+    const forms = [...new Set(L.rows.map(r => r[0]))].sort(formSort);
+    const byYear = {};
+    forms.forEach(f => { const y = parseInt(f, 10); (byYear[y] = byYear[y] || []).push(f); });
+    $('formSelect').innerHTML = '<option value="">Choose your form</option>' + Object.keys(byYear).sort((a, b) => a - b).map(y =>
+      '<optgroup label="Year ' + y + '">' + byYear[y].map(f => '<option value="' + esc(f) + '">' + esc(f) + '</option>').join('') + '</optgroup>').join('');
+    $('formSelect').value = forms.includes(state.form) ? state.form : '';
+    $('formSelect').disabled = false;
+  } else {
+    $('lessonsInfo').textContent = 'No file yet';
+    $('lessonsSub').textContent = 'The Music & LAMDA spreadsheet (.xlsx)';
+    $('lessonsBtn').textContent = 'Upload the spreadsheet';
+    $('ignoredNote').hidden = true;
+    $('formSelect').innerHTML = '<option value="">Upload the lessons file first</option>';
+    $('formSelect').disabled = true;
+  }
+}
+$('formSelect').addEventListener('change', () => { state.form = $('formSelect').value; changed(); refreshSetupForm(); });
+
+/* ---------- Timetable ---------- */
+function refreshTT() {
+  $('ttDays').innerHTML = DAYS.map(d => '<button type="button" data-d="' + d + '" aria-pressed="' + (d === ttDay) + '">' + DAY_NAMES[d].slice(0, 3) + '</button>').join('');
   const mode = state.ttMode[ttDay] || 'grid';
   $('ttModeSeg').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === mode)));
   $('ttGridEdit').hidden = mode !== 'grid';
   $('ttImageEdit').hidden = mode !== 'image';
   const img = state.ttImage[ttDay];
   $('ttImgPrev').hidden = !img; if (img) $('ttImgPrev').src = img;
+  $('ttImgRemove').hidden = !img;
   const rows = state.timetable[ttDay] || (state.timetable[ttDay] = []);
-  $('ttBody').innerHTML = rows.map((r, i) =>
+  $('ttBody').innerHTML = rows.length ? rows.map((r, i) =>
     '<tr class="' + (HIGHLIGHT.test((r.subject || '').trim()) ? 'hi' : '') + '" data-i="' + i + '">' +
-      '<td class="time-c"><input data-f="time" value="' + esc(r.time) + '" aria-label="Time"></td>' +
+      '<td class="time-c"><input data-f="time" value="' + esc(r.time) + '" aria-label="Time" placeholder="09:00"></td>' +
       '<td><input class="subj" data-f="subject" value="' + esc(r.subject) + '" aria-label="Subject"></td>' +
       '<td class="room-c"><input data-f="room" value="' + esc(r.room) + '" aria-label="Room"></td>' +
-      '<td class="act"><button type="button" class="mini" data-m="up" aria-label="Move up">\u2191</button><button type="button" class="mini" data-m="down" aria-label="Move down">\u2193</button><button type="button" class="mini" data-m="del" aria-label="Delete row">\u2715</button></td>' +
-    '</tr>').join('');
+      '<td class="act"><button type="button" class="mini" data-m="up" aria-label="Move up">↑</button><button type="button" class="mini" data-m="down" aria-label="Move down">↓</button><button type="button" class="mini" data-m="del" aria-label="Delete row">✕</button></td>' +
+    '</tr>').join('')
+    : '<tr><td colspan="4" class="hint" style="padding:0.6rem 0.2rem">No lessons for ' + DAY_NAMES[ttDay] + ' yet. Add them one by one, or paste a whole timetable.</td></tr>';
 }
-$('ttViewSeg').addEventListener('click', e => {
-  const b = e.target.closest('button'); if (!b) return;
-  state.ttView = state.ttView || {}; state.ttShow = state.ttShow || {};
-  state.ttView[ttDay] = b.dataset.v; state.ttShow[ttDay] = b.dataset.v !== 'off';
-  changed(); refreshTT();
-});
-$('firstSelect').addEventListener('change', () => {
-  state.firstRow = state.firstRow || {};
-  state.firstRow[ttDay] = $('firstSelect').value === '' ? null : +$('firstSelect').value;
-  changed();
-});
 $('ttDays').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { ttDay = b.dataset.d; refreshTT(); } });
 $('ttModeSeg').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; state.ttMode[ttDay] = b.dataset.v; changed(); refreshTT(); });
 $('ttBody').addEventListener('input', e => {
-  const inp = e.target, tr = inp.closest('tr'); if (!tr) return;
+  const inp = e.target, tr = inp.closest('tr'); if (!tr || tr.dataset.i == null) return;
   const row = state.timetable[ttDay][+tr.dataset.i];
   row[inp.dataset.f] = inp.value;
   if (inp.dataset.f === 'subject') tr.classList.toggle('hi', HIGHLIGHT.test(inp.value.trim()));
@@ -1709,11 +2448,10 @@ $('ttImgBtn').addEventListener('click', () => { $('ttImgInput').value = ''; $('t
 $('ttImgInput').addEventListener('change', async () => {
   const f = $('ttImgInput').files[0]; if (!f) return;
   try { state.ttImage[ttDay] = await readImage(f, 1100); state.ttMode[ttDay] = 'image'; changed(); refreshTT(); }
-  catch (e) { toast('That image couldn\'t be read.'); }
+  catch (e) { toast('That image couldn’t be read.'); }
 });
 $('ttImgRemove').addEventListener('click', () => { state.ttImage[ttDay] = null; state.ttMode[ttDay] = 'grid'; changed(); refreshTT(); });
 
-/* ---------- Pasting a timetable ---------- */
 const CLAUDE_TT_PROMPT = 'Convert this school timetable into plain text for my morning slide app. Write one line per lesson or break, in this exact format:\n\nDAY | TIME | SUBJECT | ROOM\n\nRules:\n- DAY is MON, TUE, WED, THU, FRI or SAT\n- TIME is the start time in 24-hour format, e.g. 09:00 or 14:40\n- Include Break, Lunch and Prep as their own lines\n- If there is no room, leave it empty but keep the last | (e.g. THU | 11:00 | Break | )\n- Output only these lines, nothing else.';
 let ttParsed = null;
 function showTTPaste(open) { $('ttPasteBox').hidden = !open; if (open) $('ttPasteText').focus(); }
@@ -1742,7 +2480,6 @@ $('ttPasteUse').addEventListener('click', () => {
   changed(); $('ttPasteCancel').click(); refreshTT();
   toast('Timetable updated for ' + got.map(d => DAY_NAMES[d].slice(0, 3)).join(', ') + '.');
 });
-
 function copyText(text, msg) {
   const done = () => toast(msg);
   if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, () => fallback());
@@ -1755,14 +2492,41 @@ function copyText(text, msg) {
   }
 }
 
-/* ---------- Morning task on/off ---------- */
-$('showTaskToggle').addEventListener('change', () => { state.showTask = $('showTaskToggle').checked; changed(); refreshDay(); });
+/* ---------- Design ---------- */
 function refreshDesign() {
-  $('designSeg').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === (state.design === 'modern' ? 'modern' : 'playful'))));
+  $('fontCards').querySelectorAll('.fontcard').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === (state.design === 'modern' ? 'modern' : 'playful'))));
+  $('themeGrid').innerHTML = DAYS.map(d => {
+    const t = themeFor(state, d);
+    return '<label class="themecard"><span class="sw" style="background:linear-gradient(135deg,' + t.main + ' 55%,' + t.tint + ' 55%)"></span><span style="min-width:0;flex:1"><b>' + DAY_NAMES[d] + '</b>' +
+      '<select data-day="' + d + '" aria-label="Colour for ' + DAY_NAMES[d] + '">' +
+        THEME_KEYS.map(k => '<option value="' + k + '"' + ((state.dayTheme[d] || 'blueberry') === k ? ' selected' : '') + '>' + THEMES[k].name + '</option>').join('') +
+      '</select></span></label>';
+  }).join('');
 }
-$('designSeg').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; state.design = b.dataset.v; changed(); refreshDesign(); });
+$('fontCards').addEventListener('click', e => {
+  const b = e.target.closest('.fontcard'); if (!b) return;
+  state.design = b.dataset.v; state.designChosen = true; applyDesignClass(); changed(); refreshDesign();
+});
+$('themeGrid').addEventListener('change', e => {
+  const sel = e.target.closest('select[data-day]'); if (!sel) return;
+  state.dayTheme[sel.dataset.day] = sel.value; state.designChosen = true; changed(); refreshDesign();
+});
 
-/* ---------- House meeting schedule (Settings) ----------
+/* ---------- Prep (Setup) ---------- */
+function refreshMorningPrepDays() {
+  $('mpDays').innerHTML = DAYS.filter(d => d !== 'SAT').map(d => '<button type="button" data-d="' + d + '" aria-pressed="' + isMorningPrep(state, d) + '">' + DAY_NAMES[d].slice(0, 3) + '</button>').join('');
+  $('tTotalSeg').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.v === (Number(state.prepTimer.total) === 40 ? 40 : 30))));
+}
+$('mpDays').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const set = new Set(state.prepDays || []);
+  if (set.has(b.dataset.d)) set.delete(b.dataset.d); else set.add(b.dataset.d);
+  state.prepDays = DAYS.filter(d => set.has(d));
+  changed(); refreshMorningPrepDays();
+});
+$('tTotalSeg').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; state.prepTimer.total = +b.dataset.v; changed(); refreshMorningPrepDays(); });
+
+/* ---------- House meeting schedule ----------
    Your changes are stored per date on top of the built-in schedule, so updates to the
    built-in schedule still reach you for every date you haven't changed. */
 function edits() { return state.schedEdits || (state.schedEdits = {}); }
@@ -1775,20 +2539,21 @@ function effectiveRow(date) { return scheduleList(state).find(r => r.date === da
 function blankRow(date) { return { date, Athlone: '', Alexander: '', Goodhart: '', Dewar: '' }; }
 function setEdit(date, row) {
   const b = BUILTIN_SCHEDULE.find(r => r.date === date);
-  // an edit that matches the built-in row exactly is no longer a change
-  if (b && row && JSON.stringify(Object.assign({}, b, { date })) === JSON.stringify(Object.assign({}, row, { date })) ) delete edits()[date];
+  if (b && row && JSON.stringify(Object.assign({}, b, { date })) === JSON.stringify(Object.assign({}, row, { date }))) delete edits()[date];
   else edits()[date] = Object.assign({}, row, { date });
 }
 function removeDate(date) {
   if (BUILTIN_SCHEDULE.some(r => r.date === date)) edits()[date] = { date, deleted: true };
   else delete edits()[date];
 }
+const srcCell = src => src === 'changed' ? '<button type="button" class="mine-pill" data-undo title="Go back to the school’s version of this date">Changed by you · Undo</button>'
+  : src === 'added' ? '<span class="mine-pill plain" title="A date you added">Added by you</span>' : '';
 function refreshSchedule() {
   const list = scheduleList(state).slice().sort((a, b) => a.date.localeCompare(b.date));
   const today = toISO(new Date()), showPast = $('schedPast').checked;
   const all = Object.values(state.schedEdits || {});
   const changes = all.filter(e => !e.deleted).length, removed = all.filter(e => e.deleted).length;
-  $('schedSource').textContent = (BUILTIN_SCHEDULE.length ? 'Built-in schedule' : 'No built-in schedule yet') +
+  $('schedSource').textContent = (BUILTIN_SCHEDULE.length ? 'The school’s schedule' : 'No school schedule yet') +
     (changes ? ' + ' + changes + (changes === 1 ? ' change of yours' : ' changes of yours') : '');
   $('schedReset').hidden = !(changes || removed);
   $('schedRestore').hidden = !removed;
@@ -1802,11 +2567,10 @@ function refreshSchedule() {
       '<td class="sd"><input type="date" data-f="date" value="' + esc(r.date) + '" aria-label="Date"></td>' +
       HOUSES.map(h => '<td><input data-f="' + h.name + '" value="' + esc(r.congers ? '' : (r[h.name] || '')) + '"' + (r.congers ? ' disabled' : '') + ' aria-label="' + h.name + '"></td>').join('') +
       '<td class="cgc"><input type="checkbox" data-f="congers"' + (r.congers ? ' checked' : '') + ' aria-label="Congers"></td>' +
-      '<td class="srcc">' + (src === 'changed' ? '<button type="button" class="mine-pill" data-undo title="Your change. Click to undo it and use the built-in schedule for this date">Yours ↺</button>'
-                            : src === 'added' ? '<span class="mine-pill plain" title="A date you added">Added</span>' : '') + '</td>' +
+      '<td class="srcc">' + srcCell(src) + '</td>' +
       '<td><button type="button" class="mini" data-del aria-label="Remove this date">✕</button></td></tr>';
   }).join('')
-    : '<tr><td colspan="8" class="hint" style="padding:0.6rem 0.2rem">' + (list.length ? 'No upcoming dates. Tick “Show past dates” to see earlier ones.' : 'No dates yet. Add one, or paste a schedule.') + '</td></tr>';
+    : '<tr><td colspan="8" class="hint" style="padding:0.6rem 0.2rem">' + (list.length ? 'No upcoming dates. Tick “Show past dates” to see earlier ones.' : 'No dates yet. Add one, or paste in a schedule.') + '</td></tr>';
 }
 $('schedPast').addEventListener('change', refreshSchedule);
 $('schedBody').addEventListener('change', e => {
@@ -1819,7 +2583,7 @@ $('schedBody').addEventListener('change', e => {
   } else if (f === 'congers') {
     setEdit(date, inp.checked ? { date, congers: true } : blankRow(date));
   } else return;
-  changed(); refreshSchedule(); refreshDay();
+  changed(); refreshSchedule();
 });
 $('schedBody').addEventListener('input', e => {
   const inp = e.target, tr = inp.closest('tr'); if (!tr || !tr.dataset.date) return;
@@ -1829,14 +2593,14 @@ $('schedBody').addEventListener('input', e => {
   setEdit(date, cur);
   const src = rowSource(date);
   tr.classList.toggle('mine', src !== 'builtin');
-  tr.querySelector('.srcc').innerHTML = src === 'changed' ? '<button type="button" class="mine-pill" data-undo title="Your change. Click to undo it and use the built-in schedule for this date">Yours ↺</button>' : src === 'added' ? '<span class="mine-pill plain" title="A date you added">Added</span>' : '';
-  changed(); refreshDay();
+  tr.querySelector('.srcc').innerHTML = srcCell(src);
+  changed();
 });
 $('schedBody').addEventListener('blur', e => { if (e.target.matches && e.target.matches('input[data-f]')) refreshSchedule(); }, true);
 $('schedBody').addEventListener('click', e => {
   const tr = e.target.closest('tr'); if (!tr || !tr.dataset.date) return;
-  if (e.target.closest('[data-undo]')) { delete edits()[tr.dataset.date]; changed(); refreshSchedule(); refreshDay(); }
-  else if (e.target.closest('[data-del]')) { removeDate(tr.dataset.date); changed(); refreshSchedule(); refreshDay(); }
+  if (e.target.closest('[data-undo]')) { delete edits()[tr.dataset.date]; changed(); refreshSchedule(); }
+  else if (e.target.closest('[data-del]')) { removeDate(tr.dataset.date); changed(); refreshSchedule(); }
 });
 $('schedAdd').addEventListener('click', () => {
   const dates = scheduleList(state).map(r => r.date).sort();
@@ -1846,12 +2610,12 @@ $('schedAdd').addEventListener('click', () => {
   changed(); refreshSchedule();
 });
 $('schedReset').addEventListener('click', () => {
-  if (!confirm('Undo all your changes to the schedule? You’ll be back on the built-in schedule.')) return;
-  state.schedEdits = {}; changed(); refreshSchedule(); refreshDay();
+  if (!confirm('Undo all your changes to the schedule? You’ll be back on the school’s version.')) return;
+  state.schedEdits = {}; changed(); refreshSchedule();
 });
 $('schedRestore').addEventListener('click', () => {
   Object.keys(edits()).forEach(k => { if (edits()[k].deleted) delete edits()[k]; });
-  changed(); refreshSchedule(); refreshDay();
+  changed(); refreshSchedule();
 });
 $('schedCopy').addEventListener('click', () => copyText(scheduleText(scheduleList(state)), 'Schedule copied.'));
 let schedParsed = null;
@@ -1867,356 +2631,77 @@ $('schedPasteText').addEventListener('input', () => {
 $('schedPasteAdd').addEventListener('click', () => {
   if (!schedParsed || !schedParsed.rows.length) return;
   schedParsed.rows.forEach(r => setEdit(r.date, r));
-  changed(); $('schedPasteCancel').click(); refreshSchedule(); refreshDay();
-  toast('Schedule updated: ' + schedParsed.rows.length + ' dates.');
+  changed(); const n = schedParsed.rows.length; $('schedPasteCancel').click(); refreshSchedule();
+  toast('Schedule updated: ' + n + ' dates.');
 });
 $('schedPasteCancel').addEventListener('click', () => { $('schedPasteBox').hidden = true; $('schedPasteText').value = ''; $('schedPastePreview').innerHTML = ''; $('schedPasteAdd').disabled = true; });
 
-/* ---------- Day colours (Settings) ---------- */
-function nextDateFor(wd) {
-  let d = schoolDay(new Date());
-  for (let i = 0; i < 7 && wdOf(d) !== wd; i++) d = addDays(d, 1);
-  return d;
+/* ---------- Backup & reset ---------- */
+const BACKUP_KEY = 'morningSlide.lastBackup';
+function refreshBackup() {
+  let last = null; try { last = localStorage.getItem(BACKUP_KEY); } catch (e) {}
+  $('lastBackup').textContent = 'Last saved a copy: ' + (last ? shortDate(new Date(last)) : 'never');
 }
-function refreshThemes() {
-  const grid = $('themeGrid');
-  grid.innerHTML = DAYS.map(d => {
-    const t = themeFor(state, d);
-    return '<span class="dname">' + DAY_NAMES[d] + '</span>' +
-      '<span class="swatches" aria-hidden="true"><i style="background:' + t.main + '"></i><i style="background:' + t.tint + '"></i><i style="background:' + t.bg + '"></i></span>' +
-      '<select class="text" data-day="' + d + '" aria-label="Colour for ' + DAY_NAMES[d] + '">' +
-        THEME_KEYS.map(k => '<option value="' + k + '"' + (state.dayTheme[d] === k ? ' selected' : '') + '>' + THEMES[k].name + '</option>').join('') +
-      '</select>' +
-      '<button type="button" class="btn small" data-preview="' + d + '">Preview</button>';
-  }).join('');
-}
-$('themeGrid').addEventListener('change', e => {
-  const sel = e.target.closest('select[data-day]'); if (!sel) return;
-  state.dayTheme[sel.dataset.day] = sel.value; changed(); refreshThemes();
-  if (wdOf(viewDate) !== sel.dataset.day) setDate(nextDateFor(sel.dataset.day));
-});
-$('themeGrid').addEventListener('click', e => {
-  const b = e.target.closest('button[data-preview]'); if (b) setDate(nextDateFor(b.dataset.preview));
-});
-
-/* ---------- Setup tab ---------- */
-function parseTime(v) {
-  if (typeof v === 'number' && isFinite(v)) { let m = Math.round((v % 1) * 1440); return m === 1440 ? 0 : m; }
-  if (v instanceof Date) return v.getHours() * 60 + v.getMinutes();
-  const m = /(\d{1,2})[:.](\d{2})\s*(am|pm)?/i.exec(String(v || '')); if (!m) return null;
-  let h = +m[1]; if (m[3]) { const pm = m[3].toLowerCase() === 'pm'; if (pm && h < 12) h += 12; if (!pm && h === 12) h = 0; }
-  return h * 60 + +m[2];
-}
-function normDay(v) { const s = String(v || '').trim().toUpperCase(); return ALL_DAYS.find(d => s.startsWith(d)) || s; }
-function formSort(a, b) { const na = parseInt(a, 10), nb = parseInt(b, 10); return na !== nb ? na - nb : a.localeCompare(b, 'en-GB', { numeric: true }); }
-
-$('lessonsBtn').addEventListener('click', () => { $('lessonsInput').value = ''; $('lessonsInput').click(); });
-$('lessonsInput').addEventListener('change', async () => {
-  const file = $('lessonsInput').files[0]; if (!file) return;
-  if (typeof XLSX === 'undefined') { toast('The spreadsheet reader didn\'t load. Check your internet connection.'); return; }
-  try {
-    const wb = XLSX.read(await file.arrayBuffer(), { type: 'array' });
-    const grid = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: true, defval: '' });
-    const rows = [], ignored = {};
-    grid.forEach((r, i) => {
-      const form = String(r[0] ?? '').trim(), name = String(r[1] ?? '').trim();
-      if (!form && !name) return;
-      if (i === 0 && form.toLowerCase() === 'form') return;
-      if (!/^\d/.test(form)) { ignored[form || '(blank)'] = (ignored[form || '(blank)'] || 0) + 1; return; }
-      rows.push([form, name, normDay(r[2]), parseTime(r[3]), String(r[4] ?? '').trim()]);
-    });
-    if (!rows.length) { toast('No lessons found. Check it\'s the right file.'); return; }
-    state.lessons = { fileName: file.name, savedAt: new Date().toISOString(), rows, ignored };
-    changed(); refreshSetup();
-    toast('Lessons loaded: ' + rows.length + ' across all forms.');
-  } catch (e) { toast('"' + file.name + '" couldn\'t be read as a spreadsheet.'); }
-});
-function refreshSetup() {
-  refreshDesign();
-  const L = state.lessons;
-  if (L) {
-    const d = new Date(L.savedAt);
-    els.lessonsInfo.textContent = L.fileName + ' (added ' + DAY_NAMES[dayCode(d)].slice(0, 3) + ' ' + d.getDate() + ' ' + MONTHS[d.getMonth()].slice(0, 3) + ')';
-    const ig = Object.entries(L.ignored || {});
-    els.ignoredNote.hidden = !ig.length;
-    if (ig.length) els.ignoredNote.textContent = 'Ignored rows whose form doesn\'t start with a number: ' + ig.map(([f, n]) => f + ' (' + n + ')').join(', ') + '.';
-    const forms = [...new Set(L.rows.map(r => r[0]))].sort(formSort);
-    const byYear = {};
-    forms.forEach(f => { const y = parseInt(f, 10); (byYear[y] = byYear[y] || []).push(f); });
-    els.formSelect.innerHTML = '<option value="">Choose your form</option>' + Object.keys(byYear).sort((a, b) => a - b).map(y =>
-      '<optgroup label="Year ' + y + '">' + byYear[y].map(f => '<option value="' + esc(f) + '">' + esc(f) + '</option>').join('') + '</optgroup>').join('');
-    els.formSelect.value = forms.includes(state.form) ? state.form : '';
-  } else {
-    els.lessonsInfo.textContent = 'No file yet';
-    els.ignoredNote.hidden = true;
-    els.formSelect.innerHTML = '<option value="">Upload the lessons file first</option>';
-  }
-  $('bitPrev').hidden = !state.bitmoji; if (state.bitmoji) $('bitPrev').src = state.bitmoji;
-}
-els.formSelect.addEventListener('change', () => { state.form = els.formSelect.value; changed(); });
-$('bitBtn').addEventListener('click', () => { $('bitInput').value = ''; $('bitInput').click(); });
-$('bitInput').addEventListener('change', async () => {
-  const f = $('bitInput').files[0]; if (!f) return;
-  try { state.bitmoji = await readImage(f, 520); changed(); refreshSetup(); } catch (e) { toast('That image couldn\'t be read.'); }
-});
-$('bitRemove').addEventListener('click', () => { state.bitmoji = null; changed(); refreshSetup(); });
-
-$('exportBtn').addEventListener('click', () => {
+function saveCopy() {
   const blob = new Blob([JSON.stringify(state)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'morning-slide-settings-' + toISO(new Date()) + '.json';
+  a.download = 'morning-slide-' + (state.form ? state.form + '-' : '') + toISO(new Date()) + '.json';
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 2000);
-});
-$('importBtn').addEventListener('click', () => { $('importInput').value = ''; $('importInput').click(); });
+  try { localStorage.setItem(BACKUP_KEY, new Date().toISOString()); } catch (e) {}
+  refreshBackup();
+}
+function openCopy() { $('importInput').value = ''; $('importInput').click(); }
+$('exportBtn').addEventListener('click', saveCopy);
+$('saveCopy').addEventListener('click', saveCopy);
+$('importBtn').addEventListener('click', openCopy);
+$('openCopy').addEventListener('click', openCopy);
 $('importInput').addEventListener('change', async () => {
   const f = $('importInput').files[0]; if (!f) return;
   try {
     const data = JSON.parse(await f.text());
     if (!data || data.v !== 1) throw new Error('bad');
+    if (!confirm('Open “' + f.name + '”? It replaces everything on this laptop: timetable, notes, preps, design and music lessons.')) return;
     localStorage.setItem(STORE_KEY, JSON.stringify(data));
-    state = loadState(); afterLoad(); toast('Settings imported.');
-  } catch (e) { toast('That file isn\'t a Morning Slide settings file.'); }
+    state = loadState(); afterLoad(); toast('Copy opened.');
+  } catch (e) { toast('That file isn’t a Morning Slide copy.'); }
 });
 $('resetAll').addEventListener('click', () => {
-  if (!confirm('Reset everything? This clears your timetable changes, notes, Bitmoji and lessons file from this laptop.')) return;
+  if (!confirm('Reset everything? This clears your timetable, notes, preps, design and music lessons from this browser.')) return;
   try { localStorage.removeItem(STORE_KEY); } catch (e) {}
   state = defaultState(); afterLoad(); toast('Everything has been reset.');
 });
-
-/* ---------- Morning / Prep switch ---------- */
-function setMode(m, quiet) {
-  editMode = m;
-  $('modeSwitch').classList.toggle('prep', m === 'prep');
-  $('modeSwitch').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === m)));
-  document.querySelectorAll('.tabs button').forEach(b => { b.hidden = !!b.dataset.mode && b.dataset.mode !== m; });
-  const cur = document.querySelector('.tabs button[aria-selected="true"]');
-  if (!quiet || !cur || cur.hidden) document.querySelector('.tabs button[data-mode="' + m + '"]').click();
-  refreshPrep();
-  if (!quiet) renderAll();
-}
-$('modeSwitch').addEventListener('click', e => { const b = e.target.closest('button'); if (b && b.dataset.m !== editMode) setMode(b.dataset.m); });
-
-/* ---------- Prep tab ---------- */
-const prepInfoEditor = makeRich(document.querySelector('[data-rich="prepinfo"]'),
-  () => (state.prepInfo || {})[wdOf(viewDate)] || '',
-  v => { state.prepInfo[wdOf(viewDate)] = v; changed(); });
-const tomorrowEditor = makeRich(document.querySelector('[data-rich="tomorrow"]'),
-  () => (state.prepTomorrow || {})[toISO(viewDate)] || '',
-  v => { const iso = toISO(viewDate); if (v) state.prepTomorrow[iso] = v; else delete state.prepTomorrow[iso]; changed(); },
-  { placeholder: 'Blank until you add something, or copy it from tomorrow’s morning slide' });
-
-let prepRowsKey = '';
-function buildPrepRows(force) {
-  const wd = wdOf(viewDate);
-  const list = state.preps[wd] || (state.preps[wd] = []);
-  const key = wd + '|' + list.length;
-  if (!force && key === prepRowsKey) return;
-  prepRowsKey = key;
-  $('prepRows').innerHTML = list.map((p, i) =>
-    '<div class="preprow" data-i="' + i + '">' +
-      '<input class="text" data-f="subject" placeholder="Subject" aria-label="Prep ' + (i + 1) + ' subject" value="' + esc(p.subject) + '">' +
-      '<label class="minsbox"><input data-f="mins" inputmode="decimal" placeholder="20" aria-label="Prep ' + (i + 1) + ' minutes" value="' + esc(p.mins) + '"><span>mins</span></label>' +
-      '<button type="button" class="mini" data-m="del" aria-label="Remove prep ' + (i + 1) + '">✕</button>' +
-    '</div>').join('');
-  $('prepAdd').disabled = list.length >= 4;
-}
-function refreshPrep() {
-  const wd = wdOf(viewDate), morning = isMorningPrep(state, wd);
-  $('prepHeading').textContent = morning ? 'Morning prep' : 'Preps';
-  $('prepTag').textContent = 'Every ' + DAY_NAMES[wd];
-  $('prepInfoTag').textContent = 'Every ' + DAY_NAMES[wd];
-  $('tomTag').textContent = 'Just for ' + shortDate(viewDate);
-  $('tomSec').hidden = morning;
-  $('mpNote').hidden = !morning;
-  buildPrepRows();
-  prepInfoEditor.refresh();
-  tomorrowEditor.refresh();
-  const set = state.prepTimer;
-  const press = (id, v) => $(id).querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.v === String(v))));
-  press('tModeSeg', set.mode); press('tTotalSeg', Number(set.total) === 40 ? 40 : 30); press('tBetweenSeg', set.between); press('tShowSeg', set.show);
-  $('tTotalBox').hidden = set.mode !== 'tens';
-  refreshTimerUi();
-}
-$('prepRows').addEventListener('input', e => {
-  const inp = e.target, row = inp.closest('.preprow'); if (!row || !inp.dataset.f) return;
-  state.preps[wdOf(viewDate)][+row.dataset.i][inp.dataset.f] = inp.value;
-  changed();
-});
-$('prepRows').addEventListener('click', e => {
-  const b = e.target.closest('button[data-m="del"]'); if (!b) return;
-  state.preps[wdOf(viewDate)].splice(+b.closest('.preprow').dataset.i, 1);
-  changed(); buildPrepRows(true);
-});
-$('prepAdd').addEventListener('click', () => {
-  const list = state.preps[wdOf(viewDate)];
-  if (list.length >= 4) return;
-  list.push({ subject: '', mins: '' }); changed(); buildPrepRows(true);
-  const last = $('prepRows').querySelector('.preprow:last-child input'); if (last) last.focus();
-});
-[['tModeSeg', 'mode'], ['tTotalSeg', 'total'], ['tBetweenSeg', 'between'], ['tShowSeg', 'show']].forEach(([id, key]) => {
-  $(id).addEventListener('click', e => {
-    const b = e.target.closest('button'); if (!b) return;
-    state.prepTimer[key] = key === 'total' ? Number(b.dataset.v) : b.dataset.v;
-    changed(); refreshPrep();
-  });
-});
-$('tomCopy').addEventListener('click', () => {
-  const tm = nextSchoolDay(viewDate), text = resolveDay(state, tm).notes;
-  if (!text.trim()) { toast(DAY_NAMES[dayCode(tm)] + '’s “What’s happening today?” is empty.'); return; }
-  const iso = toISO(viewDate), cur = state.prepTomorrow[iso] || '';
-  if (cur.trim() && cur !== text && !confirm('Replace what’s in “Tomorrow morning” with a fresh copy?')) return;
-  state.prepTomorrow[iso] = text;
-  tomorrowEditor.ta.value = text;
-  changed();
-  toast('Copied. Trim it as much as you like: tomorrow’s morning slide won’t change.');
-});
-
-/* ---------- Morning prep days (Settings) ---------- */
-function refreshMorningPrepDays() {
-  $('mpDays').innerHTML = DAYS.map(d => '<button type="button" data-d="' + d + '" aria-pressed="' + isMorningPrep(state, d) + '">' + DAY_NAMES[d].slice(0, 3) + '</button>').join('');
-}
-$('mpDays').addEventListener('click', e => {
-  const b = e.target.closest('button'); if (!b) return;
-  const set = new Set(state.prepDays || []);
-  if (set.has(b.dataset.d)) set.delete(b.dataset.d); else set.add(b.dataset.d);
-  state.prepDays = DAYS.filter(d => set.has(d));
-  changed(); refreshMorningPrepDays(); refreshPrep();
-});
-
-/* ---------- Prep timer ---------- */
-let heard = { id: timer && timer.id, chime: (timer && timer.chime) || 0 };
-function heardTimer() {               // chime once for each timer that ends, whichever window noticed it
-  if (!timer) return;
-  if (timer.id !== heard.id) { heard = { id: timer.id, chime: timer.chime || 0 }; return; }
-  if ((timer.chime || 0) > heard.chime) { heard.chime = timer.chime; chime(); }
-}
-function paintAll() {
-  paintTimer(els.preview.querySelector('.slide'), state);
-  if (!els.stage.hidden) paintTimer(els.stage.querySelector('.slide'), state);
-}
-function pushTimer() {
-  storeTimer(timer);
-  if (slideWin && !slideWin.closed) { try { slideWin.postMessage({ type: 'ms-timer', timer }, '*'); } catch (e) {} }
-  paintAll(); refreshTimerUi();
-}
-function refreshTimerUi() {
-  const t = timer;
-  const v = timerView(t, planOf(state, wdOf(viewDate)), Date.now());
-  $('tPause').disabled = !t || t.finished;
-  $('tPause').textContent = !t ? 'Pause' : t.running ? 'Pause' : t.waiting ? 'Start next' : 'Resume';
-  $('tPlus').disabled = !t || t.finished;
-  $('tNext').disabled = !t || t.finished || t.kind === 'custom';
-  $('tReset').disabled = !t;
-  $('tStart').textContent = t && !t.finished ? 'Restart prep' : 'Start prep';
-  $('timerState').innerHTML = !t ? 'Not started. The slide shows the first timer ready to go.'
-    : '<b>' + esc(v.time) + '</b> · ' + esc(v.label) + (v.sub ? ' · ' + esc(v.sub) : t.running ? ' · running' : '');
-}
-function startTimer(plan) {
-  unlockAudio();
-  if (!plan.segs.length) { toast(plan.kind === 'preps' ? 'Add the preps and their minutes first.' : 'Type a time for the timer.'); return; }
-  const segs = plan.segs.map(g => ({ label: g.label, mins: g.mins }));
-  timer = { id: Date.now().toString(36), kind: plan.kind, segs, idx: 0, running: true, waiting: false, finished: false,
-            endAt: Date.now() + segFull(segs[0]), remaining: 0, between: state.prepTimer.between, date: toISO(viewDate), chime: 0 };
-  heardTimer();
-  if (isPresenting() && editMode === 'prep') proj = { mode: 'prep', date: toISO(viewDate) };
-  pushTimer(); renderAll();
-}
-$('tStart').addEventListener('click', () => {
-  if (timer && !timer.finished && !confirm('Start the prep timer again from the beginning?')) return;
-  startTimer(planOf(state, wdOf(viewDate)));
-});
-$('tPause').addEventListener('click', () => {
-  const t = timer; if (!t || t.finished) return;
-  unlockAudio();
-  if (t.running) { t.remaining = Math.max(0, t.endAt - Date.now()); t.running = false; }
-  else { t.endAt = Date.now() + t.remaining; t.running = true; t.waiting = false; }
-  pushTimer();
-});
-$('tPlus').addEventListener('click', () => {
-  const t = timer; if (!t || t.finished) return;
-  const seg = t.segs[t.idx]; seg.extra = (seg.extra || 0) + 60000;
-  if (t.running) t.endAt += 60000; else t.remaining += 60000;
-  pushTimer();
-});
-$('tNext').addEventListener('click', () => {
-  const t = timer; if (!t || t.finished) return;
-  if (t.idx < t.segs.length - 1) {
-    t.idx++;
-    const ms = segFull(t.segs[t.idx]);
-    if (t.running) t.endAt = Date.now() + ms; else t.remaining = ms;
-  } else { t.running = false; t.waiting = false; t.finished = true; t.remaining = 0; }
-  pushTimer();
-});
-$('tReset').addEventListener('click', () => { timer = null; pushTimer(); });
-function parseDuration(str) {
-  str = String(str).trim().toLowerCase().replace(/\s*(mins?|minutes?|m)$/, '');
-  let m;
-  if ((m = str.match(/^(\d+):([0-5]?\d)$/))) return Number(m[1]) + Number(m[2]) / 60;
-  if ((m = str.match(/^\d+(\.\d+)?$/))) return Number(str);
-  return null;
-}
-$('tCustomGo').addEventListener('click', () => {
-  const mins = parseDuration($('tCustom').value);
-  if (!mins || mins <= 0 || mins > 180) { toast('Type minutes like 15, or minutes and seconds like 7:30.'); $('tCustom').focus(); return; }
-  if (timer && !timer.finished && !confirm('Replace the timer that’s running?')) return;
-  startTimer({ kind: 'custom', segs: [{ label: '', mins }] });
-});
-$('tCustom').addEventListener('keydown', e => { if (e.key === 'Enter') $('tCustomGo').click(); });
-$('tTest').addEventListener('click', () => { unlockAudio(); chime(); });
-
-// Several times a second: move the timer on (from its fixed end time) and repaint the clock and timer
-makeTicker(() => {
-  if (advanceTimer(timer, Date.now())) { heardTimer(); pushTimer(); }
-  paintAll();
-  if (editMode === 'prep' && timer && timer.running) refreshTimerUi();
-}, 250);
-
-/* ---------- Status line under the preview ---------- */
-function refreshStatus() {
-  const wd = wdOf(viewDate), parts = [];
-  if (editMode === 'prep') {
-    const morning = isMorningPrep(state, wd), n = prepList(state, wd).length;
-    parts.push((morning ? 'Morning prep' : 'Evening prep') + ': ' + n + (n === 1 ? ' prep' : ' preps'));
-    if (state.lessons && state.form) {
-      const md = morning ? wd : dayCode(nextSchoolDay(viewDate)), m = musicRows(state, md).length;
-      parts.push(m + ' music ' + (m === 1 ? 'lesson' : 'lessons') + (morning ? ' today' : ' tomorrow'));
-    }
-    if (toISO(viewDate) !== toISO(new Date())) parts.push('Preparing ' + DAY_NAMES[dayCode(viewDate)] + ' ' + viewDate.getDate() + ' ' + MONTHS[viewDate.getMonth()].slice(0, 3));
-    els.status.innerHTML = parts.map(p => '<span>' + p + '</span>').join('');
-    return;
-  }
-  if (!state.lessons) parts.push('<span class="warn">No lessons file yet (Settings tab)</span>');
-  else if (!state.form) parts.push('<span class="warn">Choose your form (Settings tab)</span>');
-  else {
-    const n = musicRows(state, wd).length;
-    parts.push(esc(state.form) + ': ' + n + ' music ' + (n === 1 ? 'lesson' : 'lessons') + ' on ' + DAY_NAMES[wd]);
-  }
-  const isToday = toISO(viewDate) === toISO(schoolDay(new Date()));
-  if (!isToday) parts.push('Preparing ' + DAY_NAMES[dayCode(viewDate)] + ' ' + viewDate.getDate() + ' ' + MONTHS[viewDate.getMonth()].slice(0, 3));
-  els.status.innerHTML = parts.map(p => '<span>' + p + '</span>').join('');
-}
 
 /* =====================================================================
    Rendering, syncing and presenting
    ===================================================================== */
 let slideWin = null;
-let renderTimer = null;
+let renderTimer = null, pendingFull = false;
 const isPresenting = () => (slideWin && !slideWin.closed) || !els.stage.hidden;
-function renderAll() {
+function renderAll(opts = {}) {
   // When nothing's on the projector, or it's showing the same kind of slide, it follows what you're editing
   if (!isPresenting() || proj.mode === editMode) proj = { mode: editMode, date: toISO(viewDate) };
-  renderView(els.preview, state, editMode, viewDate); scaleInto(els.preview);
+  const a = document.activeElement, typing = !!(a && els.preview.contains(a) && a.closest('[data-field]'));
+  if (opts.forcePreview || (!opts.keepPreview && !typing)) {
+    renderView(els.preview, state, editMode, viewDate, true);
+    decoratePreview(els.preview.querySelector('.slide'));
+    scaleInto(els.preview);
+    els.preview.style.setProperty('--frame', themeFor(state, wdOf(viewDate)).main);
+  }
   if (!els.stage.hidden) { renderView(els.stage, state, proj.mode, fromISO(proj.date)); scaleInto(els.stage); }
-  refreshStatus();
   updatePresenting();
   sendToSlide();
 }
-function changed() {
+function changed(opts = {}) {
   save();
+  if (!opts.keepPreview) pendingFull = true;
   clearTimeout(renderTimer);
-  renderTimer = setTimeout(renderAll, 60);
+  renderTimer = setTimeout(() => {
+    const full = pendingFull; pendingFull = false;
+    renderAll({ keepPreview: !full });
+    if (!$('mainScreen').hidden) { refreshWeek(); if (editMode === 'morning') refreshMorningSide(); else { refreshPrepSide(); refreshTimerUi(); } }
+  }, 60);
 }
 function sendToSlide() {
   if (slideWin && !slideWin.closed) {
@@ -2228,7 +2713,9 @@ window.addEventListener('message', e => {
   if (e.data && e.data.type === 'ms-timer') { timer = e.data.timer; heardTimer(); paintAll(); refreshTimerUi(); }
 });
 window.addEventListener('storage', e => { if (e.key === TIMER_KEY) { timer = loadTimer(); heardTimer(); paintAll(); refreshTimerUi(); } });
-new ResizeObserver(() => scaleInto(els.preview)).observe(els.preview);
+new ResizeObserver(() => { scaleInto(els.preview); positionBars(); }).observe(els.preview);
+// Typing near the edge of the scaled slide mustn't scroll it out of place
+els.preview.addEventListener('scroll', e => { const t = e.target; if (t === els.preview || (t.classList && (t.classList.contains('slide') || t.classList.contains('grid')))) { t.scrollTop = 0; t.scrollLeft = 0; } }, true);
 
 async function present() {
   if (slideWin && !slideWin.closed) { slideWin.focus(); sendToSlide(); return; }
@@ -2245,7 +2732,6 @@ async function present() {
     } catch (e) { /* permission refused or unsupported */ }
   }
   if (!target && !extended) { presentHere(); return; }
-
   const url = location.href.split('#')[0] + '#slide';
   const feat = target
     ? 'popup,left=' + target.availLeft + ',top=' + target.availTop + ',width=' + target.availWidth + ',height=' + target.availHeight + ',fullscreen'
@@ -2256,11 +2742,11 @@ async function present() {
   updatePresenting();
 }
 function presentHere() {
+  endEditNow();
   els.stage.hidden = false;
   renderView(els.stage, state, proj.mode, fromISO(proj.date)); scaleInto(els.stage);
   const done = () => { els.stage.hidden = true; updatePresenting(); };
   els.stage.requestFullscreen().then(() => setTimeout(() => scaleInto(els.stage), 60)).catch(() => {});
-  els.stage.onclick = null;
   const onFs = () => { if (!document.fullscreenElement) { document.removeEventListener('fullscreenchange', onFs); done(); } };
   document.addEventListener('fullscreenchange', onFs);
   updatePresenting();
@@ -2278,22 +2764,24 @@ function describe(v) {
 }
 function updatePresenting() {
   const on = isPresenting();
-  els.presentingPill.hidden = !on; els.endBtn.hidden = !on;
-  if (on) els.presentingPill.textContent = 'On the projector: ' + describe(proj);
+  $('endBtn').hidden = !on; $('presentBtn').hidden = on;
+  const ps = $('projStatus');
+  ps.classList.toggle('on', on); ps.classList.toggle('off', !on);
+  $('projText').innerHTML = on ? 'On the projector: <b>' + esc(describe(proj)) + '</b>' : 'Not on the projector';
   $('projSwap').hidden = !on || (proj.mode === editMode && proj.date === toISO(viewDate));
 }
 $('projSwap').addEventListener('click', () => { proj = { mode: editMode, date: toISO(viewDate) }; renderAll(); });
 setInterval(updatePresenting, 1000);
 window.addEventListener('resize', () => { if (!els.stage.hidden) scaleInto(els.stage); });
-els.presentBtn.addEventListener('click', present);
-els.endBtn.addEventListener('click', endPresenting);
+$('presentBtn').addEventListener('click', present);
+$('endBtn').addEventListener('click', endPresenting);
 window.addEventListener('beforeunload', () => { if (slideWin && !slideWin.closed) slideWin.close(); });
 
-/* Roll the date over if the dashboard is left open past midnight */
+/* Roll the date over if the page is left open past midnight */
 let lastDay = toISO(new Date());
 setInterval(() => {
   const now = toISO(new Date());
-  if (now !== lastDay) { const wasToday = toISO(viewDate) === toISO(schoolDay(fromISO(lastDay))); lastDay = now; if (wasToday) setDate(new Date()); }
+  if (now !== lastDay) { const wasToday = toISO(viewDate) === toISO(schoolDay(fromISO(lastDay))); lastDay = now; if (wasToday && !editing) setDate(new Date()); }
 }, 60000);
 
 /* At 9:00 and 17:30, offer to move on to the next slide */
@@ -2302,7 +2790,7 @@ let askTarget = null;
 function askSwitch(target) {
   const d = fromISO(target.date);
   askTarget = target;
-  $('askTitle').textContent = target.mode === 'prep' ? 'Switch to ' + DAY_NAMES[dayCode(d)] + '\u2019s prep slide?' : 'Switch to tomorrow\u2019s morning slide?';
+  $('askTitle').textContent = target.mode === 'prep' ? 'Switch to ' + DAY_NAMES[dayCode(d)] + '’s prep slide?' : 'Switch to tomorrow’s morning slide?';
   $('askText').textContent = target.mode === 'prep'
     ? 'The morning is over. This shows the prep slide, both here and on the projector.'
     : 'Prep is over. This shows the morning slide for ' + DAY_NAMES[dayCode(d)] + ' ' + d.getDate() + ' ' + MONTHS[d.getMonth()] + ', both here and on the projector.';
@@ -2312,9 +2800,9 @@ function askSwitch(target) {
 $('askYes').addEventListener('click', () => {
   $('askBox').hidden = true;
   if (!askTarget) return;
+  viewDate = fromISO(askTarget.date); ttDay = wdOf(viewDate); scopePending = {};
   proj = Object.assign({}, askTarget);
-  editMode = askTarget.mode; viewDate = fromISO(askTarget.date);
-  setMode(editMode, true); setDate(viewDate);
+  setMode(askTarget.mode);
   proj = Object.assign({}, askTarget); renderAll();
 });
 $('askNo').addEventListener('click', () => { $('askBox').hidden = true; });
@@ -2328,16 +2816,12 @@ setInterval(() => {
 
 function afterLoad() {
   pruneOverrides();
-  panelEditorKey = '';
-  setDate(viewDate);
-  refreshSetup();
-  refreshThemes();
-  refreshSchedule();
-  $('showTaskToggle').checked = state.showTask !== false;
-  refreshMorningPrepDays();
-  setMode(editMode, true);
+  applyDesignClass();
+  editing = null; hideBars();
+  setMode(editMode);
+  if (!$('setupScreen').hidden) refreshSetupAll();
 }
-if (document.fonts) document.fonts.ready.then(renderAll);
+if (document.fonts) document.fonts.ready.then(() => renderAll());
 afterLoad();
 })();
 </script>
