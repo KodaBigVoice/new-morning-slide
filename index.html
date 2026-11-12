@@ -914,6 +914,8 @@ function loadState() {
         } else base[k] = saved[k];
       }
     }
+    // Keep anything this version doesn't use (e.g. the original app's Bitmoji): both apps share this storage
+    if (saved && saved.v === 1) Object.keys(saved).forEach(k => { if (!(k in base) && k !== 'schedule') base[k] = saved[k]; });
     if (saved && Array.isArray(saved.schedule)) base.schedule = saved.schedule;   // older versions kept a full copy
   } catch (e) { /* fresh start */ }
   return migrateSchedule(base);
