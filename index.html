@@ -163,6 +163,42 @@
 .slide .pt-bar { flex: 1 1 0; height: 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.22); overflow: hidden; }
 .slide .pt-bar i { display: block; height: 100%; width: 0; border-radius: 8px; background: #fff; }
 .slide .rich[data-always]:empty::before { content: attr(data-always); color: var(--muted); }
+/* Freestyle */
+.slide .free { position: relative; min-height: 0; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.slide .free-main { grid-column: 2; grid-row: 3; }
+.slide .right .free-side { flex: 1 1 0; min-height: 300px; }
+.slide.whole .banner { grid-column: 1 / 4; }
+.slide .free-whole { grid-column: 1 / 4; grid-row: 2 / 4; }
+.slide.prep.whole .grid { grid-template-columns: minmax(0, 1fr); }
+.slide.prep.whole .banner, .slide.prep.whole .free-whole { grid-column: 1; }
+.slide .free-pbot { grid-column: 1; grid-row: 3; }
+.slide .free-image { background: var(--soft); }
+.slide .free-img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.slide .free-img.cover { object-fit: cover; }
+.slide .free-video { background: #14171b; color: #fff; }
+.slide .fv-box { position: absolute; inset: 0; }
+.slide .fv-thumb { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+.slide .fv-thumb img { width: 100%; height: 100%; object-fit: contain; opacity: 0.85; }
+.slide .fv-play { position: absolute; width: 150px; height: 150px; border-radius: 50%; background: rgba(0, 0, 0, 0.55); }
+.slide .fv-play::after { content: ""; position: absolute; left: 58px; top: 42px; border-left: 56px solid #fff; border-top: 33px solid transparent; border-bottom: 33px solid transparent; }
+.slide .fv-note { position: absolute; bottom: 26px; font-size: 28px; font-weight: 600; background: rgba(0, 0, 0, 0.6); padding: 8px 20px; border-radius: 12px; }
+.slide .free-empty { position: absolute; inset: 28px; border: 5px dashed var(--line, #c5d3df); border-radius: 28px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; padding: 30px; font-size: 30px; color: var(--muted); cursor: pointer; }
+.slide .free-video .free-empty { border-color: rgba(255, 255, 255, 0.35); color: rgba(255, 255, 255, 0.8); }
+.slide .free-empty b { font-family: var(--display); font-size: 44px; color: var(--main); }
+.slide .free-video .free-empty b { color: #fff; }
+.slide .free-missing { font-size: 30px; color: var(--muted); padding: 30px; text-align: center; }
+.slide .free-message { background: var(--fbg, #fff); color: var(--ffg, var(--ink)); --dot: currentColor; --label: currentColor; padding: 48px 64px; gap: 26px; text-align: center; }
+.slide .fm-title { font-family: var(--display); font-weight: 800; line-height: 1.12; color: var(--ftitle, var(--main)); max-width: 100%; overflow-wrap: anywhere; flex: none; }
+.slide .fm-text { flex: none; overflow: visible; max-width: 100%; text-align: center; }
+.slide .fm-text ul { display: inline-flex; text-align: left; }
+.slide:not(.editor-preview) .fm-title:empty, .slide:not(.editor-preview) .fm-text:empty { display: none; }
+.slide .ptm { flex: none; display: flex; align-items: center; gap: 18px; padding: 8px 12px 8px 24px; border-radius: 18px; background: rgba(255, 255, 255, 0.16); }
+.slide.evening .ptm { background: var(--main); color: #fff; }
+.slide .ptm-label { font-size: 28px; font-weight: 600; white-space: nowrap; max-width: 380px; overflow: hidden; text-overflow: ellipsis; }
+.slide .ptm-time { font-family: var(--dateFont); font-size: 52px; font-weight: 700; line-height: 1; padding: 6px 14px; border-radius: 12px; background: rgba(255, 255, 255, 0.18); font-variant-numeric: tabular-nums; }
+.video-layer { position: absolute; z-index: 5; border-radius: 10px; overflow: hidden; background: #000; }
+.video-layer iframe { width: 100%; height: 100%; border: 0; display: block; }
+.video-error { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 8%; text-align: center; background: #14171b; color: #fff; font: 600 clamp(14px, 2.2vw, 34px)/1.35 "Atkinson Hyperlegible", sans-serif; }
 .slide .prep-add { display: none; }
 /* Evening: a deeper version of the day's colours */
 .slide.evening .banner { background: var(--tint); color: var(--ink); }
@@ -320,6 +356,25 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
 .fmtbar .scope { display: grid; grid-auto-flow: column; background: rgba(255, 255, 255, 0.12); border-radius: 8px; padding: 3px; gap: 2px; }
 .fmtbar .scope button[aria-pressed="true"] { background: #fff; color: var(--ink); font-weight: 700; }
 .fmtbar .fnote { padding: 0 0.45rem; color: #DCE6F0; font-size: 0.8rem; }
+.zonebar { width: max-content; }
+.zonebar > span { display: inline-flex; align-items: center; gap: 4px; }
+.zonebar > span[hidden] { display: none; }
+.zonebar input { border: 0; border-radius: 6px; padding: 0.3rem 0.5rem; font-size: 0.82rem; color: var(--ink); background: #fff; }
+#zbYt { width: 230px; } #zbLink { width: 260px; } #zbStart { width: 54px; }
+.zb-start { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0 0.3rem 0 0.5rem; color: #DCE6F0; }
+.swatches { display: inline-flex; gap: 5px; padding: 0 3px; }
+.swatches button { width: 24px; height: 24px; padding: 0; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.5); }
+.swatches button[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--ink), 0 0 0 4px #fff; }
+.recentpop { position: absolute; z-index: 21; display: grid; grid-template-columns: repeat(5, 64px); gap: 6px; padding: 8px; border-radius: 12px; background: #fff; box-shadow: 0 12px 30px -10px rgba(28, 48, 72, 0.5); }
+.recentpop button { width: 64px; height: 48px; padding: 0; border: 2px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--mist); cursor: pointer; }
+.recentpop button:hover { border-color: var(--steel); }
+.recentpop img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.recentpop p { grid-column: 1 / -1; margin: 0; padding: 4px; font-size: 0.82rem; color: var(--slate); }
+.slide.editor-preview .free[data-slot] { cursor: pointer; }
+.slide.editor-preview .free.zone-sel { outline: 8px solid #3E6489; outline-offset: 6px; }
+.slide.editor-preview .free.drop-over { outline: 8px dashed #3E6489; outline-offset: 6px; }
+.vgroup { gap: 0.4rem; flex-wrap: nowrap; }
+.vlabel { font-size: 0.8rem; color: #B9C8D8; }
 .ovrtip { position: absolute; z-index: 19; display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0.6rem 0.45rem 0.75rem; border-radius: 10px; background: #fff; box-shadow: 0 10px 24px -10px rgba(28, 48, 72, 0.5); font-size: 0.82rem; white-space: nowrap; }
 .ovrtip .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--ovr); }
 
@@ -481,6 +536,7 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
             <button type="button" data-cmd="bullet" title="Bullet">• Bullet</button>
             <button type="button" data-cmd="sub" title="Sub-bullet (Tab)">◦ Sub-bullet</button>
           </span>
+          <span class="swatches fmt-colours" id="fmtColours" hidden></span>
           <span class="sep fmt-sep"></span>
           <span class="scope" id="fmtScope">
             <button type="button" data-scope="week"></button>
@@ -488,6 +544,21 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
           </span>
           <span class="fnote" id="fmtNote"></span>
         </div>
+        <div class="fmtbar zonebar" id="zonebar" role="toolbar" aria-label="Freestyle" hidden>
+          <span class="zb-image">
+            <button type="button" data-z="choose">Choose…</button>
+            <button type="button" data-z="recent">Recent ▾</button>
+            <button type="button" data-z="link">Link</button>
+            <span class="scope" id="zbFit"><button type="button" data-fit="contain">Show it all</button><button type="button" data-fit="cover">Fill the box</button></span>
+            <button type="button" data-z="remove" title="Take the picture off">Remove</button>
+          </span>
+          <span class="zb-link" hidden><input id="zbLink" placeholder="Paste a link to a picture or GIF" spellcheck="false" autocomplete="off"><button type="button" data-z="linkok">Use</button></span>
+          <span class="zb-video"><input id="zbYt" placeholder="Paste a YouTube link" spellcheck="false" autocomplete="off"><label class="zb-start">Start at <input id="zbStart" placeholder="0:00" autocomplete="off"></label></span>
+          <span class="zb-msg"><span class="swatches" id="zbColours"></span></span>
+          <span class="sep"></span><span class="fnote" id="zbNote"></span>
+        </div>
+        <div class="recentpop" id="recentPop" hidden></div>
+        <input type="file" id="freeFile" accept="image/*" hidden>
         <div class="ovrtip" id="ovrtip" role="note" hidden><span class="dot"></span><span id="ovrText"></span><button type="button" class="btn small strong" id="ovrUndo">Undo</button></div>
       </div>
     </section>
@@ -506,6 +577,15 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
       </div>
 
       <div id="regions">
+        <div class="box" id="wholeBox" style="margin-bottom:10px">
+          <div class="labelrow"><b id="wholeLbl">Freestyle over the whole slide</b><button type="button" class="switch" id="wholeSwitch" role="switch" aria-checked="false" aria-labelledby="wholeLbl"></button></div>
+          <div id="wholeOpts" hidden style="display:flex;flex-direction:column;gap:8px">
+            <select class="text" id="wholeKind" aria-label="What fills the slide"><option value="image">Image or GIF</option><option value="video">YouTube video</option><option value="message">Message</option></select>
+            <div class="seg" id="wholeScope"><button type="button" data-scope="week"></button><button type="button" data-scope="today">Change for today</button></div>
+            <p class="subtle">Everything below the date bar. Turn this off to get the usual slide back.</p>
+          </div>
+        </div>
+        <div id="areaBoxes">
         <div class="box areabox top" data-region="top" style="margin-bottom:10px">
           <h3 class="areahead"><span class="ttl"><span class="mm" data-mm="top" aria-hidden="true"></span>Top boxes</span></h3>
           <div class="labelrow"><span style="display:flex;align-items:center;gap:0.45rem"><span id="taskLbl">Morning task box</span><button type="button" class="info-i" title="The 8:30 box always shows. A first lesson box joins it when the main area shows “First lesson only”." aria-label="About the top boxes">i</button></span><button type="button" class="switch" id="taskSwitch" role="switch" aria-checked="true" aria-labelledby="taskLbl"></button></div>
@@ -517,6 +597,7 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
             <option value="full">Full timetable</option>
             <option value="first">First lesson only</option>
             <option value="off">Nothing (notes use the space)</option>
+            <optgroup label="Freestyle"><option value="free-image">Image or GIF</option><option value="free-video">YouTube video</option><option value="free-message">Message</option></optgroup>
           </select>
           <label id="firstPick" class="labelrow" hidden><span style="white-space:nowrap">First lesson</span><select class="text" id="firstSelect"></select></label>
           <div class="seg" id="mainScope"><button type="button" data-scope="week"></button><button type="button" data-scope="today">Change for today</button></div>
@@ -529,8 +610,10 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
             <option value="house">House meetings</option>
             <option value="lunch">Lunchtime arrangements</option>
             <option value="info">Custom panel</option>
+            <optgroup label="Freestyle"><option value="free-image">Image or GIF</option><option value="free-video">YouTube video</option><option value="free-message">Message</option></optgroup>
           </select>
           <div class="seg" id="sideScope"><button type="button" data-scope="week"></button><button type="button" data-scope="today">Change for today</button></div>
+        </div>
         </div>
 
         <div class="changes" id="changes"><span class="dot"></span><span id="changesText"></span><button type="button" class="linkbtn" id="undoDay">Undo them</button></div>
@@ -540,6 +623,13 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
     <!-- Prep side column -->
     <aside class="side" id="sidePrep" aria-label="Prep settings" hidden>
       <div class="box">
+        <div class="labelrow"><b>Freestyle</b><select class="text" id="pfreeSel" style="width:205px" aria-label="Freestyle on the prep slide">
+          <option value="off">Off</option>
+          <optgroup label="Instead of the bottom boxes"><option value="bottom-image">Bottom: image or GIF</option><option value="bottom-video">Bottom: YouTube video</option><option value="bottom-message">Bottom: message</option></optgroup>
+          <optgroup label="Whole slide (timer in the banner)"><option value="whole-image">Whole slide: image or GIF</option><option value="whole-video">Whole slide: YouTube</option><option value="whole-message">Whole slide: message</option></optgroup>
+        </select></div>
+        <div class="seg" id="pfreeScope" hidden><button type="button" data-scope="week"></button><button type="button" data-scope="today">Change for today</button></div>
+        <div class="divider"></div>
         <div class="labelrow"><b>Timer chime</b><div class="seg" id="chimeSeg" style="width:150px"><button type="button" data-v="on">On</button><button type="button" data-v="off">Off</button></div></div>
         <div class="divider"></div>
         <b>Timer follows</b>
@@ -552,7 +642,7 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
         <div class="seg" id="tShowSeg"><button type="button" data-v="timer">Timer</button><button type="button" data-v="clock">Clock</button><button type="button" data-v="both">Both</button></div>
       </div>
       <div class="box" id="tomBox">
-        <p class="subtle"><b style="color:var(--ink)">Tomorrow Morning</b> starts blank each evening. Copy tomorrow’s “What’s happening today?”, then trim it on the slide.</p>
+        <p class="subtle"><b style="color:var(--ink)">Tomorrow Morning</b> starts blank each evening. Copy tomorrow’s “What’s happening today?” and trim it.</p>
         <button type="button" class="btn" id="tomCopy">Copy from tomorrow’s slide</button>
       </div>
       <div class="box" id="mpNote" hidden>
@@ -570,6 +660,12 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
       <button type="button" class="bb-btn" id="tSkip">Skip</button>
       <button type="button" class="bb-btn" id="tReset">Reset</button>
       <span class="thint" id="tHint" hidden>Paused: click the time to type a new one</span>
+    </div>
+    <div class="row vgroup" id="videoGroup" hidden>
+      <span class="vlabel">Video</span>
+      <button type="button" class="bb-btn solid" id="vPlay">Play</button>
+      <button type="button" class="bb-btn" id="vRestart">Start again</button>
+      <button type="button" class="bb-btn" id="vSound">Sound off</button>
     </div>
     <span class="bbhint" id="bbHint"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg><span id="previewHint"></span></span>
     <span class="grow"></span>
@@ -845,7 +941,11 @@ function defaultState() {
     prepInfo: per(''),                   // prep info, per weekday
     prepTomorrow: {},                    // "Tomorrow morning" box, by prep date
     prepDays: [],                        // weekdays when prep happens in the morning
-    prepTimer: { mode: 'preps', total: 30, between: 'auto', show: 'both', chime: true, customMins: 0 }
+    prepTimer: { mode: 'preps', total: 30, between: 'auto', show: 'both', chime: true, customMins: 0 },
+    free: per(() => ({})),               // freestyle content for every <weekday>: { main, side, whole, prep } → { kind, img, url, fit, yt, start, title, text, colour }
+    freeWhole: per(false),               // whole-slide freestyle every <weekday>
+    prepFree: per('off'),                // prep slide freestyle every <weekday>: 'off' | 'bottom' | 'whole'
+    recentImages: []                     // the 10 most recent pictures: [{ id, name, gif }] (the files live in IndexedDB)
   };
 }
 
@@ -986,6 +1086,19 @@ function firstLessonOf(st, wd) {
 }
 function ttViewOf(st, wd) { return (st.ttView || {})[wd] || ((st.ttShow || {})[wd] === false ? 'off' : 'full'); }
 
+/* Freestyle: an image/GIF, a YouTube video or a message. Its content follows the same "every <weekday>"
+   or "just this date" choice as the area it fills. */
+const FREE_BLANK = { kind: 'image', img: null, url: '', fit: 'contain', yt: '', start: 0, title: '', text: '', colour: 'plain' };
+function freeItem(st, ovr, wd, slot, today) {
+  const it = today ? (ovr.free || {})[slot] : ((st.free || {})[wd] || {})[slot];
+  return Object.assign({}, FREE_BLANK, it || {});
+}
+function prepFreeOf(st, date) {
+  const wd = dayCode(date) === 'SUN' ? 'MON' : dayCode(date), ovr = st.overrides[toISO(date)] || {};
+  const today = ovr.pfree != null;
+  return { mode: today ? ovr.pfree : ((st.prepFree || {})[wd] || 'off'), item: freeItem(st, ovr, wd, 'prep', today), today };
+}
+
 /* What the slide shows for a given date */
 function resolveDay(st, date) {
   const code = dayCode(date);
@@ -1019,6 +1132,12 @@ function resolveDay(st, date) {
     panelTitle: panel === 'info' ? ((ovr.infoTitle != null ? ovr.infoTitle : ((st.infoTitle || {})[wd] || '')).trim() || PANEL_TITLES.info) : (PANEL_TITLES[panel] || ''),
     ttView: ovr.ttView || ttViewOf(st, wd),
     showTT: (ovr.ttView || ttViewOf(st, wd)) === 'full',
+    whole: ovr.whole != null ? !!ovr.whole : !!(st.freeWhole || {})[wd],
+    free: {
+      main: freeItem(st, ovr, wd, 'main', ovr.ttView != null),
+      side: freeItem(st, ovr, wd, 'side', ovr.panel != null),
+      whole: freeItem(st, ovr, wd, 'whole', ovr.whole != null)
+    },
     firstLesson: (ovr.ttView || ttViewOf(st, wd)) === 'first' ? firstLessonOf(st, wd) : null
   };
 }
@@ -1173,8 +1292,45 @@ function firstLessonHTML(r) {
   return '<div class="info"><div class="info-label">' + esc(label) + '</div><div class="info-value" data-fit="44,26">' + esc(r ? r.subject : 'No timetable yet') + '</div></div>';
 }
 
-function panelHTML(st, day) {
+const MSG_COLOURS = {
+  plain: { name: 'White' },
+  day:   { name: 'Day colour' },
+  sun:   { name: 'Sunshine', bg: '#FFD23F', fg: '#3B2A00' },
+  coral: { name: 'Coral',    bg: '#F2594B', fg: '#FFFFFF' },
+  mint:  { name: 'Mint',     bg: '#34C291', fg: '#06301F' },
+  sky:   { name: 'Sky',      bg: '#2F8FE0', fg: '#FFFFFF' },
+  grape: { name: 'Grape',    bg: '#8A4FD8', fg: '#FFFFFF' }
+};
+function msgStyle(colour) {
+  if (colour === 'day') return '--fbg:var(--main);--ffg:#fff;--ftitle:#fff';
+  const c = MSG_COLOURS[colour];
+  return c && c.bg ? '--fbg:' + c.bg + ';--ffg:' + c.fg + ';--ftitle:' + c.fg : '';
+}
+function freeHTML(slot, it, editor, cls) {
+  const big = slot === 'whole';
+  const attrs = ' data-slot="' + slot + '"';
+  if (it.kind === 'video') {
+    const inner = it.yt
+      ? (editor ? '<div class="fv-thumb"><img alt="" src="https://i.ytimg.com/vi/' + esc(it.yt) + '/hqdefault.jpg"><span class="fv-play"></span><span class="fv-note">Plays on the projector</span></div>'
+                : '<div class="fv-box" data-yt="' + esc(it.yt) + '" data-start="' + (Math.max(0, it.start | 0)) + '"></div>')
+      : (editor ? '<div class="free-empty"><b>YouTube video</b>Click here, then paste a YouTube link</div>' : '');
+    return '<div class="card free free-video ' + cls + '"' + attrs + '>' + inner + '</div>';
+  }
+  if (it.kind === 'message') {
+    return '<div class="card free free-message ' + cls + '"' + attrs + ' style="' + msgStyle(it.colour) + '">' +
+      '<div class="fm-title" data-mfit="' + (big ? '130,52' : '80,34') + '" data-field="free:' + slot + ':title">' + esc(it.title) + '</div>' +
+      '<div class="rich fm-text" data-mfit="' + (big ? '58,26' : '42,22') + '" data-field="free:' + slot + ':text">' + richHTML(it.text) + '</div></div>';
+  }
+  const src = it.img ? Media.cached(it.img) : it.url;
+  const inner = it.img || it.url
+    ? '<img class="free-img' + (it.fit === 'cover' ? ' cover' : '') + '" alt=""' + (it.img ? ' data-media="' + esc(it.img) + '"' : '') + (src ? ' src="' + esc(src) + '"' : '') + '>'
+    : (editor ? '<div class="free-empty"><b>Image or GIF</b>Paste with Ctrl+V, drop one here, or click to choose</div>' : '');
+  return '<div class="card free free-image ' + cls + '"' + attrs + '>' + inner + '</div>';
+}
+
+function panelHTML(st, day, editor) {
   if (day.panel === 'none') return '';
+  if (day.panel === 'free') return freeHTML('side', day.free.side, editor, 'free-side region-side');
   if (day.panel === 'house') {
     return '<div class="card panel house region-side"><div class="heading">House Meeting Locations</div><div class="houses">' +
       HOUSES.map(h => '<div class="house-tile" style="background:' + h.tint + '"><div class="house-name" style="background:' + h.bg + ';color:' + h.fg + '">' + h.name + '</div>' +
@@ -1184,32 +1340,48 @@ function panelHTML(st, day) {
     '<div class="rich" data-fit="30,18" data-field="panelText">' + richHTML(day.panelText) + '</div></div>';
 }
 
-function renderSlide(host, st, date) {
+function setSlideHTML(host, html) {      // replaces the slide but keeps anything else in the host (the video player, hints)
+  host.querySelectorAll(':scope > .slide').forEach(s => s.remove());
+  host.insertAdjacentHTML('afterbegin', html);
+}
+function renderSlide(host, st, date, editor) {
   const day = resolveDay(st, date);
   const t = themeFor(st, day.wd);
   const rows = musicRows(st, day.wd);
   host.style.background = t.bg;
-  host.innerHTML =
-    '<div class="slide' + (day.showTT ? '' : ' no-tt') + (day.ttView === 'first' ? ' first' : '') + (st.design === 'modern' ? ' modern' : '') + (day.panel === 'none' ? ' no-panel' : '') + '" style="' + themeVars(t) + '">' +
+  if (day.whole) {
+    setSlideHTML(host,
+      '<div class="slide whole' + (st.design === 'modern' ? ' modern' : '') + '" style="' + themeVars(t) + '">' +
+        '<div class="circle" style="width:900px;height:900px;left:-300px;bottom:-480px"></div>' +
+        '<div class="circle" style="width:700px;height:700px;right:-260px;top:-360px"></div>' +
+        '<div class="grid"><div class="banner">' + dateHTML(date) + '</div>' + freeHTML('whole', day.free.whole, editor, 'free-whole') + '</div>' +
+      '</div>');
+    fitSlide(host.querySelector('.slide'), 'none');
+    return host.querySelector('.slide');
+  }
+  const freeMain = day.ttView === 'free';
+  setSlideHTML(host,
+    '<div class="slide' + (day.showTT || freeMain ? '' : ' no-tt') + (day.ttView === 'first' ? ' first' : '') + (st.design === 'modern' ? ' modern' : '') + (day.panel === 'none' ? ' no-panel' : '') + '" style="' + themeVars(t) + '">' +
       '<div class="circle" style="width:900px;height:900px;left:-300px;bottom:-480px"></div>' +
       '<div class="circle" style="width:700px;height:700px;right:-260px;top:-360px"></div>' +
       '<div class="grid">' +
         '<div class="banner">' + dateHTML(date) + '</div>' +
         '<div class="right">' +
-          '<div class="card music' + (day.panel === 'info' || day.panel === 'lunch' ? ' natural' : '') + '"><div class="heading">Music Lessons</div><div class="music-body">' + musicHTML(rows) + '</div></div>' +
-          panelHTML(st, day) +
+          '<div class="card music' + (day.panel === 'info' || day.panel === 'lunch' || day.panel === 'free' ? ' natural' : '') + '"><div class="heading">Music Lessons</div><div class="music-body">' + musicHTML(rows) + '</div></div>' +
+          panelHTML(st, day, editor) +
         '</div>' +
         '<div class="pair region-top' + (day.showTask || day.ttView === 'first' ? '' : ' single') + '" style="--boxes:' + ((day.showTask ? 1 : 0) + 1 + (day.ttView === 'first' ? 1 : 0)) + '">' +
           (day.showTask ? '<div class="info"><div class="info-label">Today\u2019s morning task</div><div class="info-value" data-fit="44,30" data-field="task">' + esc(day.task) + '</div></div>' : '') +
           '<div class="info"><div class="info-label">' + (day.showTask ? 'then at 8:30\u2026' : 'At 8:30\u2026') + '</div><div class="info-value" data-fit="44,30" data-field="at830">' + esc(day.at830) + '</div></div>' +
           (day.ttView === 'first' ? firstLessonHTML(day.firstLesson) : '') +
         '</div>' +
-        '<div class="left' + (day.showTT ? '' : ' region-main') + '">' +
+        '<div class="left' + (day.showTT || freeMain ? '' : ' region-main') + '">' +
           '<div class="card notes"><div class="heading">What\u2019s happening today?</div><div class="rich" data-fit="32,20" data-field="notes">' + richHTML(day.notes) + '</div></div>' +
         '</div>' +
         (day.showTT ? '<div class="card tt region-main"><div class="heading">Timetable</div>' + timetableHTML(st, day.wd) + '</div>' : '') +
+        (freeMain ? freeHTML('main', day.free.main, editor, 'free-main region-main') : '') +
       '</div>' +
-    '</div>';
+    '</div>');
   fitSlide(host.querySelector('.slide'), day.panel);
   return host.querySelector('.slide');
 }
@@ -1220,7 +1392,7 @@ function fitSlide(slide, panel) {
   // Music first: with a bullet panel the music card takes only what it needs, up to a cap
   const music = slide.querySelector('.music');
   const body = slide.querySelector('.music-body');
-  if (music) music.style.maxHeight = (panel === 'info' || panel === 'lunch') ? '640px' : '';
+  if (music) music.style.maxHeight = (panel === 'info' || panel === 'lunch' || panel === 'free') ? '640px' : '';
   if (body && body.querySelector('.m-row')) {
     let size = 24;
     body.style.fontSize = size + 'px';
@@ -1238,6 +1410,14 @@ function fitSlide(slide, panel) {
       el.style.whiteSpace = 'normal'; el.style.overflowWrap = 'anywhere';
       size = Math.min(max, 34); el.style.fontSize = size + 'px';
       while (size > 20 && el.offsetHeight > size * 1.15 * 2 + 4) { size -= 1; el.style.fontSize = size + 'px'; }
+    }
+  });
+  // Messages: heading and text shrink together until the whole message fits its box
+  slide.querySelectorAll('.free-message').forEach(card => {
+    const parts = [...card.querySelectorAll('[data-mfit]')].map(el => { const [max, min] = el.dataset.mfit.split(',').map(Number); el.style.fontSize = max + 'px'; return { el, max, min, size: max }; });
+    let guard = 60;
+    while (guard-- > 0 && card.scrollHeight > card.clientHeight + 1 && parts.some(q => q.size > q.min)) {
+      parts.forEach(q => { q.size = Math.max(q.min, Math.round(q.size * 0.93)); q.el.style.fontSize = q.size + 'px'; });
     }
   });
   // Timetable rows: 48px each at most, smaller (with smaller text) when the day is long
@@ -1346,8 +1526,29 @@ function renderPrep(host, st, date, editor) {
     musicDay = dayCode(nextSchoolDay(date)); musicTitle = 'Tomorrow’s Music Lessons'; musicEmpty = 'No music lessons tomorrow';
   }
   const info = (st.prepInfo || {})[wd] || '';
+  const pf = prepFreeOf(st, date);
   host.style.background = t.bg;
-  host.innerHTML =
+  if (pf.mode === 'whole') {
+    // Everything below the banner is freestyle; the timer moves into the banner so it's never lost
+    setSlideHTML(host,
+      '<div class="slide prep whole' + (morning ? '' : ' evening') + (st.design === 'modern' ? ' modern' : '') + '" data-wd="' + wd + '" style="' + themeVars(t) + '">' +
+        '<div class="circle" style="width:900px;height:900px;left:-300px;bottom:-480px"></div>' +
+        '<div class="circle" style="width:700px;height:700px;right:-260px;top:-360px"></div>' +
+        '<div class="grid">' +
+          '<div class="banner' + (showClock || clockOnly ? '' : ' no-clock') + '">' +
+            (showClock || clockOnly ? '<div class="pt-clock">' + clockText(new Date()) + '</div>' : '') +
+            '<div class="banner-main">' + DAY_NAMES[wd] + ' Prep</div>' +
+            (clockOnly ? '' : '<div class="ptm"><span class="ptm-label"></span><span class="ptm-time"></span></div>') +
+            '<div class="banner-sub">' + shortD + '</div>' +
+          '</div>' +
+          freeHTML('whole', pf.item, editor, 'free-whole').replace('data-slot="whole"', 'data-slot="prep"').replace(/data-field="free:whole:/g, 'data-field="free:prep:') +
+        '</div>' +
+      '</div>');
+    const s = host.querySelector('.slide');
+    fitSlide(s, 'none'); paintTimer(s, st);
+    return s;
+  }
+  setSlideHTML(host,
     '<div class="slide prep' + (morning ? '' : ' evening') + (st.design === 'modern' ? ' modern' : '') + '" data-wd="' + wd + '" style="' + themeVars(t) + '">' +
       '<div class="circle" style="width:900px;height:900px;left:-300px;bottom:-480px"></div>' +
       '<div class="circle" style="width:700px;height:700px;right:-260px;top:-360px"></div>' +
@@ -1363,17 +1564,18 @@ function renderPrep(host, st, date, editor) {
             : (editor ? '' : '<div class="prep-none">No preps set for ' + DAY_NAMES[wd] + ' yet</div>')) +
           (editor && rows.length < 4 ? '<button type="button" class="prep-add" data-add-prep>+ Add a prep</button>' : '') +
         '</div>' +
+        (pf.mode === 'bottom' ? freeHTML('prep', pf.item, editor, 'free-pbot') :
         '<div class="prep-low">' +
           '<div class="card prep-box"><div class="heading">Prep Info</div><div class="rich" data-fit="30,18" data-field="prepInfo" data-always="No extra instructions">' + richHTML(info) + '</div></div>' +
           '<div class="card prep-box"><div class="heading">' + secondTitle + '</div><div class="rich" data-fit="30,18"' + (morning ? '' : ' data-field="tomorrow"') + '>' + richHTML(second) + '</div></div>' +
-        '</div>' +
+        '</div>') +
         '<div class="right">' +
           (clockOnly ? '<div class="pt clock-only"><div class="pt-label">Time now</div><div class="pt-time pt-bigclock"></div></div>'
                      : '<div class="pt"><div class="pt-label"></div><div class="pt-time"></div><div class="pt-bars"></div><div class="pt-sub"></div></div>') +
           '<div class="card music"><div class="heading">' + musicTitle + '</div><div class="music-body">' + musicHTML(musicRows(st, musicDay), musicEmpty) + '</div></div>' +
         '</div>' +
       '</div>' +
-    '</div>';
+    '</div>');
   const slide = host.querySelector('.slide');
   fitSlide(slide, 'none');
   paintTimer(slide, st);
@@ -1392,6 +1594,13 @@ function paintTimer(slide, st) {
     const tag = isNow ? 'Now' : isDone ? 'Done' : '';
     const el = r.querySelector('.prep-tag'); if (el.textContent !== tag) el.textContent = tag;
   });
+  const mini = slide.querySelector('.ptm');
+  if (mini) {
+    const lbl = v.sub || (v.label && v.label !== 'Add prep times' ? v.label.split(' · ')[0] : '');
+    const a = mini.querySelector('.ptm-label'), b = mini.querySelector('.ptm-time');
+    if (a.textContent !== lbl) a.textContent = lbl;
+    if (b.textContent !== v.time) b.textContent = v.time;
+  }
   const pt = slide.querySelector('.pt:not(.clock-only)');
   if (!pt) return;
   const set = (sel, txt) => { const e = pt.querySelector(sel); if (e.textContent !== txt) e.textContent = txt; };
@@ -1406,8 +1615,118 @@ function paintTimer(slide, st) {
 }
 
 function renderView(host, st, mode, date, editor) {
-  return mode === 'prep' ? renderPrep(host, st, date, editor) : renderSlide(host, st, date);
+  const slide = mode === 'prep' ? renderPrep(host, st, date, editor) : renderSlide(host, st, date, editor);
+  hydrateMedia(host);
+  if (!editor) syncVideo(host);
+  return slide;
 }
+
+/* ---------- Pictures and GIFs: kept in the browser's storage for files (IndexedDB), not with the settings ---------- */
+const Media = (() => {
+  let dbp = null;
+  const urls = new Map();
+  const db = () => dbp || (dbp = new Promise((res, rej) => {
+    const r = indexedDB.open('morningSlide.v2.media', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('images', { keyPath: 'id' });
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  }));
+  const run = (mode, fn) => db().then(d => new Promise((res, rej) => {
+    const t = d.transaction('images', mode), req = fn(t.objectStore('images'));
+    t.oncomplete = () => res(req && req.result); t.onerror = () => rej(t.error);
+  }));
+  return {
+    put: rec => run('readwrite', s => s.put(rec)),
+    del: id => { const u = urls.get(id); if (u) { URL.revokeObjectURL(u); urls.delete(id); } return run('readwrite', s => s.delete(id)).catch(() => {}); },
+    cached: id => urls.get(id) || '',
+    url: async id => {
+      if (urls.has(id)) return urls.get(id);
+      try { const r = await run('readonly', s => s.get(id)); if (!r) return null; const u = URL.createObjectURL(r.blob); urls.set(id, u); return u; }
+      catch (e) { return null; }
+    }
+  };
+})();
+function hydrateMedia(host) {
+  host.querySelectorAll('img[data-media]:not([src])').forEach(img => {
+    Media.url(img.dataset.media).then(u => {
+      if (u) img.src = u;
+      else if (img.isConnected) { const d = document.createElement('div'); d.className = 'free-missing'; d.textContent = 'This picture isn’t saved on this laptop'; img.replaceWith(d); }
+    });
+  });
+}
+
+/* ---------- YouTube ---------- */
+function parseStart(t) {
+  t = String(t || '').trim(); let m;
+  if (!t) return 0;
+  if ((m = t.match(/^(\d+):(\d{1,2})$/))) return +m[1] * 60 + +m[2];
+  if ((m = t.match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s?)?$/))) return (+m[1] || 0) * 3600 + (+m[2] || 0) * 60 + (+m[3] || 0);
+  return 0;
+}
+const fmtStart = s => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+function parseYouTube(s) {
+  s = String(s || '').trim();
+  if (!s) return null;
+  if (/^[\w-]{11}$/.test(s)) return { id: s, start: 0 };
+  let u; try { u = new URL(/^https?:/i.test(s) ? s : 'https://' + s); } catch (e) { return null; }
+  const host = u.hostname.replace(/^(www|m|music)\./, '');
+  let id = null;
+  if (host === 'youtu.be') id = u.pathname.slice(1, 12);
+  else if (/(^|\.)youtube(-nocookie)?\.com$/.test(host)) id = u.searchParams.get('v') || (u.pathname.match(/\/(?:shorts|embed|live|v)\/([\w-]{11})/) || [])[1];
+  if (!id || !/^[\w-]{11}$/.test(id)) return null;
+  return { id, start: parseStart(u.searchParams.get('t') || u.searchParams.get('start')) };
+}
+/* The player sits over the slide (not inside it), so it keeps playing while the slide around it is redrawn */
+let videoStatus = { playing: false, muted: false, error: '' };
+let onVideoStatus = () => {};
+function syncVideo(host) {
+  const box = host.querySelector(':scope > .slide .fv-box');
+  let layer = host.querySelector(':scope > .video-layer');
+  if (!box) { if (layer) { layer.remove(); videoStatus = { playing: false, muted: false, error: '' }; onVideoStatus(); } return; }
+  const key = box.dataset.yt + '@' + box.dataset.start;
+  if (!layer || layer.dataset.key !== key) {
+    if (layer) layer.remove();
+    layer = document.createElement('div');
+    layer.className = 'video-layer'; layer.dataset.key = key; layer.dataset.start = box.dataset.start;
+    const origin = /^https?:/.test(location.origin) ? '&origin=' + encodeURIComponent(location.origin) : '';
+    layer.innerHTML = '<iframe title="Video" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen src="https://www.youtube-nocookie.com/embed/' +
+      encodeURIComponent(box.dataset.yt) + '?enablejsapi=1&rel=0&playsinline=1&modestbranding=1' + (+box.dataset.start ? '&start=' + box.dataset.start : '') + origin + '"></iframe><div class="video-error" hidden></div>';
+    host.appendChild(layer);
+    const f = layer.querySelector('iframe');
+    f.addEventListener('load', () => { try { f.contentWindow.postMessage(JSON.stringify({ event: 'listening', id: 1, channel: 'widget' }), '*'); } catch (e) {} });
+    videoStatus = { playing: false, muted: false, error: '' }; onVideoStatus();
+  }
+  placeVideo(host);
+}
+function placeVideo(host) {
+  const box = host.querySelector(':scope > .slide .fv-box'), layer = host.querySelector(':scope > .video-layer');
+  if (!box || !layer) return;
+  const a = box.getBoundingClientRect(), b = host.getBoundingClientRect();
+  let w = a.width, hh = w * 9 / 16;
+  if (hh > a.height) { hh = a.height; w = hh * 16 / 9; }
+  Object.assign(layer.style, { left: (a.left - b.left + (a.width - w) / 2) + 'px', top: (a.top - b.top + (a.height - hh) / 2) + 'px', width: w + 'px', height: hh + 'px' });
+}
+function videoCommand(host, cmd) {
+  const layer = host.querySelector(':scope > .video-layer'), f = layer && layer.querySelector('iframe');
+  if (!f) return;
+  const send = (func, args) => { try { f.contentWindow.postMessage(JSON.stringify({ event: 'command', func, args: args || [] }), '*'); } catch (e) {} };
+  if (cmd === 'play') send('playVideo');
+  else if (cmd === 'pause') send('pauseVideo');
+  else if (cmd === 'restart') { send('seekTo', [+layer.dataset.start || 0, true]); send('playVideo'); }
+  else if (cmd === 'mute') { send('mute'); videoStatus.muted = true; onVideoStatus(); }
+  else if (cmd === 'unmute') { send('unMute'); videoStatus.muted = false; onVideoStatus(); }
+}
+window.addEventListener('message', e => {
+  if (typeof e.data !== 'string' || !/youtube/.test(e.origin || '')) return;
+  let d; try { d = JSON.parse(e.data); } catch (x) { return; }
+  if (d.event === 'onError') {
+    videoStatus.error = (d.info === 101 || d.info === 150 || d.info === 153) ? 'This video’s owner doesn’t let it be shown on other websites. Try another video.' : 'This video can’t be played. Check the link.';
+    document.querySelectorAll('.video-layer .video-error').forEach(el => { el.textContent = videoStatus.error; el.hidden = false; });
+  }
+  const info = d.info && typeof d.info === 'object' ? d.info : null;
+  if (info && typeof info.playerState === 'number') videoStatus.playing = info.playerState === 1 || info.playerState === 3;
+  if (info && typeof info.muted === 'boolean') videoStatus.muted = info.muted;
+  onVideoStatus();
+});
 
 /* A steady tick that keeps going in background tabs (a tiny worker isn't slowed down like page timers are) */
 function makeTicker(fn, ms) {
@@ -1459,6 +1778,7 @@ function scaleInto(host) {
   const s = Math.min(host.clientWidth / 1920, host.clientHeight / 1080);
   const x = (host.clientWidth - 1920 * s) / 2, y = (host.clientHeight - 1080 * s) / 2;
   slide.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + s + ')';
+  placeVideo(host);
 }
 
 /* =====================================================================
@@ -1476,7 +1796,9 @@ if (location.hash === '#slide') {
     const d = e.data;
     if (d && d.type === 'ms-state') { state = d.state; mode = d.mode || 'morning'; viewDate = fromISO(d.date) || viewDate; if ('timer' in d) timer = d.timer; draw(); }
     if (d && d.type === 'ms-timer') { timer = d.timer; paint(); }
+    if (d && d.type === 'ms-video') videoCommand(stage, d.cmd);
   });
+  onVideoStatus = () => { if (window.opener && !window.opener.closed) { try { window.opener.postMessage({ type: 'ms-video-status', status: videoStatus }, '*'); } catch (e) {} } };
   window.addEventListener('storage', e => {
     if (e.key === STORE_KEY) { state = loadState(); draw(); }
     if (e.key === TIMER_KEY) { timer = loadTimer(); paint(); }
@@ -1550,7 +1872,7 @@ function setOvr(key, val) {
   if (val == null) delete o[key]; else o[key] = val;
   if (Object.keys(o).length) state.overrides[iso] = o; else delete state.overrides[iso];
 }
-const OVR_NAMES = { task: 'morning task', at830: '8:30 box', notes: 'What’s happening', panel: 'side panel', panelText: 'side panel text', infoTitle: 'panel heading', house: 'house rooms', ttView: 'main area' };
+const OVR_NAMES = { whole: 'whole slide', free: 'freestyle', pfree: 'prep freestyle', task: 'morning task', at830: '8:30 box', notes: 'What’s happening', panel: 'side panel', panelText: 'side panel text', infoTitle: 'panel heading', house: 'house rooms', ttView: 'main area' };
 function plainFirst(s) {
   const line = String(s || '').replace(/^\s*[-*•]\s+/gm, '').replace(/\*\*|__|\*/g, '').split('\n').map(x => x.trim()).find(Boolean) || '';
   return line.length > 38 ? line.slice(0, 36).trim() + '…' : line;
@@ -1582,7 +1904,7 @@ function setMode(m) {
   $('timerGroup').hidden = m !== 'prep';
   $('bbHint').hidden = m === 'prep';
   if (m === 'prep' && viewDate.getDay() === 6) viewDate = addDays(viewDate, -1);
-  endEditNow();
+  endEditNow(); hideZone();
   refreshUi(); renderAll();
 }
 $('modeSwitch').addEventListener('click', e => { const b = e.target.closest('button'); if (b && b.dataset.m !== editMode) setMode(b.dataset.m); });
@@ -1592,7 +1914,7 @@ function setDate(d) {
   if (editMode === 'prep' && viewDate.getDay() === 6) viewDate = addDays(viewDate, -1);
   scopePending = {};
   ttDay = wdOf(viewDate);
-  endEditNow();
+  endEditNow(); hideZone();
   refreshUi(); renderAll();
 }
 
@@ -1664,8 +1986,11 @@ function refreshMorningSide() {
       (s.done ? '<span></span>' : '<button type="button" class="linkbtn" data-go="' + s.go + '">' + s.action + '</button>') + '</div>').join('');
   }
   $('taskSwitch').setAttribute('aria-checked', String(state.showTask !== false));
+  $('wholeSwitch').setAttribute('aria-checked', String(day.whole));
+  $('wholeOpts').hidden = !day.whole; $('areaBoxes').hidden = day.whole;
+  if (day.whole) { $('wholeKind').value = day.free.whole.kind; scopeSeg('wholeScope', day.ovr.whole != null, wd); }
 
-  const sel = $('ttViewSel'); sel.value = day.ttView;
+  const sel = $('ttViewSel'); sel.value = day.ttView === 'free' ? 'free-' + day.free.main.kind : day.ttView;
   const mainOvr = day.ovr.ttView != null;
   $('mainSrc').textContent = mainOvr ? 'Changed for ' + dayMonth(viewDate) : DAY_NAMES[wd] + '’s usual';
   scopeSeg('mainScope', mainOvr || scopePending.main, wd);
@@ -1678,7 +2003,7 @@ function refreshMorningSide() {
     $('firstSelect').value = pick != null && rows[pick] ? String(pick) : '';
   }
 
-  $('panelSel').value = day.panel;
+  $('panelSel').value = day.panel === 'free' ? 'free-' + day.free.side.kind : day.panel;
   const own = ((state.infoTitle || {})[wd] || '').trim();
   $('panelSel').querySelector('option[value="info"]').textContent = own ? 'Custom panel (' + own + ')' : 'Custom panel';
   const sideOvr = day.ovr.panel != null;
@@ -1723,9 +2048,12 @@ document.querySelectorAll('.areabox').forEach(box => {
 
 $('taskSwitch').addEventListener('click', () => { state.showTask = state.showTask === false; changed(); refreshUi(); });
 $('ttViewSel').addEventListener('change', () => {
-  const v = $('ttViewSel').value, wd = wdOf(viewDate), today = ovr().ttView != null || scopePending.main;
-  if (today) setOvr('ttView', v === ttViewOf(state, wd) ? null : v);
+  const raw = $('ttViewSel').value, isFree = raw.startsWith('free-'), v = isFree ? 'free' : raw, wd = wdOf(viewDate);
+  const weekly = ttViewOf(state, wd);
+  const today = ovr().ttView != null || scopePending.main || (isFree && weekly !== 'free');   // freestyle starts as a one-off
+  if (today) setOvr('ttView', v === weekly ? null : v);
   else { state.ttView[wd] = v; state.ttShow[wd] = v !== 'off'; setOvr('ttView', null); }
+  if (isFree) { setFreeProp('main', { kind: raw.slice(5) }); selectZone('main'); }
   changed(); refreshUi();
 });
 $('firstSelect').addEventListener('change', () => {
@@ -1734,25 +2062,325 @@ $('firstSelect').addEventListener('change', () => {
   changed();
 });
 $('panelSel').addEventListener('change', () => {
-  const v = $('panelSel').value, day = resolveDay(state, viewDate), wd = day.wd;
-  let today = ovr().panel != null || scopePending.side;
+  const raw = $('panelSel').value, isFree = raw.startsWith('free-'), v = isFree ? 'free' : raw, day = resolveDay(state, viewDate), wd = day.wd;
+  let today = ovr().panel != null || scopePending.side || (isFree && day.defaultPanel !== 'free');
   if (!today && day.sched && !day.sched.congers && v !== 'house') {
     today = true; toast('Changed just for ' + dayMonth(viewDate) + ': the house meeting schedule sets this date.');
   }
   if (today) { setOvr('panel', null); setOvr('panel', v === resolveDay(state, viewDate).defaultPanel ? null : v); }
   else { state.panelDefault[wd] = v; setOvr('panel', null); }
+  if (isFree) { setFreeProp('side', { kind: raw.slice(5) }); selectZone('side'); }
   changed(); refreshUi();
 });
-function scopeClick(segId, key, ovrKey) {
+function scopeClick(segId, key, ovrKey, slot) {
   $(segId).addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
     if (b.dataset.scope === 'today') scopePending[key] = true;
-    else { scopePending[key] = false; if (ovr()[ovrKey] != null) { setOvr(ovrKey, null); changed(); } }
+    else {
+      scopePending[key] = false;
+      const o = ovr();
+      if (o[ovrKey] != null) {
+        // Make today's choice the usual one for this weekday
+        const wd = wdOf(viewDate), v = o[ovrKey];
+        if (ovrKey === 'ttView') { state.ttView[wd] = v; state.ttShow[wd] = v !== 'off'; }
+        else state.panelDefault[wd] = v;
+        promoteFree(slot);
+        setOvr(ovrKey, null); changed();
+        toast('Now the same every ' + DAY_NAMES[wd] + '.');
+      }
+    }
     refreshUi();
   });
 }
-scopeClick('mainScope', 'main', 'ttView');
-scopeClick('sideScope', 'side', 'panel');
+scopeClick('mainScope', 'main', 'ttView', 'main');
+scopeClick('sideScope', 'side', 'panel', 'side');
+
+/* ---------- Freestyle ---------- */
+function slotToday(slot) {
+  const o = ovr();
+  return slot === 'main' ? o.ttView != null : slot === 'side' ? o.panel != null : slot === 'whole' ? o.whole != null : o.pfree != null;
+}
+function setFreeProp(slot, props) {
+  const wd = wdOf(viewDate);
+  if (slotToday(slot)) {
+    const iso = toISO(viewDate), o = state.overrides[iso] || (state.overrides[iso] = {});
+    o.free = o.free || {};
+    if (!o.free[slot]) o.free[slot] = Object.assign({}, ((state.free || {})[wd] || {})[slot] || {});   // start from the usual content
+    Object.assign(o.free[slot], props);
+  } else {
+    state.free = state.free || {};
+    const f = state.free[wd] || (state.free[wd] = {});
+    f[slot] = Object.assign({}, f[slot] || {}, props);
+  }
+}
+function promoteFree(slot) {             // today's freestyle content becomes the usual content
+  const o = ovr(), wd = wdOf(viewDate);
+  if (!o.free || !o.free[slot]) return;
+  state.free[wd] = state.free[wd] || {};
+  state.free[wd][slot] = o.free[slot];
+  delete o.free[slot];
+  if (!Object.keys(o.free).length) setOvr('free', null);
+}
+function currentFree(slot) {
+  if (slot === 'prep') return prepFreeOf(state, viewDate).item;
+  return resolveDay(state, viewDate).free[slot];
+}
+$('wholeSwitch').addEventListener('click', () => {
+  const wd = wdOf(viewDate), day = resolveDay(state, viewDate), wk = !!state.freeWhole[wd];
+  if (!day.whole) { if (wk) setOvr('whole', null); else setOvr('whole', true); selectedSlot = 'whole'; }
+  else if (ovr().whole != null) setOvr('whole', wk ? false : null);
+  else state.freeWhole[wd] = false;
+  endEditNow(); changed(); refreshUi();
+});
+$('wholeKind').addEventListener('change', () => { setFreeProp('whole', { kind: $('wholeKind').value }); selectedSlot = 'whole'; changed(); refreshUi(); });
+$('wholeScope').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const wd = wdOf(viewDate), o = ovr();
+  if (b.dataset.scope === 'week' && o.whole != null) {
+    state.freeWhole[wd] = !!o.whole; promoteFree('whole'); setOvr('whole', null);
+    toast('Now the same every ' + DAY_NAMES[wd] + '.');
+  } else if (b.dataset.scope === 'today' && o.whole == null) {
+    const it = resolveDay(state, viewDate).free.whole;
+    setOvr('whole', resolveDay(state, viewDate).whole);
+    const oo = state.overrides[toISO(viewDate)]; oo.free = oo.free || {}; oo.free.whole = Object.assign({}, it);
+  }
+  changed(); refreshUi();
+});
+// Prep slide freestyle
+$('pfreeSel').addEventListener('change', () => {
+  const v = $('pfreeSel').value, [mode, kind] = v === 'off' ? ['off'] : v.split('-'), wd = wdOf(viewDate);
+  const wk = state.prepFree[wd] || 'off';
+  const today = ovr().pfree != null || (mode !== 'off' && wk === 'off');
+  if (today) setOvr('pfree', mode === wk ? null : mode);
+  else { state.prepFree[wd] = mode; setOvr('pfree', null); }
+  if (kind) { setFreeProp('prep', { kind }); selectedSlot = 'prep'; }
+  endEditNow(); changed(); refreshUi();
+});
+$('pfreeScope').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const wd = wdOf(viewDate), o = ovr(), pf = prepFreeOf(state, viewDate);
+  if (b.dataset.scope === 'week' && o.pfree != null) {
+    state.prepFree[wd] = o.pfree; promoteFree('prep'); setOvr('pfree', null);
+    toast('Now the same every ' + DAY_NAMES[wd] + '.');
+  } else if (b.dataset.scope === 'today' && o.pfree == null) {
+    setOvr('pfree', pf.mode);
+    const oo = state.overrides[toISO(viewDate)]; oo.free = oo.free || {}; oo.free.prep = Object.assign({}, pf.item);
+  }
+  changed(); refreshUi();
+});
+
+/* Choosing a freestyle area on the preview shows its bar: pictures, YouTube link or message colours */
+let selectedSlot = null;
+const zonebar = $('zonebar'), recentPop = $('recentPop');
+function zoneEl(slot) { return slot ? els.preview.querySelector('.free[data-slot="' + slot + '"]') : null; }
+function selectZone(slot) { selectedSlot = slot; setTimeout(showZone, 0); }
+function showZone() {
+  els.preview.querySelectorAll('.zone-sel').forEach(z => z.classList.remove('zone-sel'));
+  const z = zoneEl(selectedSlot);
+  if (!z || editing) { zonebar.hidden = true; recentPop.hidden = true; return; }
+  z.classList.add('zone-sel');
+  const it = currentFree(selectedSlot);
+  zonebar.querySelector('.zb-image').hidden = it.kind !== 'image';
+  zonebar.querySelector('.zb-link').hidden = true;
+  zonebar.querySelector('.zb-video').hidden = it.kind !== 'video';
+  zonebar.querySelector('.zb-msg').hidden = it.kind !== 'message';
+  $('zbFit').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.fit === (it.fit === 'cover' ? 'cover' : 'contain'))));
+  zonebar.querySelector('[data-z="remove"]').hidden = !(it.img || it.url);
+  if (document.activeElement !== $('zbYt')) $('zbYt').value = it.yt ? 'https://youtu.be/' + it.yt : '';
+  if (document.activeElement !== $('zbStart')) $('zbStart').value = it.start ? fmtStart(it.start) : '';
+  paintSwatches($('zbColours'), it.colour);
+  $('zbNote').textContent = slotNote(selectedSlot);
+  zonebar.hidden = false;
+  const r = rectIn(z), W = els.wrap.clientWidth;
+  zonebar.style.left = Math.max(6, Math.min(r.l + 10, W - zonebar.offsetWidth - 6)) + 'px';
+  zonebar.style.top = Math.max(4, r.t + 10) + 'px';
+  if (!recentPop.hidden) placeRecent();
+}
+function slotNote(slot) { return slotToday(slot) ? 'Just for ' + shortDate(viewDate) : 'Every ' + DAY_NAMES[wdOf(viewDate)]; }
+function paintSwatches(host, current) {
+  const t = themeFor(state, wdOf(viewDate));
+  host.innerHTML = Object.keys(MSG_COLOURS).map(k => {
+    const c = MSG_COLOURS[k], bg = k === 'plain' ? '#fff' : k === 'day' ? t.main : c.bg;
+    return '<button type="button" data-colour="' + k + '" title="' + c.name + '" aria-label="' + c.name + '" aria-pressed="' + ((current || 'plain') === k) + '" style="background:' + bg + '"></button>';
+  }).join('');
+}
+function hideZone() { selectedSlot = null; zonebar.hidden = true; recentPop.hidden = true; els.preview.querySelectorAll('.zone-sel').forEach(z => z.classList.remove('zone-sel')); }
+els.preview.addEventListener('click', e => {
+  const z = e.target.closest('.free[data-slot]');
+  if (!z || e.target.closest('[data-field]')) return;
+  const slot = z.dataset.slot, it = currentFree(slot);
+  selectedSlot = slot; showZone();
+  if (it.kind === 'image' && !(it.img || it.url)) openFreeFile();
+  if (it.kind === 'video' && !it.yt) setTimeout(() => $('zbYt').focus(), 0);
+});
+document.addEventListener('mousedown', e => {
+  if (!selectedSlot) return;
+  if (e.target.closest('#zonebar, #recentPop, .free[data-slot], #freeFile, .areabox, #wholeBox, #sidePrep')) return;
+  hideZone();
+});
+zonebar.addEventListener('mousedown', e => { if (e.target.closest('button')) e.preventDefault(); });
+zonebar.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b || !selectedSlot) return;
+  const slot = selectedSlot;
+  if (b.dataset.z === 'choose') openFreeFile();
+  else if (b.dataset.z === 'recent') { recentPop.hidden = !recentPop.hidden; if (!recentPop.hidden) paintRecent(); }
+  else if (b.dataset.z === 'link') { zonebar.querySelector('.zb-image').hidden = true; zonebar.querySelector('.zb-link').hidden = false; $('zbLink').value = currentFree(slot).url || ''; $('zbLink').focus(); }
+  else if (b.dataset.z === 'linkok') useLink();
+  else if (b.dataset.z === 'remove') { setFreeProp(slot, { img: null, url: '' }); changed(); }
+  else if (b.dataset.fit) { setFreeProp(slot, { fit: b.dataset.fit }); changed(); }
+  else if (b.dataset.colour) { setFreeProp(slot, { colour: b.dataset.colour }); changed(); }
+});
+function useLink() {
+  const v = $('zbLink').value.trim();
+  if (v && !/^https?:\/\/\S+$/i.test(v)) { toast('That doesn’t look like a web link.'); return; }
+  setFreeProp(selectedSlot, { url: v, img: null }); changed(); showZone();
+}
+$('zbLink').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); useLink(); } if (e.key === 'Escape') showZone(); });
+function setYouTube() {
+  const raw = $('zbYt').value.trim(), slot = selectedSlot; if (!slot) return;
+  if (!raw) { setFreeProp(slot, { yt: '' }); changed(); return; }
+  const y = parseYouTube(raw);
+  if (!y) { toast('That doesn’t look like a YouTube link.'); return; }
+  const startTyped = $('zbStart').value.trim();
+  setFreeProp(slot, { yt: y.id, start: y.start || (startTyped ? parseStart(startTyped) : currentFree(slot).start || 0) });
+  changed();
+}
+$('zbYt').addEventListener('change', setYouTube);
+$('zbYt').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); setYouTube(); $('zbYt').blur(); } });
+$('zbYt').addEventListener('paste', () => setTimeout(setYouTube, 0));
+$('zbStart').addEventListener('change', () => { if (!selectedSlot) return; setFreeProp(selectedSlot, { start: parseStart($('zbStart').value) }); changed(); });
+$('zbStart').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('zbStart').blur(); } });
+
+/* Pictures: chosen, pasted, dropped or linked. The 10 most recent are kept to reuse. */
+function openFreeFile() { $('freeFile').value = ''; $('freeFile').click(); }
+$('freeFile').addEventListener('change', () => { const f = $('freeFile').files[0]; if (f && selectedSlot) addImage(f, selectedSlot); });
+function shrinkImage(file, maxSide) {
+  return new Promise(resolve => {
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const s = Math.min(1, maxSide / Math.max(img.width, img.height));
+      if (s === 1 && file.size < 2.5e6) { resolve(file); return; }
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      const png = file.type === 'image/png' && file.size < 4e6;
+      c.toBlob(b => resolve(b || file), png ? 'image/png' : 'image/jpeg', 0.9);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+    img.src = url;
+  });
+}
+function imageInUse(id) {
+  const used = it => it && it.img === id;
+  return Object.values(state.free || {}).some(d => Object.values(d || {}).some(used)) ||
+         Object.values(state.overrides || {}).some(o => o.free && Object.values(o.free).some(used));
+}
+async function addImage(file, slot) {
+  if (!file || !/^image\//.test(file.type)) { toast('That isn’t a picture.'); return; }
+  const gif = file.type === 'image/gif';
+  let blob = gif || file.type === 'image/svg+xml' ? file : await shrinkImage(file, 1920);
+  if (!blob) { toast('That picture couldn’t be read.'); return; }
+  if (blob.size > 25e6) { toast('That file is too big (over 25 MB).'); return; }
+  const id = 'img-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  try { await Media.put({ id, blob, name: file.name || 'Pasted picture', added: Date.now() }); }
+  catch (e) { toast('That picture couldn’t be saved in this browser.'); return; }
+  state.recentImages = [{ id, name: file.name || 'Pasted picture', gif }].concat(state.recentImages || []);
+  // Keep the 10 most recent, but never forget one that's still on a slide
+  while (state.recentImages.length > 10) {
+    const i = state.recentImages.map(r => imageInUse(r.id) || r.id === id).lastIndexOf(false);
+    if (i < 0) break;
+    Media.del(state.recentImages[i].id); state.recentImages.splice(i, 1);
+  }
+  setFreeProp(slot, { img: id, url: '' });
+  selectedSlot = slot; changed();
+}
+function paintRecent() {
+  const list = state.recentImages || [];
+  recentPop.innerHTML = list.length ? list.map(r => '<button type="button" data-id="' + esc(r.id) + '" title="' + esc(r.name) + '"><img alt="" data-media="' + esc(r.id) + '"></button>').join('')
+    : '<p>No pictures yet. Choose, paste or drop one and it’ll be kept here.</p>';
+  hydrateMedia(recentPop);
+  placeRecent();
+}
+function placeRecent() {
+  const b = zonebar.querySelector('[data-z="recent"]'), r = rectIn(b);
+  recentPop.style.left = Math.max(6, Math.min(r.l, els.wrap.clientWidth - recentPop.offsetWidth - 6)) + 'px';
+  recentPop.style.top = (r.b + 8) + 'px';
+}
+recentPop.addEventListener('mousedown', e => e.preventDefault());
+recentPop.addEventListener('click', e => {
+  const b = e.target.closest('button[data-id]'); if (!b || !selectedSlot) return;
+  setFreeProp(selectedSlot, { img: b.dataset.id, url: '' });
+  const list = state.recentImages, i = list.findIndex(r => r.id === b.dataset.id);
+  if (i > 0) list.unshift(list.splice(i, 1)[0]);
+  recentPop.hidden = true; changed();
+});
+function imageTarget() {
+  if (selectedSlot && currentFree(selectedSlot).kind === 'image') return selectedSlot;
+  if (editMode === 'prep') { const pf = prepFreeOf(state, viewDate); return pf.mode !== 'off' && pf.item.kind === 'image' ? 'prep' : null; }
+  const d = resolveDay(state, viewDate);
+  if (d.whole) return d.free.whole.kind === 'image' ? 'whole' : null;
+  if (d.ttView === 'free' && d.free.main.kind === 'image') return 'main';
+  if (d.panel === 'free' && d.free.side.kind === 'image') return 'side';
+  return null;
+}
+document.addEventListener('paste', e => {
+  if ($('mainScreen').hidden) return;
+  const t = e.target;
+  if (t && t.closest && (t.closest('[data-field]') || t.closest('input, textarea, select'))) return;
+  const file = [...((e.clipboardData && e.clipboardData.files) || [])].find(f => /^image\//.test(f.type));
+  const text = e.clipboardData ? (e.clipboardData.getData('text/plain') || '').trim() : '';
+  if (!file && !text) return;
+  if (!file && selectedSlot && currentFree(selectedSlot).kind === 'video' && parseYouTube(text)) {
+    e.preventDefault(); $('zbYt').value = text; setYouTube(); return;
+  }
+  const slot = imageTarget();
+  if (!slot) { if (file) toast('To paste a picture, choose “Image or GIF” for part of the slide first.'); return; }
+  e.preventDefault();
+  if (file) addImage(file, slot);
+  else if (/^https?:\/\/\S+$/i.test(text)) { setFreeProp(slot, { url: text, img: null }); selectedSlot = slot; changed(); }
+});
+els.preview.addEventListener('dragover', e => {
+  const z = e.target.closest('.free[data-slot]');
+  if (!z || currentFree(z.dataset.slot).kind !== 'image') return;
+  e.preventDefault(); z.classList.add('drop-over');
+});
+els.preview.addEventListener('dragleave', e => { const z = e.target.closest('.free[data-slot]'); if (z) z.classList.remove('drop-over'); });
+els.preview.addEventListener('drop', e => {
+  const z = e.target.closest('.free[data-slot]');
+  if (!z || currentFree(z.dataset.slot).kind !== 'image') return;
+  e.preventDefault(); z.classList.remove('drop-over');
+  const f = [...e.dataTransfer.files].find(x => /^image\//.test(x.type));
+  if (f) addImage(f, z.dataset.slot);
+  else { const u = (e.dataTransfer.getData('text/uri-list') || '').split('\n')[0].trim(); if (/^https?:/.test(u)) { setFreeProp(z.dataset.slot, { url: u, img: null }); changed(); } }
+});
+
+/* Video controls in the bottom bar (the video plays on the projector) */
+function projVideo() {
+  if (!isPresenting()) return null;
+  const d = fromISO(proj.date);
+  if (proj.mode === 'prep') { const pf = prepFreeOf(state, d); return pf.mode !== 'off' && pf.item.kind === 'video' && pf.item.yt ? pf.item : null; }
+  const day = resolveDay(state, d);
+  const slots = day.whole ? ['whole'] : [].concat(day.ttView === 'free' ? ['main'] : [], day.panel === 'free' ? ['side'] : []);
+  const s = slots.find(k => day.free[k].kind === 'video' && day.free[k].yt);
+  return s ? day.free[s] : null;
+}
+function sendVideo(cmd) {
+  if (!els.stage.hidden) videoCommand(els.stage, cmd);
+  else if (slideWin && !slideWin.closed) { try { slideWin.postMessage({ type: 'ms-video', cmd }, '*'); } catch (e) {} }
+}
+function refreshVideoUi() {
+  const v = projVideo();
+  $('videoGroup').hidden = !v;
+  if (!v) return;
+  $('vPlay').textContent = videoStatus.playing ? 'Pause' : 'Play';
+  $('vSound').textContent = videoStatus.muted ? 'Sound on' : 'Sound off';
+  $('videoGroup').title = videoStatus.error || '';
+}
+onVideoStatus = refreshVideoUi;
+$('vPlay').addEventListener('click', () => { sendVideo(videoStatus.playing ? 'pause' : 'play'); videoStatus.playing = !videoStatus.playing; refreshVideoUi(); });
+$('vRestart').addEventListener('click', () => { sendVideo('restart'); videoStatus.playing = true; refreshVideoUi(); });
+$('vSound').addEventListener('click', () => { sendVideo(videoStatus.muted ? 'unmute' : 'mute'); videoStatus.muted = !videoStatus.muted; refreshVideoUi(); });
 $('undoDay').addEventListener('click', () => {
   const iso = toISO(viewDate), saved = state.overrides[iso];
   if (!saved) return;
@@ -1775,7 +2403,11 @@ function refreshPrepSide() {
   press('chimeSeg', set.chime === false ? 'off' : 'on');
   press('tModeSeg', set.mode); press('tBetweenSeg', set.between); press('tShowSeg', set.show);
   $('tModeHelp').textContent = MODE_HELP[set.mode] || '';
-  $('tomBox').hidden = morning; $('mpNote').hidden = !morning;
+  const pf = prepFreeOf(state, viewDate);
+  $('pfreeSel').value = pf.mode === 'off' ? 'off' : pf.mode + '-' + pf.item.kind;
+  $('pfreeScope').hidden = pf.mode === 'off' && !pf.today;
+  scopeSeg('pfreeScope', pf.today, wd);
+  $('tomBox').hidden = morning || pf.mode !== 'off'; $('mpNote').hidden = !morning || pf.mode !== 'off';
 }
 $('chimeSeg').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
@@ -1813,6 +2445,7 @@ $('tomCopy').addEventListener('click', () => {
    Typing on the preview
    ===================================================================== */
 const RICH = new Set(['notes', 'panelText', 'prepInfo', 'tomorrow']);
+const isRich = f => RICH.has(f) || /^free:\w+:text$/.test(f);
 const SCOPED = { task: 'task', at830: 'at830', notes: 'notes', panelTitle: 'infoTitle', panelText: 'panelText' };   // field → override key
 const PH = { task: 'Click to add', at830: 'Click to add', notes: 'Click to add', panelText: 'Click to add', panelTitle: PANEL_TITLES.info, tomorrow: 'Click to add, or copy from tomorrow’s slide' };
 let editing = null;            // { el, field, scope: 'week' | 'today', forceToday }
@@ -1822,13 +2455,13 @@ function decoratePreview(slide) {
   if (!slide) return;
   slide.classList.add('editor-preview');
   slide.querySelectorAll('[data-field]').forEach(el => {
-    const f = el.dataset.field, rich = RICH.has(f);
+    const f = el.dataset.field, rich = isRich(f);
     el.setAttribute('contenteditable', rich ? 'true' : 'plaintext-only');
     if (!rich && el.contentEditable !== 'plaintext-only') el.setAttribute('contenteditable', 'true');
     el.setAttribute('role', 'textbox');
     if (rich) el.setAttribute('aria-multiline', 'true');
     el.spellcheck = !f.endsWith(':mins');
-    el.dataset.ph = el.dataset.always || PH[f] || (f.startsWith('house:') ? 'Click to add' : f.endsWith(':subject') ? 'Click to add a prep' : f.endsWith(':mins') ? '?' : '');
+    el.dataset.ph = el.dataset.always || PH[f] || (f.startsWith('free:') ? (f.endsWith(':title') ? 'Click to add a heading' : 'Click to add a message') : '') || (f.startsWith('house:') ? 'Click to add' : f.endsWith(':subject') ? 'Click to add a prep' : f.endsWith(':mins') ? '?' : '');
   });
   if (editMode === 'morning') addDots(slide, resolveDay(state, viewDate));
 }
@@ -1939,13 +2572,15 @@ function setField(f, v) {
   } else if (f.startsWith('prep:')) {
     const [, i, k] = f.split(':'), list = state.preps[wd] || [];
     if (list[+i]) list[+i][k] = v;
+  } else if (f.startsWith('free:')) {
+    const [, slot, key] = f.split(':'); setFreeProp(slot, { [key]: v });
   } else if (f === 'prepInfo') state.prepInfo[wd] = v;
   else if (f === 'tomorrow') { if (v.trim()) state.prepTomorrow[iso] = v; else delete state.prepTomorrow[iso]; }
 }
 function commitField(el) {
   const f = el.dataset.field;
   let v;
-  if (RICH.has(f)) v = htmlToRich(el);
+  if (isRich(f)) v = htmlToRich(el);
   else {
     v = el.textContent.replace(/\s*\n\s*/g, ' ');
     if (f.endsWith(':mins')) {
@@ -1995,7 +2630,8 @@ function startEdit(el) {
   const has = day ? fieldHasOvr(f, day) : false;
   editing = { el, field: f, scope: has ? 'today' : 'week', forceToday: false };
   if (f === 'at830' && day && day.at830Source === 'auto') { editing.forceToday = true; }
-  if (RICH.has(f) && !el.textContent.trim() && !el.querySelector('li')) {
+  hideZone();
+  if (isRich(f) && !f.startsWith('free:') && !el.textContent.trim() && !el.querySelector('li')) {
     el.innerHTML = '<ul><li><br></li></ul>';
     caretTo(el.querySelector('li'), true);
   }
@@ -2005,7 +2641,7 @@ function endEdit() {
   if (!editing) return;
   const el = editing.el;
   editing = null; hideBars();
-  if (el && RICH.has(el.dataset.field) && !el.textContent.trim()) el.innerHTML = '';
+  if (el && isRich(el.dataset.field) && !el.textContent.trim()) el.innerHTML = '';
   if (editMode === 'prep') {
     const wd = wdOf(viewDate), list = state.preps[wd] || [];
     const kept = list.filter(p => (p.subject || '').trim() || String(p.mins || '').trim());
@@ -2030,7 +2666,7 @@ els.preview.addEventListener('focusout', e => {
 els.preview.addEventListener('input', e => { const el = e.target.closest && e.target.closest('[data-field]'); if (el) commitField(el); });
 els.preview.addEventListener('keydown', e => {
   const el = e.target.closest && e.target.closest('[data-field]'); if (!el) return;
-  const rich = RICH.has(el.dataset.field);
+  const rich = isRich(el.dataset.field);
   if (e.key === 'Escape') { e.preventDefault(); el.blur(); return; }
   if (!rich && e.key === 'Enter') { e.preventDefault(); el.blur(); return; }
   if (rich && e.key === 'Tab') {
@@ -2046,7 +2682,7 @@ els.preview.addEventListener('paste', e => {
   const el = e.target.closest && e.target.closest('[data-field]'); if (!el) return;
   e.preventDefault();
   let t = (e.clipboardData || window.clipboardData).getData('text/plain') || '';
-  if (!RICH.has(el.dataset.field)) t = t.replace(/\s*\n\s*/g, ' ');
+  if (!isRich(el.dataset.field)) t = t.replace(/\s*\n\s*/g, ' ');
   document.execCommand('insertText', false, t);
 });
 els.preview.addEventListener('drop', e => { if (e.target.closest && e.target.closest('[data-field]')) e.preventDefault(); });
@@ -2069,6 +2705,13 @@ const bar = $('fmtbar'), tip = $('ovrtip');
 [bar, tip].forEach(b => b.addEventListener('mousedown', e => { if (e.target.closest('button')) e.preventDefault(); }));
 bar.addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b || !editing) return;
+  if (b.dataset.colour) {
+    const slot = editing.field.split(':')[1];
+    setFreeProp(slot, { colour: b.dataset.colour }); save();
+    const card = editing.el.closest('.free'); if (card) card.setAttribute('style', msgStyle(b.dataset.colour));
+    paintSwatches($('fmtColours'), b.dataset.colour);
+    changed({ keepPreview: true }); return;
+  }
   if (b.dataset.cmd) { runCmd(b.dataset.cmd); return; }
   if (b.dataset.scope) setScope(b.dataset.scope);
 });
@@ -2076,12 +2719,12 @@ function setScope(scope) {
   const ed = editing; if (!ed || !SCOPED[ed.field] || scope === ed.scope) return;
   const f = ed.field, el = ed.el, key = SCOPED[f];
   if (scope === 'today') {
-    setOvr(key, f === 'panelTitle' ? currentText(f) : RICH.has(f) ? htmlToRich(el) : el.textContent);
+    setOvr(key, f === 'panelTitle' ? currentText(f) : isRich(f) ? htmlToRich(el) : el.textContent);
     ed.scope = 'today'; placeDot(el);
   } else {
     setOvr(key, null); ed.scope = 'week'; removeDot(el);
     const v = currentText(f);
-    if (RICH.has(f)) { el.innerHTML = v.trim() ? richHTML(v) : '<ul><li><br></li></ul>'; caretTo(el, false); }
+    if (isRich(f)) { el.innerHTML = v.trim() ? richHTML(v) : '<ul><li><br></li></ul>'; caretTo(el, false); }
     else { el.textContent = f === 'panelTitle' ? (state.infoTitle || {})[wdOf(viewDate)] || '' : v; caretTo(el, false); }
   }
   changed({ keepPreview: true });
@@ -2099,12 +2742,15 @@ function rectIn(el) {
 }
 function showBars() {
   const ed = editing; if (!ed) { hideBars(); return; }
-  const f = ed.field, rich = RICH.has(f), wd = DAY_NAMES[wdOf(viewDate)];
+  const f = ed.field, rich = isRich(f), wd = DAY_NAMES[wdOf(viewDate)];
   let scope = !!SCOPED[f] && editMode === 'morning', note = '';
   if (f === 'at830' && ed.forceToday && ed.scope !== 'today') { scope = false; note = 'Set by the house meeting schedule: your change is just for ' + dayMonth(viewDate); }
   if (f.startsWith('house:')) note = 'Just for ' + shortDate(viewDate);
   else if (f.startsWith('prep:') || f === 'prepInfo') note = 'Same every ' + wd;
   else if (f === 'tomorrow') note = 'Just this evening';
+  else if (f.startsWith('free:')) note = slotNote(f.split(':')[1]);
+  $('fmtColours').hidden = !f.startsWith('free:');
+  if (f.startsWith('free:')) paintSwatches($('fmtColours'), currentFree(f.split(':')[1]).colour);
   bar.querySelector('.fmt-rich').hidden = !rich;
   $('fmtScope').hidden = !scope;
   $('fmtScope').querySelector('[data-scope="week"]').textContent = 'Same every ' + wd;
@@ -2130,7 +2776,7 @@ function positionBars() {
   const bw = bar.offsetWidth, bh = bar.offsetHeight;
   bar.style.left = Math.max(6, Math.min(r.l, W - bw - 6)) + 'px';
   // Over a card's own heading (so it never hides another box); above one-line boxes and headings
-  const overHeading = host.classList.contains('card') && editing.field !== 'panelTitle';
+  const overHeading = host.classList.contains('card') && editing.field !== 'panelTitle' && !editing.field.startsWith('free:');
   bar.style.top = (overHeading ? r.t + 4 : r.t - bh - 6 >= 4 ? r.t - bh - 6 : r.b + 6) + 'px';
   if (!tip.hidden) {
     const tw = tip.offsetWidth, th = tip.offsetHeight;
@@ -2715,6 +3361,7 @@ function renderAll(opts = {}) {
     decoratePreview(els.preview.querySelector('.slide'));
     scaleInto(els.preview);
     els.preview.style.setProperty('--frame', themeFor(state, wdOf(viewDate)).main);
+    showZone();
   }
   if (!els.stage.hidden) { renderView(els.stage, state, proj.mode, fromISO(proj.date)); scaleInto(els.stage); }
   updatePresenting();
@@ -2738,9 +3385,10 @@ function sendToSlide() {
 window.addEventListener('message', e => {
   if (e.data && e.data.type === 'ms-hello') sendToSlide();
   if (e.data && e.data.type === 'ms-timer') { timer = e.data.timer; heardTimer(); paintAll(); refreshTimerUi(); }
+  if (e.data && e.data.type === 'ms-video-status') { videoStatus = e.data.status; refreshVideoUi(); }
 });
 window.addEventListener('storage', e => { if (e.key === TIMER_KEY) { timer = loadTimer(); heardTimer(); paintAll(); refreshTimerUi(); } });
-new ResizeObserver(() => { scaleInto(els.preview); positionBars(); }).observe(els.preview);
+new ResizeObserver(() => { scaleInto(els.preview); positionBars(); if (selectedSlot) showZone(); }).observe(els.preview);
 // Typing near the edge of the scaled slide mustn't scroll it out of place
 els.preview.addEventListener('scroll', e => { const t = e.target; if (t === els.preview || (t.classList && (t.classList.contains('slide') || t.classList.contains('grid')))) { t.scrollTop = 0; t.scrollLeft = 0; } }, true);
 
@@ -2796,6 +3444,7 @@ function updatePresenting() {
   ps.classList.toggle('on', on); ps.classList.toggle('off', !on);
   $('projText').innerHTML = on ? '<span class="pl-long">On the projector:</span><span class="pl-short">Projector:</span> <b>' + esc(describe(proj)) + '</b>' : 'Not on the projector';
   $('projSwap').hidden = !on || (proj.mode === editMode && proj.date === toISO(viewDate));
+  refreshVideoUi();
 }
 $('projSwap').addEventListener('click', () => { proj = { mode: editMode, date: toISO(viewDate) }; renderAll(); });
 setInterval(updatePresenting, 1000);
