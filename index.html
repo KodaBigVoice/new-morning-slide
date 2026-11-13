@@ -222,7 +222,7 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
 .row { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
 
 /* Top bar */
-.topbar { display: flex; align-items: center; gap: 0.9rem; padding: 0 1.1rem; height: 64px; background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 30; }
+.topbar { display: flex; align-items: center; gap: 0.8rem; padding: 0 1rem; height: 56px; background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 30; }
 .modeswitch { position: relative; display: grid; grid-template-columns: 1fr 1fr; background: var(--mist); border-radius: 12px; padding: 4px; flex: none; }
 .modeswitch::before { content: ""; position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); border-radius: 8px; background: var(--steel); box-shadow: 0 3px 8px -3px rgba(28, 48, 72, 0.5); transition: transform 0.22s ease; }
 .modeswitch.prep::before { transform: translateX(100%); }
@@ -248,13 +248,14 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
 .end-btn { flex: none; border: 1px solid #B54848; border-radius: 10px; padding: 0.5rem 1.1rem; background: #fff; color: #B54848; font-weight: 700; font-size: 1rem; cursor: pointer; }
 
 /* Main screen */
-.mainview { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 20px; padding: 20px; max-width: 1700px; width: 100%; margin: 0 auto; align-items: start; }
+.mainview { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 14px; padding: 14px; max-width: 1700px; width: 100%; margin: 0 auto; align-items: start; }
 .preview-col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .preview-wrap { position: relative; }
 .preview { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden; overflow: clip; box-shadow: 0 0 0 3px var(--frame, #24527f), 0 10px 30px -14px rgba(28, 48, 72, 0.4); background: #eaf2fa; }
-.preview-hint { display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; color: var(--slate); }
-.side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
-.box { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 10px; }
+.bbhint { display: inline-flex; align-items: center; gap: 0.5rem; color: #B9C8D8; font-size: 0.85rem; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.info-i { width: 20px; height: 20px; flex: none; border-radius: 50%; border: 1px solid #C9A3BB; background: #fff; color: var(--top); font: 700 12px/1 Georgia, serif; font-style: italic; cursor: help; padding: 0; }
+.side { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.box { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 8px; }
 .box h3 { margin: 0; font-family: var(--disp); font-size: 0.98rem; }
 .areabox.top { background: var(--top-bg); border-color: var(--top-line); }
 .areabox.main { background: var(--main-bg); border-color: var(--main-line); }
@@ -262,8 +263,12 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
 .areabox.lit { box-shadow: 0 0 0 2px currentColor; }
 .areabox.top.lit { color: var(--top); } .areabox.main.lit { color: var(--main); } .areabox.side-p.lit { color: var(--side); }
 .areabox > * { color: var(--ink); }
-.areahead { margin: 0; padding: 0.4rem 0.75rem; border-radius: 8px; color: #fff; font-family: var(--disp); font-size: 0.95rem; display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
-.areahead span { font-family: var(--ui); font-weight: 400; font-size: 0.75rem; opacity: 0.92; }
+.areahead { margin: 0; padding: 0.3rem 0.6rem 0.3rem 0.4rem; border-radius: 8px; color: #fff; font-family: var(--disp); font-size: 0.95rem; display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
+.areahead .mm { flex: none; display: grid; grid-template-columns: 2.25fr 1.6fr 2.15fr; grid-template-rows: 1fr 1fr 2.4fr; gap: 1.5px; width: 34px; height: 22px; padding: 2px; border-radius: 4px; background: rgba(255, 255, 255, 0.22); align-self: center; }
+.areahead .mm i { display: block; border-radius: 1.5px; background: rgba(255, 255, 255, 0.35); }
+.areahead .mm i.on { background: #fff; }
+.areahead .ttl { flex: 1; display: flex; align-items: center; gap: 0.5rem; }
+.areahead .src { font-family: var(--ui); font-weight: 400; font-size: 0.75rem; opacity: 0.92; }
 .top .areahead { background: var(--top); } .main .areahead { background: var(--main); } .side-p .areahead { background: var(--side); }
 .areabox.off { opacity: 0.55; }
 .labelrow { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; font-size: 0.9rem; }
@@ -276,7 +281,7 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
 .changes.none .dot { background: #C9D3DE; }
 .changes .linkbtn { white-space: nowrap; }
 .linkbtn { border: 0; background: none; padding: 0; color: var(--steel); font-weight: 700; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
-.divider { height: 1px; background: var(--soft-line); margin: 2px -14px; }
+.divider { height: 1px; background: var(--soft-line); margin: 2px -12px; }
 .subtle { font-size: 0.82rem; color: var(--slate); margin: 0; }
 
 /* Getting started */
@@ -314,12 +319,12 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
 .fmtbar .sep { width: 1px; height: 22px; margin: 0 4px; background: rgba(255, 255, 255, 0.25); }
 .fmtbar .scope { display: grid; grid-auto-flow: column; background: rgba(255, 255, 255, 0.12); border-radius: 8px; padding: 3px; gap: 2px; }
 .fmtbar .scope button[aria-pressed="true"] { background: #fff; color: var(--ink); font-weight: 700; }
-.fmtbar .note { padding: 0 0.4rem; color: #CFDAE6; }
+.fmtbar .fnote { padding: 0 0.45rem; color: #DCE6F0; font-size: 0.8rem; }
 .ovrtip { position: absolute; z-index: 19; display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0.6rem 0.45rem 0.75rem; border-radius: 10px; background: #fff; box-shadow: 0 10px 24px -10px rgba(28, 48, 72, 0.5); font-size: 0.82rem; white-space: nowrap; }
 .ovrtip .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--ovr); }
 
 /* Bottom bar */
-.bottombar { position: sticky; bottom: 0; z-index: 30; display: flex; align-items: center; gap: 0.75rem; padding: 0 1.1rem; min-height: 58px; background: var(--ink); color: #fff; font-size: 0.9rem; }
+.bottombar { position: sticky; bottom: 0; z-index: 30; display: flex; align-items: center; gap: 0.6rem; padding: 0 1rem; min-height: 52px; background: var(--ink); color: #fff; font-size: 0.9rem; }
 .bottombar .grow { flex: 1; }
 .bottombar .vsep { width: 1px; height: 24px; background: rgba(255, 255, 255, 0.2); }
 .bb-btn { border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 8px; padding: 0.4rem 0.75rem; background: none; color: #fff; cursor: pointer; white-space: nowrap; }
@@ -330,22 +335,27 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
 .timebox { width: 96px; border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 10px; padding: 0.3rem 0.4rem; background: transparent; color: #fff; font-size: 1.35rem; font-weight: 700; letter-spacing: 0.5px; text-align: center; font-variant-numeric: tabular-nums; cursor: pointer; }
 .timebox.editable { border: 2px solid #9FC2E6; background: rgba(255, 255, 255, 0.12); cursor: text; }
 .timebox:focus { outline: none; border: 2px solid #fff; background: rgba(255, 255, 255, 0.16); }
-.tlabel { display: flex; flex-direction: column; gap: 4px; font-size: 0.75rem; color: #B9C8D8; min-width: 140px; max-width: 200px; }
-.tbars { display: flex; gap: 4px; width: 150px; }
+.tlabel { display: flex; flex-direction: column; gap: 4px; font-size: 0.75rem; color: #B9C8D8; min-width: 0; flex: 0 1 190px; overflow: hidden; }
+.tlabel span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.projstatus { min-width: 0; overflow: hidden; padding-left: 5px; }
+#projText { overflow: hidden; text-overflow: ellipsis; }
+.tbars { display: flex; gap: 4px; width: 100%; max-width: 150px; }
 .tbars i { display: block; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.2); overflow: hidden; flex-basis: 0; }
 .tbars i b { display: block; height: 100%; width: 0; background: #fff; }
 .thint { font-size: 0.75rem; color: #B9C8D8; }
 .projstatus { display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap; }
-.projstatus .led { width: 9px; height: 9px; border-radius: 50%; background: #64798F; }
+.projstatus .led { flex: none; width: 9px; height: 9px; border-radius: 50%; background: #64798F; }
 .projstatus.on .led { background: #43C27A; box-shadow: 0 0 0 4px rgba(67, 194, 122, 0.25); }
 .projstatus.off { color: #B9C8D8; }
 .savestate { display: inline-flex; align-items: center; gap: 0.35rem; color: #9FDDB8; white-space: nowrap; }
 .savestate.bad { color: #FFB4A8; font-weight: 700; }
 @media (max-width: 1500px) { .thint { display: none; } }
+.pl-short { display: none; }
+@media (max-width: 1400px) { .pl-long { display: none; } .pl-short { display: inline; } }
 
 /* Setup page */
 .setupview { flex: 1; display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 28px; padding: 24px 28px; max-width: 1300px; width: 100%; margin: 0 auto; align-items: start; }
-.setupbar { display: flex; align-items: center; gap: 1rem; padding: 0 1.1rem; height: 64px; background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 30; }
+.setupbar { display: flex; align-items: center; gap: 1rem; padding: 0 1rem; height: 56px; background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 30; }
 .setupbar h1 { margin: 0; font-family: var(--disp); font-size: 1.4rem; }
 .setupbar .savestate { color: #2E7D4F; font-size: 0.85rem; }
 .setupnav { display: flex; flex-direction: column; gap: 4px; position: sticky; top: 88px; }
@@ -476,14 +486,10 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
             <button type="button" data-scope="week"></button>
             <button type="button" data-scope="today">Change for today</button>
           </span>
-          <span class="note" id="fmtNote"></span>
+          <span class="fnote" id="fmtNote"></span>
         </div>
         <div class="ovrtip" id="ovrtip" role="note" hidden><span class="dot"></span><span id="ovrText"></span><button type="button" class="btn small strong" id="ovrUndo">Undo</button></div>
       </div>
-      <p class="preview-hint">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg>
-        <span id="previewHint"></span>
-      </p>
     </section>
 
     <!-- Morning side column -->
@@ -500,16 +506,13 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
       </div>
 
       <div id="regions">
-        <div class="box" style="padding:12px;margin-bottom:14px"><div class="map" id="map" aria-hidden="true"></div></div>
-
-        <div class="box areabox top" data-region="top" style="margin-bottom:14px">
-          <h3 class="areahead">Top boxes</h3>
-          <div class="labelrow"><span id="taskLbl">Morning task box</span><button type="button" class="switch" id="taskSwitch" role="switch" aria-checked="true" aria-labelledby="taskLbl"></button></div>
-          <p class="subtle">The 8:30 box always shows. A first lesson box joins it when the main area shows “First lesson only”.</p>
+        <div class="box areabox top" data-region="top" style="margin-bottom:10px">
+          <h3 class="areahead"><span class="ttl"><span class="mm" data-mm="top" aria-hidden="true"></span>Top boxes</span></h3>
+          <div class="labelrow"><span style="display:flex;align-items:center;gap:0.45rem"><span id="taskLbl">Morning task box</span><button type="button" class="info-i" title="The 8:30 box always shows. A first lesson box joins it when the main area shows “First lesson only”." aria-label="About the top boxes">i</button></span><button type="button" class="switch" id="taskSwitch" role="switch" aria-checked="true" aria-labelledby="taskLbl"></button></div>
         </div>
 
-        <div class="box areabox main" data-region="main" style="margin-bottom:14px">
-          <h3 class="areahead">Main area<span id="mainSrc"></span></h3>
+        <div class="box areabox main" data-region="main" style="margin-bottom:10px">
+          <h3 class="areahead"><span class="ttl"><span class="mm" data-mm="main" aria-hidden="true"></span>Main area</span><span class="src" id="mainSrc"></span></h3>
           <select class="text" id="ttViewSel" aria-label="What the main area shows">
             <option value="full">Full timetable</option>
             <option value="first">First lesson only</option>
@@ -519,8 +522,8 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
           <div class="seg" id="mainScope"><button type="button" data-scope="week"></button><button type="button" data-scope="today">Change for today</button></div>
         </div>
 
-        <div class="box areabox side-p" data-region="side" style="margin-bottom:14px">
-          <h3 class="areahead">Side panel<span id="sideSrc"></span></h3>
+        <div class="box areabox side-p" data-region="side" style="margin-bottom:10px">
+          <h3 class="areahead"><span class="ttl"><span class="mm" data-mm="side" aria-hidden="true"></span>Side panel</span><span class="src" id="sideSrc"></span></h3>
           <select class="text" id="panelSel" aria-label="What the side panel shows">
             <option value="none">Nothing (music uses the full height)</option>
             <option value="house">House meetings</option>
@@ -549,15 +552,12 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
         <div class="seg" id="tShowSeg"><button type="button" data-v="timer">Timer</button><button type="button" data-v="clock">Clock</button><button type="button" data-v="both">Both</button></div>
       </div>
       <div class="box" id="tomBox">
-        <h3>Tomorrow Morning box</h3>
-        <p class="subtle">Starts blank each evening. Copy tomorrow’s “What’s happening today?”, then trim it on the slide.</p>
+        <p class="subtle"><b style="color:var(--ink)">Tomorrow Morning</b> starts blank each evening. Copy tomorrow’s “What’s happening today?”, then trim it on the slide.</p>
         <button type="button" class="btn" id="tomCopy">Copy from tomorrow’s slide</button>
       </div>
       <div class="box" id="mpNote" hidden>
-        <h3>Morning prep today</h3>
-        <p class="subtle">The prep slide shows today’s “What’s happening today?” and music lessons. Change your morning prep days in Setup.</p>
+        <p class="subtle"><b style="color:var(--ink)">Morning prep today.</b> The prep slide shows today’s “What’s happening today?” and music lessons. Change your morning prep days in Setup.</p>
       </div>
-      <p class="subtle" id="prepNote" style="padding:0 4px"></p>
     </aside>
   </main>
 
@@ -571,6 +571,7 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
       <button type="button" class="bb-btn" id="tReset">Reset</button>
       <span class="thint" id="tHint" hidden>Paused: click the time to type a new one</span>
     </div>
+    <span class="bbhint" id="bbHint"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg><span id="previewHint"></span></span>
     <span class="grow"></span>
     <span class="projstatus off" id="projStatus"><span class="led"></span><span id="projText">Not on the projector</span></span>
     <button type="button" class="bb-btn" id="projSwap" hidden>Show this instead</button>
@@ -597,6 +598,7 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
       <button type="button" data-sec="prep"><b>Prep</b><span>Morning prep days, timer</span></button>
       <button type="button" data-sec="house"><b>House meetings</b><span>This term’s schedule</span></button>
       <button type="button" data-sec="backup"><b>Backup &amp; reset</b><span>Save, open or start again</span></button>
+      <a class="linkbtn v1link" href="https://morning-slide.netlify.app/" style="margin:14px 0 0 0.85rem;font-size:0.85rem">Back to the original Morning Slide</a>
     </nav>
     <div>
       <!-- Form & music -->
@@ -744,8 +746,13 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
             <input type="file" id="importInput" accept=".json,application/json" hidden>
           </div>
         </div>
+        <div class="card2" id="v1Card">
+          <h3>The original Morning Slide</h3>
+          <p class="hint" style="margin:0">The first time you opened v2, it copied your settings from the original Morning Slide. Since then the two save separately: changes here don’t affect the original, and changes there don’t appear here.</p>
+          <div class="row"><button type="button" class="btn" id="copyV1">Copy my settings from the original again</button><a class="linkbtn" id="v1Link" href="https://morning-slide.netlify.app/">Go back to the original</a></div>
+        </div>
         <div class="card2 danger">
-          <div style="flex:1"><h3 style="margin-bottom:4px">Start again</h3><p class="hint" style="margin:0">Clears everything in this browser: timetable, notes, preps, design and music lessons. Save a copy first if you might want it back.</p></div>
+          <div style="flex:1"><h3 style="margin-bottom:4px">Start again</h3><p class="hint" style="margin:0">Clears everything in v2 on this browser: timetable, notes, preps, design and music lessons. The original Morning Slide isn’t affected. Save a copy first if you might want it back.</p></div>
           <button type="button" class="btn danger" id="resetAll">Reset everything</button>
         </div>
       </section>
@@ -774,7 +781,9 @@ const DAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 const ALL_DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 const DAY_NAMES = { MON: 'Monday', TUE: 'Tuesday', WED: 'Wednesday', THU: 'Thursday', FRI: 'Friday', SAT: 'Saturday', SUN: 'Sunday' };
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const STORE_KEY = 'morningSlide.state.v1';
+const STORE_KEY = 'morningSlide.v2.state';
+const V1_KEY = 'morningSlide.state.v1';      // the original Morning Slide: copied once the first time v2 opens, never changed
+let copiedFromV1 = false;
 const PANEL_DEFAULT = { MON: 'none', TUE: 'none', WED: 'lunch', THU: 'house', FRI: 'none', SAT: 'lunch' };
 const PANEL_TITLES = { info: 'Additional Information', lunch: 'Lunchtime Arrangements', house: 'House Meeting Locations' };
 const HOUSES = [
@@ -905,7 +914,9 @@ function richHTML(src) {
 function loadState() {
   const base = defaultState();
   try {
-    const saved = JSON.parse(localStorage.getItem(STORE_KEY));
+    let raw = localStorage.getItem(STORE_KEY);
+    if (raw == null) { raw = localStorage.getItem(V1_KEY); copiedFromV1 = !!raw; }
+    const saved = JSON.parse(raw);
     if (saved && saved.v === 1) {
       for (const k of Object.keys(base)) {
         if (saved[k] === undefined) continue;
@@ -914,11 +925,13 @@ function loadState() {
         } else base[k] = saved[k];
       }
     }
-    // Keep anything this version doesn't use (e.g. the original app's Bitmoji): both apps share this storage
+    // Keep anything this version doesn't use (e.g. the original app's Bitmoji), so a saved copy loses nothing
     if (saved && saved.v === 1) Object.keys(saved).forEach(k => { if (!(k in base) && k !== 'schedule') base[k] = saved[k]; });
     if (saved && Array.isArray(saved.schedule)) base.schedule = saved.schedule;   // older versions kept a full copy
   } catch (e) { /* fresh start */ }
-  return migrateSchedule(base);
+  migrateSchedule(base);
+  if (copiedFromV1) { try { localStorage.setItem(STORE_KEY, JSON.stringify(base)); } catch (e) {} }
+  return base;
 }
 let state = loadState();
 function migrateSchedule(st) {
@@ -1252,7 +1265,7 @@ function fitSlide(slide, panel) {
 /* =====================================================================
    PREP SLIDE
    ===================================================================== */
-const TIMER_KEY = 'morningSlide.prepTimer.v1';
+const TIMER_KEY = 'morningSlide.v2.prepTimer';
 function loadTimer() { try { return JSON.parse(localStorage.getItem(TIMER_KEY)) || null; } catch (e) { return null; } }
 function storeTimer(t) { try { if (t) localStorage.setItem(TIMER_KEY, JSON.stringify(t)); else localStorage.removeItem(TIMER_KEY); } catch (e) {} }
 let timer = loadTimer();
@@ -1567,6 +1580,7 @@ function setMode(m) {
   $('sideMorning').hidden = m !== 'morning';
   $('sidePrep').hidden = m !== 'prep';
   $('timerGroup').hidden = m !== 'prep';
+  $('bbHint').hidden = m === 'prep';
   if (m === 'prep' && viewDate.getDay() === 6) viewDate = addDays(viewDate, -1);
   endEditNow();
   refreshUi(); renderAll();
@@ -1681,11 +1695,15 @@ function refreshMorningSide() {
   paintMap(day);
 }
 function paintMap(day) {
-  const cell = (cls, col, row, region) => '<i class="' + cls + '" style="grid-column:' + col + ';grid-row:' + row + '"' + (region ? ' data-r="' + region + '"' : '') + '></i>';
-  let html = cell('', '1 / 3', '1') + cell('m-top', '1 / 3', '2', 'top');
-  html += day.showTT ? cell('', '1', '3') + cell('m-main', '2', '3', 'main') : cell('m-main', '1 / 3', '3', 'main');
-  html += day.panel === 'none' ? cell('', '3', '1 / 4') : cell('', '3', '1 / 3') + cell('m-side', '3', '3', 'side');
-  $('map').innerHTML = html;
+  // A small map of the slide in each area's heading, with that area lit
+  const cell = (col, row, region) => '<i' + (region ? ' data-r="' + region + '"' : '') + ' style="grid-column:' + col + ';grid-row:' + row + '"></i>';
+  let cells = cell('1 / 3', '1') + cell('1 / 3', '2', 'top');
+  cells += day.showTT ? cell('1', '3') + cell('2', '3', 'main') : cell('1 / 3', '3', 'main');
+  cells += day.panel === 'none' ? cell('3', '1 / 4') : cell('3', '1 / 3') + cell('3', '3', 'side');
+  document.querySelectorAll('.mm[data-mm]').forEach(mm => {
+    mm.innerHTML = cells;
+    mm.querySelectorAll('i[data-r="' + mm.dataset.mm + '"]').forEach(i => i.classList.add('on'));
+  });
 }
 $('checkSteps').addEventListener('click', e => { const b = e.target.closest('[data-go]'); if (b) openSetup(b.dataset.go); });
 $('checkSkip').addEventListener('click', () => { state.checklistHidden = true; changed(); refreshUi(); });
@@ -1696,12 +1714,10 @@ document.querySelectorAll('.areabox').forEach(box => {
   box.addEventListener('mouseenter', () => {
     box.classList.add('lit');
     const el = els.preview.querySelector('.region-' + r); if (el) el.classList.add('region-lit');
-    $('map').querySelectorAll('i[data-r]').forEach(i => i.classList.toggle('dim', i.dataset.r !== r));
   });
   box.addEventListener('mouseleave', () => {
     box.classList.remove('lit');
     els.preview.querySelectorAll('.region-lit').forEach(el => el.classList.remove('region-lit'));
-    $('map').querySelectorAll('i.dim').forEach(i => i.classList.remove('dim'));
   });
 });
 
@@ -1760,8 +1776,6 @@ function refreshPrepSide() {
   press('tModeSeg', set.mode); press('tBetweenSeg', set.between); press('tShowSeg', set.show);
   $('tModeHelp').textContent = MODE_HELP[set.mode] || '';
   $('tomBox').hidden = morning; $('mpNote').hidden = !morning;
-  const n = ((state.preps || {})[wd] || []).length;
-  $('prepNote').textContent = 'Preps and their minutes are saved for every ' + DAY_NAMES[wd] + '.' + (n < 4 ? ' Add another prep by clicking under the last one on the slide.' : '');
 }
 $('chimeSeg').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
@@ -2640,7 +2654,18 @@ $('schedPasteCancel').addEventListener('click', () => { $('schedPasteBox').hidde
 
 /* ---------- Backup & reset ---------- */
 const BACKUP_KEY = 'morningSlide.lastBackup';
+const V1_URL = /\/v2\/?(index\.html)?$/.test(location.pathname) ? '../' : 'https://morning-slide.netlify.app/';
+document.querySelectorAll('#v1Link, .v1link').forEach(a => { a.href = V1_URL; });
+$('copyV1').addEventListener('click', () => {
+  let raw = null; try { raw = localStorage.getItem(V1_KEY); } catch (e) {}
+  if (!raw) { toast('There are no settings from the original Morning Slide in this browser.'); return; }
+  if (!confirm('Replace everything in v2 with your settings from the original Morning Slide? Anything you’ve only set up in v2 will be lost.')) return;
+  try { localStorage.setItem(STORE_KEY, raw); } catch (e) {}
+  state = loadState(); afterLoad(); refreshSetupAll(); toast('Settings copied from the original Morning Slide.');
+});
 function refreshBackup() {
+  let hasV1 = false; try { hasV1 = !!localStorage.getItem(V1_KEY); } catch (e) {}
+  $('copyV1').hidden = !hasV1;
   let last = null; try { last = localStorage.getItem(BACKUP_KEY); } catch (e) {}
   $('lastBackup').textContent = 'Last saved a copy: ' + (last ? shortDate(new Date(last)) : 'never');
 }
@@ -2670,9 +2695,9 @@ $('importInput').addEventListener('change', async () => {
   } catch (e) { toast('That file isn’t a Morning Slide copy.'); }
 });
 $('resetAll').addEventListener('click', () => {
-  if (!confirm('Reset everything? This clears your timetable, notes, preps, design and music lessons from this browser.')) return;
-  try { localStorage.removeItem(STORE_KEY); } catch (e) {}
-  state = defaultState(); afterLoad(); toast('Everything has been reset.');
+  if (!confirm('Reset everything in v2? This clears your timetable, notes, preps, design and music lessons here. The original Morning Slide isn’t affected.')) return;
+  state = defaultState();
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {} afterLoad(); toast('Everything has been reset.');
 });
 
 /* =====================================================================
@@ -2762,14 +2787,14 @@ function endPresenting() {
 }
 function describe(v) {
   const d = fromISO(v.date);
-  return v.mode === 'prep' ? DAY_NAMES[dayCode(d)] + ' Prep' : 'Morning slide, ' + shortDate(d);
+  return v.mode === 'prep' ? DAY_NAMES[dayCode(d)] + ' Prep' : 'Morning, ' + shortDate(d);
 }
 function updatePresenting() {
   const on = isPresenting();
   $('endBtn').hidden = !on; $('presentBtn').hidden = on;
   const ps = $('projStatus');
   ps.classList.toggle('on', on); ps.classList.toggle('off', !on);
-  $('projText').innerHTML = on ? 'On the projector: <b>' + esc(describe(proj)) + '</b>' : 'Not on the projector';
+  $('projText').innerHTML = on ? '<span class="pl-long">On the projector:</span><span class="pl-short">Projector:</span> <b>' + esc(describe(proj)) + '</b>' : 'Not on the projector';
   $('projSwap').hidden = !on || (proj.mode === editMode && proj.date === toISO(viewDate));
 }
 $('projSwap').addEventListener('click', () => { proj = { mode: editMode, date: toISO(viewDate) }; renderAll(); });
@@ -2825,6 +2850,7 @@ function afterLoad() {
 }
 if (document.fonts) document.fonts.ready.then(() => renderAll());
 afterLoad();
+if (copiedFromV1) toast('Welcome to Morning Slide v2! Your settings from the original have been copied over.');
 })();
 </script>
 </body>
