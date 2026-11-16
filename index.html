@@ -2963,12 +2963,14 @@ function showBars() {
 function hideBars() { bar.hidden = true; tip.hidden = true; }
 function positionBars() {
   if (!editing || bar.hidden) return;
-  const host = editing.el.closest('.info, .card, .prep-row') || editing.el;
+  // Headings: sit just above (or below) the heading itself, never on top of it
+  const isHeading = /^hd:/.test(editing.field) || editing.field === 'panelTitle' || editing.field === 'otherTitle';
+  const host = isHeading ? editing.el : (editing.el.closest('.info, .card, .prep-row') || editing.el);
   const r = rectIn(host), W = els.wrap.clientWidth, H = els.preview.clientHeight;
   const bw = bar.offsetWidth, bh = bar.offsetHeight;
   bar.style.left = Math.max(6, Math.min(r.l, W - bw - 6)) + 'px';
   // Over a card's own heading (so it never hides another box); above one-line boxes and headings
-  const overHeading = host.classList.contains('card') && editing.field !== 'panelTitle' && !editing.field.startsWith('free:');
+  const overHeading = !isHeading && host.classList.contains('card') && !editing.field.startsWith('free:');
   bar.style.top = (overHeading ? r.t + 4 : r.t - bh - 6 >= 4 ? r.t - bh - 6 : r.b + 6) + 'px';
   if (!tip.hidden) {
     const tw = tip.offsetWidth, th = tip.offsetHeight;
