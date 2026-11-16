@@ -391,8 +391,20 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
 .slide.editor-preview.hd-mode [data-hd]:focus { outline: 5px solid #3E6489; }
 .slide.editor-preview .pt-sub { display: none; }
 .slide .pt-ctrl { display: none; }
-.slide.editor-preview .pt-ctrl { display: flex; gap: 16px; justify-content: center; }
-.slide .pt-ctrl button { font: inherit; font-size: 28px; font-weight: 700; border: 0; border-radius: 14px; padding: 8px 26px; cursor: pointer; background: rgba(255, 255, 255, 0.92); color: var(--main); }
+.slide.editor-preview .pt-ctrl { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.slide .pt-ctrl button { font: inherit; font-size: 23px; font-weight: 700; border: 0; border-radius: 12px; padding: 6px 14px; cursor: pointer; background: rgba(255, 255, 255, 0.92); color: var(--main); white-space: nowrap; max-width: 250px; overflow: hidden; text-overflow: ellipsis; }
+.slide .pt-ctrl button[hidden] { display: none; }
+.slide .pt { position: relative; }
+.slide .pt-bell { display: none; }
+.slide.editor-preview .pt-bell { display: grid; place-items: center; position: absolute; z-index: 3; top: 18px; left: 20px; width: 56px; height: 56px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.18); color: inherit; font-size: 32px; cursor: pointer; }
+.slide.editor-preview .pt-bell.off { opacity: 0.6; }
+.slide.editor-preview .ptm .pt-bell { position: static; width: 48px; height: 48px; font-size: 26px; flex: none; }
+.slide.editor-preview .ptm-ctrl { gap: 8px; flex-wrap: nowrap; }
+.slide .ptm-ctrl button { font-size: 20px; padding: 6px 12px; border-radius: 10px; }
+.slide.editor-preview .ptm-time { cursor: text; }
+.slide.editor-preview .pt > .pt-label { padding: 0 60px; }
+.slide .pt-tstat { display: none; }
+.slide.editor-preview .pt-tstat { display: block; font-size: 26px; text-align: center; opacity: 0.85; min-height: 1.2em; }
 .slide .pt-ctrl button.ghost { background: rgba(255, 255, 255, 0.18); color: inherit; }
 .slide .pt-ctrl button:disabled { opacity: 0.4; cursor: default; }
 .slide.editor-preview .pt:not(.clock-only) { cursor: pointer; }
@@ -1423,6 +1435,10 @@ function panelHTML(st, day, editor) {
     '<div class="rich" data-fit="30,18" data-field="panelText">' + richHTML(day.panelText) + '</div></div>';
 }
 
+/* Timer buttons shown in the timer box on the laptop's preview (never on the projector) */
+const BELL = on => '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>' + (on ? '' : '<path d="M3 3l18 18"></path>') + '</svg>';
+const timerBell = st => '<button type="button" class="pt-bell' + (st.prepTimer.chime === false ? ' off' : '') + '" data-t="chime" title="' + (st.prepTimer.chime === false ? 'Chime is off: click to turn it on' : 'Chime is on: click to turn it off') + '" aria-label="Timer chime">' + BELL(st.prepTimer.chime !== false) + '</button>';
+const timerCtrl = cls => '<div class="pt-ctrl' + (cls ? ' ' + cls : '') + '"><button type="button" data-t="play">Start</button><button type="button" class="ghost" data-t="plus">+1 min</button><button type="button" class="ghost" data-t="skip">Skip</button><button type="button" class="ghost" data-t="reset">Reset</button></div>';
 function setSlideHTML(host, html) {      // replaces the slide but keeps anything else in the host (the video player, hints)
   host.querySelectorAll(':scope > .slide').forEach(s => s.remove());
   host.insertAdjacentHTML('afterbegin', html);
@@ -1622,7 +1638,7 @@ function renderPrep(host, st, date, editor) {
           '<div class="banner' + (showClock || clockOnly ? '' : ' no-clock') + '">' +
             (showClock || clockOnly ? '<div class="pt-clock">' + clockText(new Date()) + '</div>' : '') +
             '<div class="banner-main">' + DAY_NAMES[wd] + ' Prep</div>' +
-            (clockOnly ? '' : '<div class="ptm"><span class="ptm-label"></span><span class="ptm-time"></span></div>') +
+            (clockOnly ? '' : '<div class="ptm"><span class="ptm-label"></span><span class="ptm-time" title="Click to type a time"></span>' + (editor ? timerCtrl('ptm-ctrl') + timerBell(st) : '') + '</div>') +
             '<div class="banner-sub">' + shortD + '</div>' +
           '</div>' +
           freeHTML('whole', pf.item, editor, 'free-whole').replace('data-slot="whole"', 'data-slot="prep"').replace(/data-field="free:whole:/g, 'data-field="free:prep:') +
@@ -1654,9 +1670,10 @@ function renderPrep(host, st, date, editor) {
           '<div class="card prep-box">' + hdEl(st, date, secondTitle) + '<div class="rich" data-fit="30,18"' + (morning ? '' : ' data-field="tomorrow"') + '>' + richHTML(second) + '</div></div>' +
         '</div>') +
         '<div class="right">' +
-          (clockOnly ? '<div class="pt clock-only">' + hdEl(st, date, 'timeNow', null, 'pt-label') + '<div class="pt-time pt-bigclock"></div></div>'
-                     : '<div class="pt"><div class="pt-label"></div><div class="pt-time" title="Click to type a time"></div><div class="pt-bars"></div><div class="pt-sub"></div>' +
-                       (editor ? '<div class="pt-ctrl"><button type="button" data-t="play">Start</button><button type="button" class="ghost" data-t="reset">Reset</button></div>' : '') + '</div>') +
+          (clockOnly ? '<div class="pt clock-only">' + (editor ? timerBell(st) : '') + hdEl(st, date, 'timeNow', null, 'pt-label') + '<div class="pt-time pt-bigclock"></div>' +
+                         (editor ? '<div class="pt-tstat"></div>' + timerCtrl() : '') + '</div>'
+                     : '<div class="pt">' + (editor ? timerBell(st) : '') + '<div class="pt-label"></div><div class="pt-time" title="Click to type a time"></div><div class="pt-bars"></div><div class="pt-sub"></div>' +
+                       (editor ? timerCtrl() : '') + '</div>') +
           '<div class="card music">' + hdEl(st, date, musicTitle) + '<div class="music-body">' + musicHTML(musicRows(st, musicDay), musicEmpty) + '</div></div>' +
         '</div>' +
       '</div>' +
@@ -1986,7 +2003,7 @@ function setMode(m) {
   $('modeSwitch').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === m)));
   $('sideMorning').hidden = m !== 'morning';
   $('sidePrep').hidden = m !== 'prep';
-  $('timerGroup').hidden = m !== 'prep';
+  $('timerGroup').hidden = true;   // the timer's controls live in the timer box on the slide
   if (m === 'prep' && viewDate.getDay() === 6) viewDate = addDays(viewDate, -1);
   endEditNow(); hideZone();
   refreshUi(); renderAll();
@@ -2565,7 +2582,7 @@ $('tModeSeg').addEventListener('click', e => {
   else if (timer && timer.finished) timer = null;
   state.prepTimer.mode = b.dataset.v;
   changed(); pushTimer(); refreshPrepSide();
-  if (b.dataset.v === 'custom' && !(state.prepTimer.customMins > 0)) setTimeout(() => $('timeBox').focus(), 0);
+  if (b.dataset.v === 'custom' && !(state.prepTimer.customMins > 0)) setTimeout(focusSlideTime, 80);
 });
 [['tBetweenSeg', 'between'], ['tShowSeg', 'show']].forEach(([id, key]) => {
   $(id).addEventListener('click', e => {
@@ -3000,20 +3017,24 @@ function refreshTimerUi() {
   $('tPlay').textContent = !t ? (custom ? 'Start' : 'Start prep') : t.finished ? 'Start again' : t.running ? 'Pause' : t.waiting ? 'Start next' : 'Resume';
   $('tPlus').disabled = !t || t.finished;
   const segs = t ? t.segs : plan.segs, idx = t ? t.idx : 0;
-  $('tSkip').hidden = custom || segs.length < 2;
+  $('tSkip').hidden = custom || segs.length < 2 || !!(t && idx >= segs.length - 1);
   $('tSkip').disabled = !t || t.finished || idx >= segs.length - 1;
   const nextSeg = segs[Math.min(idx + 1, segs.length - 1)];
   $('tSkip').textContent = kind === 'preps' && nextSeg ? 'Skip to ' + nextSeg.label : 'Skip to next';
   $('tReset').disabled = !t;
-  const pb = els.preview.querySelector('.pt-ctrl [data-t="play"]'), rb = els.preview.querySelector('.pt-ctrl [data-t="reset"]');
-  if (pb && pb.textContent !== $('tPlay').textContent) pb.textContent = $('tPlay').textContent;
-  if (rb) rb.disabled = !t;
+  els.preview.querySelectorAll('.pt-ctrl').forEach(c => {
+    const set = (k, src) => { const b = c.querySelector('[data-t="' + k + '"]'); if (!b) return; if (b.textContent !== src.textContent) b.textContent = src.textContent; b.disabled = src.disabled; b.hidden = src.hidden; };
+    set('play', $('tPlay')); set('plus', $('tPlus')); set('skip', $('tSkip')); set('reset', $('tReset'));
+    const sk = c.querySelector('[data-t="skip"]'); if (sk) sk.title = $('tSkip').textContent;
+  });
+  const ts = els.preview.querySelector('.pt-tstat');
+  if (ts) { const s = t ? 'Timer ' + v.time + (v.sub ? ' · ' + v.sub : v.label ? ' · ' + v.label : '') : ''; if (ts.textContent !== s) ts.textContent = s; }
   $('tHint').hidden = !(paused && !t.waiting) || boxEditing;
 }
 function startTimer(plan) {
   unlockAudio();
   if (!plan.segs.length) {
-    if (plan.kind === 'custom') { $('timeBox').focus(); return; }
+    if (plan.kind === 'custom') { focusSlideTime(); return; }
     toast(plan.kind === 'preps' ? 'Type each prep’s minutes on the slide first.' : 'Nothing to time yet.'); return;
   }
   const segs = plan.segs.map(g => ({ label: g.label, mins: g.mins }));
@@ -3114,14 +3135,26 @@ function editTimeOnSlide(timeEl) {
   pe.value = timeEl.textContent.trim();
   pe.hidden = false; pe.focus();
 }
+function focusSlideTime() {
+  const t = els.preview.querySelector('.pt:not(.clock-only) .pt-time, .ptm-time');
+  if (t) editTimeOnSlide(t);
+}
 els.preview.addEventListener('click', e => {
   if (editMode !== 'prep') return;
-  const btn = e.target.closest('.pt-ctrl button');
-  if (btn) { (btn.dataset.t === 'reset' ? $('tReset') : $('tPlay')).click(); return; }
-  const pt = e.target.closest('.pt:not(.clock-only)'); if (!pt) return;
-  const time = e.target.closest('.pt-time');
+  const btn = e.target.closest('[data-t]');
+  if (btn) {
+    const k = btn.dataset.t;
+    if (k === 'chime') {
+      state.prepTimer.chime = state.prepTimer.chime === false;
+      changed(); refreshPrepSide();
+      if (state.prepTimer.chime) { unlockAudio(); chime(); }
+      toast(state.prepTimer.chime ? 'Chime on' : 'Chime off');
+    } else ({ play: $('tPlay'), plus: $('tPlus'), skip: $('tSkip'), reset: $('tReset') })[k].click();
+    return;
+  }
+  const time = e.target.closest('.pt:not(.clock-only) .pt-time, .ptm-time');
   if (time) { editTimeOnSlide(time); return; }
-  $('tPlay').click();
+  if (e.target.closest('.pt:not(.clock-only)')) $('tPlay').click();
 });
 
 // Several times a second: move the timer on (from its fixed end time) and repaint the clock and timer
@@ -3564,6 +3597,7 @@ function renderAll(opts = {}) {
     scaleInto(els.preview);
     els.preview.style.setProperty('--frame', themeFor(state, wdOf(viewDate)).main);
     showZone();
+    if (editMode === 'prep') refreshTimerUi();
   }
   if (!els.stage.hidden) { renderView(els.stage, state, proj.mode, fromISO(proj.date)); scaleInto(els.stage); }
   updatePresenting();
