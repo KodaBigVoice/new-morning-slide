@@ -705,7 +705,10 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
         <div class="seg" id="tShowSeg"><button type="button" data-v="timer">Timer</button><button type="button" data-v="clock">Clock</button><button type="button" data-v="both">Both</button></div>
       </div>
       <div class="box" id="tomBox">
-        <button type="button" class="btn" id="tomCopy" title="Tomorrow Morning starts blank each evening. This copies tomorrow’s “What’s happening today?” so you can trim it.">Copy tomorrow’s notes into Tomorrow Morning</button>
+        <div class="labelrow" style="flex-wrap:nowrap"><b style="font-size:0.85rem;white-space:nowrap">Copy tomorrow’s</b>
+          <button type="button" class="btn small strong" id="tomCopyWeekly" style="white-space:nowrap" data-tip="Copies tomorrow’s every-week announcements into Tomorrow Morning’s every-week part">Every week</button>
+          <button type="button" class="btn small strong" id="tomCopyOnce" style="white-space:nowrap" data-tip="Copies tomorrow’s just-this-week announcements into this evening’s Tomorrow Morning">One-offs</button>
+        </div>
       </div>
       <div class="box" id="mpNote" hidden>
         <p class="subtle"><b style="color:var(--ink)">Morning prep today.</b> The prep slide shows today’s “What’s happening today?” and music lessons. Change your morning prep days in Setup.</p>
@@ -987,14 +990,15 @@ function hd(st, date, key, dflt) {
 const isSplit = (st, box) => (st.split || {})[box] !== false;
 function oneOff(st, date, box) { return (((st.oneoff || {})[toISO(date)] || {})[box]) || ''; }
 function boxText(st, date, box, weekly) {
-  if (!isSplit(st, box)) return weekly || '';
+  if (!isSplit(st, box)) return box === 'tomorrow' ? oneOff(st, date, box) : (weekly || '');
   return [weekly || '', oneOff(st, date, box)].filter(s => s.trim()).join('\n');
 }
 function splitHTML(st, date, box, field, weekly, fit, editor, always) {
   const split = isSplit(st, box);
   const toggle = editor ? '<button type="button" class="split-toggle" data-split-toggle="' + box + '" title="' +
     (split ? 'Show this box as one list that stays the same every week' : 'Split this box into announcements for every week and ones just for this week') + '">' + (split ? 'Use one list' : 'Split: weekly + this week') + '</button>' : '';
-  if (!editor || !split) return toggle + '<div class="rich" data-fit="' + fit + '" data-field="' + field + '"' + (always ? ' data-always="' + always + '"' : '') + '>' + richHTML(editor ? weekly : boxText(st, date, box, weekly)) + '</div>';
+  if (!split && box === 'tomorrow') { field = 'once:tomorrow'; weekly = oneOff(st, date, box); }
+  if (!editor || !split) return toggle + '<div class="rich" data-fit="' + fit + '" data-field="' + field + '"' + (always ? ' data-always="' + always + '"' : '') + '>' + richHTML(editor || !split ? weekly : boxText(st, date, box, weekly)) + '</div>';
   const wdn = DAY_NAMES[dayCode(date) === 'SUN' ? 'MON' : dayCode(date)], [max, min] = fit.split(',');
   const last = oneOff(st, addDays(date, -7), box), now = oneOff(st, date, box);
   const q = '<span class="split-q" data-tip="These small headings are just for you while editing. On the projector the box looks normal: one list, with this week’s announcements after the weekly ones.">?</span>';
@@ -1065,7 +1069,8 @@ function defaultState() {
     design: 'playful',                   // slide design: 'playful' or 'modern'
     preps: per(() => [{ subject: '', mins: '' }, { subject: '', mins: '' }]),   // per weekday
     prepInfo: per(''),                   // prep info, per weekday
-    prepTomorrow: {},                    // "Tomorrow morning" box, by prep date
+    prepTomorrow: {},                    // (old) "Tomorrow morning" box, by prep date: moved into oneoff[date].tomorrow
+    tomorrowWeekly: per(''),             // "Tomorrow Morning" notes for every <weekday> evening
     prepDays: [],                        // weekdays when prep happens in the morning
     prepTimer: { mode: 'preps', total: 30, between: 'auto', show: 'both', chime: true, customMins: 0 },
     free: per(() => ({})),               // freestyle content for every <weekday>: { main, side, whole, prep } → { kind, img, url, fit, yt, start, title, text, colour }
@@ -1180,7 +1185,12 @@ function migrateSchedule(st) {
 function pruneOverrides() {
   const cutoff = toISO(addDays(new Date(), -21));
   Object.keys(state.overrides).forEach(k => { if (k < cutoff) delete state.overrides[k]; });
-  Object.keys(state.prepTomorrow || {}).forEach(k => { if (k < cutoff) delete state.prepTomorrow[k]; });
+  Object.keys(state.prepTomorrow || {}).forEach(k => {          // move old Tomorrow Morning text into this evening's one-offs
+    state.oneoff = state.oneoff || {};
+    const o = state.oneoff[k] || (state.oneoff[k] = {});
+    if (!o.tomorrow && (state.prepTomorrow[k] || '').trim()) o.tomorrow = state.prepTomorrow[k];
+    delete state.prepTomorrow[k];
+  });
   const yearAgo = toISO(addDays(new Date(), -400));       // one-off announcements are kept for a school year, to look back on
   Object.keys(state.oneoff || {}).forEach(k => { if (k < yearAgo) delete state.oneoff[k]; });
 }
@@ -1269,6 +1279,7 @@ function resolveDay(st, date) {
     otherTitle: ovr.otherTitle != null ? ovr.otherTitle : ((st.otherTitle || {})[wd] || ''),
     otherText: ovr.otherText != null ? ovr.otherText : ((st.other || {})[wd] || ''),
     prepInfo: ovr.prepInfo != null ? ovr.prepInfo : ((st.prepInfo || {})[wd] || ''),
+    tomorrow: ovr.tomorrow != null ? ovr.tomorrow : ((st.tomorrowWeekly || {})[wd] || ''),
     whole: ovr.whole != null ? !!ovr.whole : !!(st.freeWhole || {})[wd],
     free: {
       main: freeItem(st, ovr, wd, 'main', ovr.ttView != null),
@@ -1684,10 +1695,10 @@ function renderPrep(host, st, date, editor) {
   const shortD = String(n).padStart(2, '0') + '/' + String(date.getMonth() + 1).padStart(2, '0') + '/' + date.getFullYear();
   let second, secondTitle, musicTitle, musicDay, musicEmpty;
   if (morning) {
-    second = boxText(st, date, 'notes', resolveDay(st, date).notes); secondTitle = 'notes';
+    second = resolveDay(st, date).notes; secondTitle = 'notes';
     musicDay = wd; musicTitle = 'music'; musicEmpty = 'No music lessons today';
   } else {
-    second = (st.prepTomorrow || {})[toISO(date)] || ''; secondTitle = 'tomorrow';
+    second = resolveDay(st, date).tomorrow; secondTitle = 'tomorrow';
     musicDay = dayCode(nextSchoolDay(date)); musicTitle = 'tmusic'; musicEmpty = 'No music lessons tomorrow';
   }
   const info = resolveDay(st, date).prepInfo;
@@ -1732,7 +1743,7 @@ function renderPrep(host, st, date, editor) {
         (pf.mode === 'bottom' ? freeHTML('prep', pf.item, editor, 'free-pbot') :
         '<div class="prep-low">' +
           '<div class="card prep-box">' + hdEl(st, date, 'prepInfo') + splitHTML(st, date, 'prepInfo', 'prepInfo', info, '30,18', editor, 'No extra instructions') + '</div>' +
-          '<div class="card prep-box">' + hdEl(st, date, secondTitle) + '<div class="rich" data-fit="30,18"' + (morning ? '' : ' data-field="tomorrow"') + '>' + richHTML(second) + '</div></div>' +
+          '<div class="card prep-box">' + hdEl(st, date, secondTitle) + splitHTML(st, date, secondTitle, secondTitle, second, '30,18', editor) + '</div>' +
         '</div>') +
         '<div class="right">' +
           (clockOnly ? '<div class="pt clock-only">' + (editor ? timerBell(st) : '') + hdEl(st, date, 'timeNow', null, 'pt-label') + '<div class="pt-time pt-bigclock"></div>' +
@@ -2040,7 +2051,7 @@ function setOvr(key, val) {
   if (val == null) delete o[key]; else o[key] = val;
   if (Object.keys(o).length) state.overrides[iso] = o; else delete state.overrides[iso];
 }
-const OVR_NAMES = { prepInfo: 'prep info', headings: 'headings', otherTitle: 'other info heading', otherText: 'other info', whole: 'whole slide', free: 'freestyle', pfree: 'prep freestyle', task: 'morning task', at830: '8:30 box', notes: 'What’s happening', panel: 'side panel', panelText: 'side panel text', infoTitle: 'panel heading', house: 'house rooms', ttView: 'main area' };
+const OVR_NAMES = { tomorrow: 'Tomorrow Morning', prepInfo: 'prep info', headings: 'headings', otherTitle: 'other info heading', otherText: 'other info', whole: 'whole slide', free: 'freestyle', pfree: 'prep freestyle', task: 'morning task', at830: '8:30 box', notes: 'What’s happening', panel: 'side panel', panelText: 'side panel text', infoTitle: 'panel heading', house: 'house rooms', ttView: 'main area' };
 function plainFirst(s) {
   const line = String(s || '').replace(/^\s*[-*•]\s+/gm, '').replace(/\*\*|__|\*/g, '').split('\n').map(x => x.trim()).find(Boolean) || '';
   return line.length > 38 ? line.slice(0, 36).trim() + '…' : line;
@@ -2658,14 +2669,30 @@ $('tModeSeg').addEventListener('click', e => {
     changed(); refreshPrepSide();
   });
 });
-$('tomCopy').addEventListener('click', () => {
-  const tm = nextSchoolDay(viewDate), text = boxText(state, tm, 'notes', resolveDay(state, tm).notes);
-  if (!text.trim()) { toast(DAY_NAMES[dayCode(tm)] + '’s “What’s happening today?” is empty.'); return; }
-  const iso = toISO(viewDate), cur = state.prepTomorrow[iso] || '';
-  if (cur.trim() && cur !== text && !confirm('Replace what’s in “Tomorrow Morning” with a fresh copy?')) return;
-  state.prepTomorrow[iso] = text;
+function copyInto(field, text, what) {
+  const day = resolveDay(state, viewDate), wd = day.wd, iso = toISO(viewDate);
+  if (field === 'weekly') {
+    const cur = (state.tomorrowWeekly || {})[wd] || '';
+    if (cur.trim() && cur !== text && !confirm('Replace Tomorrow Morning’s every-' + DAY_NAMES[wd] + ' notes?')) return;
+    state.tomorrowWeekly = state.tomorrowWeekly || {}; state.tomorrowWeekly[wd] = text;
+  } else {
+    const cur = oneOff(state, viewDate, 'tomorrow');
+    if (cur.trim() && cur !== text && !confirm('Replace this evening’s Tomorrow Morning one-offs?')) return;
+    state.oneoff = state.oneoff || {}; (state.oneoff[iso] = state.oneoff[iso] || {}).tomorrow = text;
+    if (!isSplit(state, 'tomorrow')) { /* one-list mode shows just this evening's text */ }
+  }
   endEditNow(); changed();
-  toast('Copied. Trim it on the slide as much as you like: tomorrow’s morning slide won’t change.');
+  toast('Copied ' + what + '. Trim them on the slide as much as you like: tomorrow’s morning slide won’t change.');
+}
+$('tomCopyWeekly').addEventListener('click', () => {
+  const tm = nextSchoolDay(viewDate), text = (state.notes || {})[dayCode(tm)] || '';
+  if (!text.trim()) { toast(DAY_NAMES[dayCode(tm)] + ' has no every-week announcements.'); return; }
+  copyInto(isSplit(state, 'tomorrow') ? 'weekly' : 'once', text, 'tomorrow’s every-week notes');
+});
+$('tomCopyOnce').addEventListener('click', () => {
+  const tm = nextSchoolDay(viewDate), text = oneOff(state, tm, 'notes');
+  if (!text.trim()) { toast('There are no one-offs for ' + DAY_NAMES[dayCode(tm)] + ' yet.'); return; }
+  copyInto('once', text, 'tomorrow’s one-offs');
 });
 
 /* =====================================================================
@@ -2673,16 +2700,17 @@ $('tomCopy').addEventListener('click', () => {
    ===================================================================== */
 const RICH = new Set(['notes', 'panelText', 'prepInfo', 'tomorrow', 'otherText']);
 const isRich = f => RICH.has(f) || /^free:\w+:text$/.test(f) || /^once:/.test(f);
-const SCOPED = { task: 'task', at830: 'at830', notes: 'notes', panelTitle: 'infoTitle', panelText: 'panelText', otherTitle: 'otherTitle', otherText: 'otherText', prepInfo: 'prepInfo' };
+const SCOPED = { tomorrow: 'tomorrow', task: 'task', at830: 'at830', notes: 'notes', panelTitle: 'infoTitle', panelText: 'panelText', otherTitle: 'otherTitle', otherText: 'otherText', prepInfo: 'prepInfo' };
 // The weekly part of a split box: changes default to "just today" so the usual announcements are safe
 function splitBoxOf(f) {
   if (f === 'notes') return 'notes';
   if (f === 'otherText') return 'other';
   if (f === 'prepInfo') return 'prepInfo';
+  if (f === 'tomorrow') return 'tomorrow';
   if (f === 'panelText') { const p = resolveDay(state, viewDate).panel; return p === 'info' || p === 'lunch' ? p : null; }
   return null;
 }   // field → override key
-const PH = { otherTitle: 'Other info', otherText: 'Click to add', task: 'Click to add', at830: 'Click to add', notes: 'Click to add', panelText: 'Click to add', panelTitle: PANEL_TITLES.info, tomorrow: 'Click to add, or copy from tomorrow’s slide' };
+const PH = { prepInfo: 'Click to add', otherTitle: 'Other info', otherText: 'Click to add', task: 'Click to add', at830: 'Click to add', notes: 'Click to add', panelText: 'Click to add', panelTitle: PANEL_TITLES.info, tomorrow: 'Click to add' };
 let editing = null;            // { el, field, scope: 'week' | 'today', forceToday }
 let fitTimer = null;
 
@@ -2696,7 +2724,7 @@ function decoratePreview(slide) {
     el.setAttribute('role', 'textbox');
     if (rich) el.setAttribute('aria-multiline', 'true');
     el.spellcheck = !f.endsWith(':mins');
-    el.dataset.ph = el.dataset.always || PH[f] || (f.startsWith('free:') ? (f.endsWith(':title') ? 'Click to add a heading' : 'Click to add a message') : '') || (f.startsWith('house:') ? 'Click to add' : f.endsWith(':subject') ? 'Click to add a prep' : f.endsWith(':mins') ? '?' : '');
+    el.dataset.ph = (f.startsWith('once:') ? 'Click to add' : '') || el.dataset.always || PH[f] || (f.startsWith('free:') ? (f.endsWith(':title') ? 'Click to add a heading' : 'Click to add a message') : '') || (f.startsWith('house:') ? 'Click to add' : f.endsWith(':subject') ? 'Click to add a prep' : f.endsWith(':mins') ? '?' : '');
   });
   addDots(slide, resolveDay(state, viewDate));
   slide.classList.toggle('hd-mode', !!hdMode);
@@ -2821,6 +2849,7 @@ function setField(f, v) {
     else if (f === 'otherTitle') { state.otherTitle = state.otherTitle || {}; state.otherTitle[wd] = v; }
     else if (f === 'otherText') { state.other = state.other || {}; state.other[wd] = v; }
     else if (f === 'prepInfo') state.prepInfo[wd] = v;
+    else if (f === 'tomorrow') { state.tomorrowWeekly = state.tomorrowWeekly || {}; state.tomorrowWeekly[wd] = v; }
     else if (f === 'panelText') { const p = resolveDay(state, viewDate).panel; state[p === 'lunch' ? 'lunch' : 'info'][wd] = v; }
   } else if (f.startsWith('house:')) {
     const h = Object.assign({}, resolveDay(state, viewDate).houses); h[f.slice(6)] = v; setOvr('house', h);
@@ -2836,7 +2865,6 @@ function setField(f, v) {
     const o = state.oneoff[iso] || (state.oneoff[iso] = {});
     if (v.trim()) o[box] = v; else { delete o[box]; if (!Object.keys(o).length) delete state.oneoff[iso]; }
   } else if (f === 'prepInfo') state.prepInfo[wd] = v;
-  else if (f === 'tomorrow') { if (v.trim()) state.prepTomorrow[iso] = v; else delete state.prepTomorrow[iso]; }
 }
 function commitField(el) {
   const f = el.dataset.field;
@@ -3022,12 +3050,11 @@ function rectIn(el) {
 function showBars() {
   const ed = editing; if (!ed) { hideBars(); return; }
   const f = ed.field, rich = isRich(f), wd = DAY_NAMES[wdOf(viewDate)];
-  let scope = !!SCOPED[f] && (editMode === 'morning' || f === 'prepInfo'), note = '';
+  let scope = !!SCOPED[f], note = '';
   if (f === 'at830' && ed.forceToday && ed.scope !== 'today') { scope = false; note = 'Set by the house meeting schedule: your change is just for ' + dayMonth(viewDate); }
   if (f.startsWith('house:')) note = 'Just for ' + shortDate(viewDate);
   else if (f.startsWith('prep:')) note = 'Same every ' + wd;
   else if (f.startsWith('once:')) note = 'Just this ' + wd + ' · gone next week';
-  else if (f === 'tomorrow') note = 'Just this evening';
   else if (f.startsWith('free:')) note = slotNote(f.split(':')[1]);
   else if (f.startsWith('hd:')) note = hdScopeName() + ' · delete the text to go back to the default';
   $('fmtColours').hidden = !f.startsWith('free:');
