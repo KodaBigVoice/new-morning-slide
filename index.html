@@ -121,13 +121,17 @@
 .slide .panel { padding: 32px; display: flex; flex-direction: column; gap: 18px; min-height: 0; }
 .slide .panel.bullets { flex: 1 1 0; min-height: 300px; }
 .slide .split-part { flex: none; overflow: visible; min-height: 1.3em; }
+.slide .split-scroll { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 18px; padding-bottom: 50px; scrollbar-width: thin; }
+.slide .too-long { display: none; }
+.slide.editor-preview .too-long-box .too-long { display: block; position: absolute; left: 24px; bottom: 16px; z-index: 2; font-size: 18px; font-weight: 700; color: #9a4b00; background: #FFE8C7; border-radius: 10px; padding: 4px 12px; max-width: calc(100% - 300px); line-height: 1.25; }
 .slide .split-lbl { display: flex; align-items: center; gap: 14px; font-family: var(--ui, sans-serif); font-size: 20px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 4px 0 -8px; }
 .slide .split-lbl + .split-part + .split-lbl { border-top: 2px dashed var(--line, #c5d3df); padding-top: 12px; margin-top: 2px; }
 .slide .split-q { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; border: 2px solid currentColor; font-size: 17px; letter-spacing: 0; cursor: help; flex: none; opacity: 0.75; }
 .slide .split-copy { font: inherit; font-size: 18px; letter-spacing: 0; text-transform: none; border: 2px solid var(--line, #c5d3df); background: #fff; color: var(--main); border-radius: 999px; padding: 2px 14px; cursor: pointer; }
 .slide .split-toggle { display: none; }
-.slide.editor-preview .split-toggle { display: block; position: absolute; right: 18px; bottom: 16px; z-index: 2; font: inherit; font-size: 18px; font-weight: 600; border: 2px solid var(--line, #c5d3df); background: rgba(255, 255, 255, 0.92); color: var(--muted); border-radius: 999px; padding: 4px 14px; cursor: pointer; opacity: 0.7; }
-.slide.editor-preview .card:hover .split-toggle { opacity: 1; }
+.slide.editor-preview .split-toggle { display: inline-flex; align-items: center; gap: 8px; position: absolute; right: 18px; bottom: 14px; z-index: 2; font: inherit; font-size: 21px; font-weight: 700; border: 3px solid var(--main); background: #fff; color: var(--main); border-radius: 999px; padding: 5px 18px; cursor: pointer; box-shadow: 0 4px 12px -6px rgba(0, 0, 0, 0.35); }
+.slide.editor-preview .split-toggle:hover { background: var(--main); color: #fff; }
+.slide.editor-preview .split-toggle::before { content: "⇅"; font-size: 1.1em; }
 .slide.editor-preview .split-lbl .ovr-dot { position: static; width: 18px; height: 18px; box-shadow: none; flex: none; }
 .slide .other { grid-column: 2; grid-row: 3; padding: 32px; display: flex; flex-direction: column; gap: 18px; min-height: 0; }
 .slide .other .heading { font-size: 40px; line-height: 1.05; }
@@ -135,6 +139,9 @@
 /* Without teachers' first initials the music column needs less room */
 .slide.short-teachers .grid { grid-template-columns: 660px 520px 580px; }
 .slide.short-teachers .pair { grid-template-columns: 660px 520px; }
+.slide.no-tt.short-teachers .pair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.slide.short-teachers .pair.single { grid-template-columns: minmax(0, 1fr); }
+.slide.first.short-teachers .pair { grid-template-columns: repeat(var(--boxes, 3), minmax(0, 1fr)); }
 .slide.prep.short-teachers .grid { grid-template-columns: 1212px 580px; }
 .slide .panel.house { flex: none; }
 .slide .panel .heading { font-size: 40px; line-height: 1.05; }
@@ -991,12 +998,13 @@ function splitHTML(st, date, box, field, weekly, fit, editor, always) {
   const wdn = DAY_NAMES[dayCode(date) === 'SUN' ? 'MON' : dayCode(date)], [max, min] = fit.split(',');
   const last = oneOff(st, addDays(date, -7), box), now = oneOff(st, date, box);
   const q = '<span class="split-q" data-tip="These small headings are just for you while editing. On the projector the box looks normal: one list, with this week’s announcements after the weekly ones.">?</span>';
-  return toggle +
+  return toggle + '<div class="split-scroll">' +
     '<div class="split-lbl">Every ' + wdn + q + '</div>' +
     '<div class="rich split-part" data-mfit="' + max + ',' + min + '" data-field="' + field + '">' + richHTML(weekly) + '</div>' +
     '<div class="split-lbl">Just this ' + wdn + ' · ' + date.getDate() + ' ' + MONTHS[date.getMonth()].slice(0, 3) + q +
       (!now.trim() && last.trim() ? '<button type="button" class="split-copy" data-copy-last="' + box + '">Copy last ' + wdn + '’s</button>' : '') + '</div>' +
-    '<div class="rich split-part" data-mfit="' + max + ',' + min + '" data-field="once:' + box + '">' + richHTML(now) + '</div>';
+    '<div class="rich split-part" data-mfit="' + max + ',' + min + '" data-field="once:' + box + '">' + richHTML(now) + '</div></div>' +
+    '<div class="too-long">Too long to all fit on the projector: scroll down to see the rest</div>';
 }
 const hdEl = (st, date, key, dflt, cls) => '<div class="' + (cls || 'heading') + '" data-hd="' + key + '">' + esc(hd(st, date, key, dflt)) + '</div>';
 const PANEL_TITLES = { info: 'Additional Information', lunch: 'Lunchtime Arrangements', house: 'House Meeting Locations' };
@@ -1568,13 +1576,14 @@ function fitSlide(slide, panel) {
     }
   });
   // Messages: heading and text shrink together until the whole message fits its box
-  new Set([...slide.querySelectorAll('[data-mfit]')].map(el => el.closest('.card'))).forEach(card => {
+  new Set([...slide.querySelectorAll('[data-mfit]')].map(el => el.closest('.split-scroll, .card'))).forEach(card => {
     if (!card) return;
     const parts = [...card.querySelectorAll('[data-mfit]')].map(el => { const [max, min] = el.dataset.mfit.split(',').map(Number); el.style.fontSize = max + 'px'; return { el, max, min, size: max }; });
     let guard = 60;
     while (guard-- > 0 && card.scrollHeight > card.clientHeight + 1 && parts.some(q => q.size > q.min)) {
       parts.forEach(q => { q.size = Math.max(q.min, Math.round(q.size * 0.93)); q.el.style.fontSize = q.size + 'px'; });
     }
+    if (card.classList.contains('split-scroll')) card.parentElement.classList.toggle('too-long-box', card.scrollHeight > card.clientHeight + 1);
   });
   // Timetable rows: 48px each at most, smaller (with smaller text) when the day is long
   const ttRows = slide.querySelector('.tt-rows');
