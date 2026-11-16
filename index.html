@@ -1448,7 +1448,8 @@ const TICON = {
   play: '<svg viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true"><path d="M7 4.5l13 7.5-13 7.5z" fill="currentColor"/></svg>',
   pause: '<svg viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true"><rect x="5.5" y="4.5" width="4.5" height="15" rx="1.2" fill="currentColor"/><rect x="14" y="4.5" width="4.5" height="15" rx="1.2" fill="currentColor"/></svg>',
   skip: '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5l10 7-10 7z" fill="currentColor"/><path d="M19 5v14"/></svg>',
-  reset: '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>'
+  reset: '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>',
+  back: '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 5L9 12l10 7z" fill="currentColor"/><path d="M5 5v14"/></svg>'
 };
 const tbtn = (k, cls, inner, title) => '<button type="button" class="ticon ' + cls + '" data-t="' + k + '" title="' + title + '" aria-label="' + title + '">' + inner + '</button>';
 const tPlayBtn = () => tbtn('play', 'solid', TICON.play, 'Start'), tPlusBtn = () => tbtn('plus', 'ghost plus', '+1', 'Add a minute'),
@@ -3040,7 +3041,12 @@ function refreshTimerUi() {
   $('tReset').disabled = !t;
   els.preview.querySelectorAll('.pt-ctrl').forEach(c => {
     const set = (k, src, title) => { const b = c.querySelector('[data-t="' + k + '"]'); if (!b) return; b.disabled = src.disabled; b.hidden = src.hidden; if (b.title !== title) { b.title = title; b.setAttribute('aria-label', title); } };
-    set('play', $('tPlay'), $('tPlay').textContent); set('plus', $('tPlus'), 'Add a minute'); set('skip', $('tSkip'), $('tSkip').textContent); set('reset', $('tReset'), 'Reset');
+    // After the first prep, the reset button goes back to the start of the current prep instead
+    const back = !!(t && t.idx > 0);
+    set('play', $('tPlay'), $('tPlay').textContent); set('plus', $('tPlus'), 'Add a minute'); set('skip', $('tSkip'), $('tSkip').textContent);
+    set('reset', $('tReset'), back ? 'Back to the start of ' + (t.kind === 'preps' ? t.segs[t.idx].label : 'these 10 minutes') : 'Reset');
+    const rb = c.querySelector('[data-t="reset"]'), ricon = back ? 'back' : 'reset';
+    if (rb && rb.dataset.icon !== ricon) { rb.dataset.icon = ricon; rb.innerHTML = TICON[ricon]; }
     const pb = c.querySelector('[data-t="play"]'), icon = t && t.running ? 'pause' : 'play';
     if (pb && pb.dataset.icon !== icon) { pb.dataset.icon = icon; pb.innerHTML = TICON[icon]; }
   });
@@ -3083,6 +3089,14 @@ $('tSkip').addEventListener('click', () => {
   pushTimer();
 });
 $('tReset').addEventListener('click', () => { timer = null; pushTimer(); });
+function restartPrep() {               // back to the start of the current prep, keeping earlier ones done
+  const t = timer; if (!t) return;
+  const seg = t.segs[t.idx]; seg.extra = 0;
+  const ms = segFull(seg);
+  t.finished = false; t.waiting = false;
+  if (t.running) t.endAt = Date.now() + ms; else t.remaining = ms;
+  pushTimer();
+}
 function parseDuration(str) {
   str = String(str).trim().toLowerCase().replace(/\s*(mins?|minutes?|m)$/, '');
   let m;
@@ -3172,7 +3186,8 @@ els.preview.addEventListener('click', e => {
       changed(); refreshPrepSide();
       if (state.prepTimer.chime) { unlockAudio(); chime(); }
       toast(state.prepTimer.chime ? 'Chime on' : 'Chime off');
-    } else ({ play: $('tPlay'), plus: $('tPlus'), skip: $('tSkip'), reset: $('tReset') })[k].click();
+    } else if (k === 'reset' && timer && timer.idx > 0) restartPrep();
+    else ({ play: $('tPlay'), plus: $('tPlus'), skip: $('tSkip'), reset: $('tReset') })[k].click();
     return;
   }
   const time = e.target.closest('.pt:not(.clock-only) .pt-time, .ptm-time');
