@@ -1453,8 +1453,9 @@ const TICON = {
 };
 const tbtn = (k, cls, inner, title) => '<button type="button" class="ticon ' + cls + '" data-t="' + k + '" title="' + title + '" aria-label="' + title + '">' + inner + '</button>';
 const tPlayBtn = () => tbtn('play', 'solid', TICON.play, 'Start'), tPlusBtn = () => tbtn('plus', 'ghost plus', '+1', 'Add a minute'),
-      tSkipBtn = () => tbtn('skip', 'ghost', TICON.skip, 'Skip'), tResetBtn = () => tbtn('reset', 'ghost', TICON.reset, 'Reset');
-const timerCtrl = cls => '<div class="pt-ctrl' + (cls ? ' ' + cls : '') + '">' + tPlayBtn() + tPlusBtn() + tSkipBtn() + tResetBtn() + '</div>';
+      tSkipBtn = () => tbtn('skip', 'ghost', TICON.skip, 'Skip'), tResetBtn = () => tbtn('reset', 'ghost', TICON.reset, 'Reset'),
+      tBackBtn = () => tbtn('back', 'ghost', TICON.back, 'Back');
+const timerCtrl = cls => '<div class="pt-ctrl' + (cls ? ' ' + cls : '') + '">' + tBackBtn() + tPlayBtn() + tSkipBtn() + tPlusBtn() + tResetBtn() + '</div>';
 function setSlideHTML(host, html) {      // replaces the slide but keeps anything else in the host (the video player, hints)
   host.querySelectorAll(':scope > .slide').forEach(s => s.remove());
   host.insertAdjacentHTML('afterbegin', html);
@@ -1689,7 +1690,7 @@ function renderPrep(host, st, date, editor) {
           (clockOnly ? '<div class="pt clock-only">' + (editor ? timerBell(st) : '') + hdEl(st, date, 'timeNow', null, 'pt-label') + '<div class="pt-time pt-bigclock"></div>' +
                          (editor ? '<div class="pt-tstat"></div>' + timerCtrl() : '') + '</div>'
                      : '<div class="pt">' + (editor ? timerBell(st) : '') + '<div class="pt-label"></div><div class="pt-time" title="Click to type a time"></div>' +
-                       (editor ? '<div class="pt-barrow pt-ctrl">' + tPlayBtn() + tPlusBtn() + '<div class="pt-bars"></div>' + tSkipBtn() + tResetBtn() + '</div>' : '<div class="pt-bars"></div>') +
+                       (editor ? '<div class="pt-barrow pt-ctrl">' + tBackBtn() + tPlayBtn() + tSkipBtn() + '<div class="pt-bars"></div>' + tPlusBtn() + tResetBtn() + '</div>' : '<div class="pt-bars"></div>') +
                        '<div class="pt-sub"></div></div>') +
           '<div class="card music">' + hdEl(st, date, musicTitle) + '<div class="music-body">' + musicHTML(musicRows(st, musicDay), musicEmpty) + '</div></div>' +
         '</div>' +
@@ -3041,12 +3042,10 @@ function refreshTimerUi() {
   $('tReset').disabled = !t;
   els.preview.querySelectorAll('.pt-ctrl').forEach(c => {
     const set = (k, src, title) => { const b = c.querySelector('[data-t="' + k + '"]'); if (!b) return; b.disabled = src.disabled; b.hidden = src.hidden; if (b.title !== title) { b.title = title; b.setAttribute('aria-label', title); } };
-    // After the first prep, the reset button goes back to the start of the current prep instead
-    const back = !!(t && t.idx > 0);
     set('play', $('tPlay'), $('tPlay').textContent); set('plus', $('tPlus'), 'Add a minute'); set('skip', $('tSkip'), $('tSkip').textContent);
-    set('reset', $('tReset'), back ? 'Back to the start of ' + (t.kind === 'preps' ? t.segs[t.idx].label : 'these 10 minutes') : 'Reset');
-    const rb = c.querySelector('[data-t="reset"]'), ricon = back ? 'back' : 'reset';
-    if (rb && rb.dataset.icon !== ricon) { rb.dataset.icon = ricon; rb.innerHTML = TICON[ricon]; }
+    set('reset', $('tReset'), 'Reset: back to the very beginning');
+    const bb = c.querySelector('[data-t="back"]'), bt = backTarget();
+    if (bb) { bb.disabled = !bt; const tt = bt ? 'Back to the start of ' + bt : 'Back'; if (bb.title !== tt) { bb.title = tt; bb.setAttribute('aria-label', tt); } }
     const pb = c.querySelector('[data-t="play"]'), icon = t && t.running ? 'pause' : 'play';
     if (pb && pb.dataset.icon !== icon) { pb.dataset.icon = icon; pb.innerHTML = TICON[icon]; }
   });
@@ -3089,12 +3088,24 @@ $('tSkip').addEventListener('click', () => {
   pushTimer();
 });
 $('tReset').addEventListener('click', () => { timer = null; pushTimer(); });
-function restartPrep() {               // back to the start of the current prep, keeping earlier ones done
+/* Rewind: to the start of the timer that's going, or, if it hasn't started yet, to the start of the one before. Always waits for Play. */
+function segStarted(t) {
+  if (!t) return false;
+  if (t.finished) return true;
+  const left = t.running ? t.endAt - Date.now() : t.remaining;
+  return t.running || left < segFull(t.segs[t.idx]) - 999;
+}
+const segName = (t, i) => t.kind === 'preps' ? t.segs[i].label : t.kind === 'tens' ? 'these 10 minutes' : 'the timer';
+function backTarget() {
+  const t = timer; if (!t) return null;
+  if (segStarted(t)) return segName(t, t.idx);
+  return t.idx > 0 ? segName(t, t.idx - 1) : null;
+}
+function rewind() {
   const t = timer; if (!t) return;
+  if (!segStarted(t)) { if (t.idx === 0) return; t.idx--; }
   const seg = t.segs[t.idx]; seg.extra = 0;
-  const ms = segFull(seg);
-  t.finished = false; t.waiting = false;
-  if (t.running) t.endAt = Date.now() + ms; else t.remaining = ms;
+  t.running = false; t.waiting = false; t.finished = false; t.remaining = segFull(seg);
   pushTimer();
 }
 function parseDuration(str) {
@@ -3186,7 +3197,7 @@ els.preview.addEventListener('click', e => {
       changed(); refreshPrepSide();
       if (state.prepTimer.chime) { unlockAudio(); chime(); }
       toast(state.prepTimer.chime ? 'Chime on' : 'Chime off');
-    } else if (k === 'reset' && timer && timer.idx > 0) restartPrep();
+    } else if (k === 'back') rewind();
     else ({ play: $('tPlay'), plus: $('tPlus'), skip: $('tSkip'), reset: $('tReset') })[k].click();
     return;
   }
