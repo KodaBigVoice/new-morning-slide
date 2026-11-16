@@ -717,6 +717,15 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
           <h3>Your form</h3>
           <select class="text" id="formSelect" style="max-width:320px"></select>
           <p class="hint">Only your form’s lessons appear on the slide. Your form also shows at the top of the main screen.</p>
+          <label class="check"><input type="checkbox" id="teacherInitial"><span>Show music teachers’ first initial (Miss A Woodhouse, not Miss Woodhouse)</span></label>
+          <div id="pupilsWrap" hidden>
+            <h3 style="margin-top:8px">Preferred names</h3>
+            <p class="hint" style="margin:0">Pupils come from the spreadsheet. Type the name a pupil goes by and the slide uses it; leave it blank to use the spreadsheet’s name. Names are kept for future weeks.</p>
+            <table class="tt-table pupils" style="max-width:560px">
+              <thead><tr><th>Name on the spreadsheet</th><th>Preferred name</th></tr></thead>
+              <tbody id="pupilsBody"></tbody>
+            </table>
+          </div>
         </div>
       </section>
 
@@ -945,7 +954,9 @@ function defaultState() {
     free: per(() => ({})),               // freestyle content for every <weekday>: { main, side, whole, prep } → { kind, img, url, fit, yt, start, title, text, colour }
     freeWhole: per(false),               // whole-slide freestyle every <weekday>
     prepFree: per('off'),                // prep slide freestyle every <weekday>: 'off' | 'bottom' | 'whole'
-    recentImages: []                     // the 10 most recent pictures: [{ id, name, gif }] (the files live in IndexedDB)
+    recentImages: [],                    // the 10 most recent pictures: [{ id, name, gif }] (the files live in IndexedDB)
+    teacherInitial: true,                // show "Miss A Woodhouse" (true) or "Miss Woodhouse" (false)
+    prefNames: {}                        // { form: { name on the spreadsheet: preferred name } }
   };
 }
 
@@ -1263,11 +1274,21 @@ function timetableHTML(st, wd) {
   }).join('') + '</div>';
 }
 
+function displayName(st, name) {
+  const p = ((st.prefNames || {})[st.form] || {})[name];
+  return p && p.trim() ? p.trim() : name;
+}
+function teacherName(st, t) {
+  t = String(t || '');
+  if (st.teacherInitial !== false) return t;
+  // "Miss A Woodhouse" → "Miss Woodhouse" (drops single-letter initials that come before a name)
+  return t.replace(/\b[A-Z]\.?(?:-[A-Z]\.?)?\s+(?=\S)/g, '').replace(/\s{2,}/g, ' ').trim();
+}
 function musicRows(st, wd) {
   if (!st.lessons || !st.form) return [];
   return st.lessons.rows
     .filter(r => r[0] === st.form && r[2] === wd)
-    .map(r => ({ name: r[1], mins: r[3], teacher: r[4] }))
+    .map(r => ({ name: displayName(st, r[1]), mins: r[3], teacher: teacherName(st, r[4]) }))
     .sort((a, b) => nameCmp(a.name, b.name) || (a.mins ?? 9999) - (b.mins ?? 9999));
 }
 
@@ -3040,8 +3061,30 @@ function refreshSetupForm() {
     $('formSelect').innerHTML = '<option value="">Upload the lessons file first</option>';
     $('formSelect').disabled = true;
   }
+  refreshPupils();
 }
 $('formSelect').addEventListener('change', () => { state.form = $('formSelect').value; changed(); refreshSetupForm(); });
+$('teacherInitial').addEventListener('change', () => { state.teacherInitial = $('teacherInitial').checked; changed(); });
+function refreshPupils() {
+  const L = state.lessons, form = state.form;
+  $('teacherInitial').checked = state.teacherInitial !== false;
+  $('pupilsWrap').hidden = !(L && form);
+  if (!L || !form) return;
+  const saved = (state.prefNames || {})[form] || {};
+  const thisWeek = new Set(L.rows.filter(r => r[0] === form).map(r => r[1]));
+  const names = [...new Set([...thisWeek, ...Object.keys(saved).filter(k => (saved[k] || '').trim())])].sort(nameCmp);
+  $('pupilsBody').innerHTML = names.length ? names.map(n =>
+    '<tr><td style="padding-right:12px">' + esc(n) + (thisWeek.has(n) ? '' : ' <span class="hint" style="margin:0">(no lessons this week)</span>') + '</td>' +
+    '<td><input data-name="' + esc(n) + '" value="' + esc(saved[n] || '') + '" placeholder="Same as the spreadsheet" aria-label="Preferred name for ' + esc(n) + '"></td></tr>').join('')
+    : '<tr><td colspan="2" class="hint">No pupils from ' + esc(form) + ' in this week’s spreadsheet.</td></tr>';
+}
+$('pupilsBody').addEventListener('input', e => {
+  const inp = e.target.closest('input[data-name]'); if (!inp) return;
+  state.prefNames = state.prefNames || {};
+  const m = state.prefNames[state.form] || (state.prefNames[state.form] = {});
+  if (inp.value.trim()) m[inp.dataset.name] = inp.value; else delete m[inp.dataset.name];
+  changed();
+});
 
 /* ---------- Timetable ---------- */
 function refreshTT() {
