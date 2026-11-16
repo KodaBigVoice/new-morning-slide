@@ -120,6 +120,14 @@
 
 .slide .panel { padding: 32px; display: flex; flex-direction: column; gap: 18px; min-height: 0; }
 .slide .panel.bullets { flex: 1 1 0; min-height: 300px; }
+.slide .split-part { flex: none; overflow: visible; min-height: 1.3em; }
+.slide .split-lbl { display: flex; align-items: center; gap: 14px; font-family: var(--ui, sans-serif); font-size: 20px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 4px 0 -8px; }
+.slide .split-lbl + .split-part + .split-lbl { border-top: 2px dashed var(--line, #c5d3df); padding-top: 12px; margin-top: 2px; }
+.slide .split-copy { font: inherit; font-size: 18px; letter-spacing: 0; text-transform: none; border: 2px solid var(--line, #c5d3df); background: #fff; color: var(--main); border-radius: 999px; padding: 2px 14px; cursor: pointer; }
+.slide .split-toggle { display: none; }
+.slide.editor-preview .split-toggle { display: block; position: absolute; right: 18px; bottom: 16px; z-index: 2; font: inherit; font-size: 18px; font-weight: 600; border: 2px solid var(--line, #c5d3df); background: rgba(255, 255, 255, 0.92); color: var(--muted); border-radius: 999px; padding: 4px 14px; cursor: pointer; opacity: 0.7; }
+.slide.editor-preview .card:hover .split-toggle { opacity: 1; }
+.slide.editor-preview .split-lbl .ovr-dot { position: static; width: 18px; height: 18px; box-shadow: none; flex: none; }
 .slide .other { grid-column: 2; grid-row: 3; padding: 32px; display: flex; flex-direction: column; gap: 18px; min-height: 0; }
 .slide .other .heading { font-size: 40px; line-height: 1.05; }
 .slide .other .rich { font-size: 30px; }
@@ -965,6 +973,27 @@ function hd(st, date, key, dflt) {
   const pick = o => (o && typeof o[key] === 'string' && o[key].trim()) ? o[key].trim() : null;
   return pick(((st.overrides || {})[toISO(date)] || {}).headings) || pick((H.day || {})[wd]) || pick(H.all) || (dflt != null ? dflt : HEADINGS[key]);
 }
+/* Boxes with weekly announcements plus "just this <weekday>" ones. On the projector they're one list, one-offs first. */
+const isSplit = (st, box) => (st.split || {})[box] !== false;
+function oneOff(st, date, box) { return (((st.oneoff || {})[toISO(date)] || {})[box]) || ''; }
+function boxText(st, date, box, weekly) {
+  if (!isSplit(st, box)) return weekly || '';
+  return [oneOff(st, date, box), weekly || ''].filter(s => s.trim()).join('\n');
+}
+function splitHTML(st, date, box, field, weekly, fit, editor, always) {
+  const split = isSplit(st, box);
+  const toggle = editor ? '<button type="button" class="split-toggle" data-split-toggle="' + box + '" title="' +
+    (split ? 'Show this box as one list that stays the same every week' : 'Split this box into announcements for every week and ones just for this week') + '">' + (split ? 'Use one list' : 'Split: weekly + this week') + '</button>' : '';
+  if (!editor || !split) return toggle + '<div class="rich" data-fit="' + fit + '" data-field="' + field + '"' + (always ? ' data-always="' + always + '"' : '') + '>' + richHTML(editor ? weekly : boxText(st, date, box, weekly)) + '</div>';
+  const wdn = DAY_NAMES[dayCode(date) === 'SUN' ? 'MON' : dayCode(date)], [max, min] = fit.split(',');
+  const last = oneOff(st, addDays(date, -7), box), now = oneOff(st, date, box);
+  return toggle +
+    '<div class="split-lbl">Just this ' + wdn + ' · ' + date.getDate() + ' ' + MONTHS[date.getMonth()].slice(0, 3) +
+      (!now.trim() && last.trim() ? '<button type="button" class="split-copy" data-copy-last="' + box + '">Copy last ' + wdn + '’s</button>' : '') + '</div>' +
+    '<div class="rich split-part" data-mfit="' + max + ',' + min + '" data-field="once:' + box + '">' + richHTML(now) + '</div>' +
+    '<div class="split-lbl">Every ' + wdn + '</div>' +
+    '<div class="rich split-part" data-mfit="' + max + ',' + min + '" data-field="' + field + '">' + richHTML(weekly) + '</div>';
+}
 const hdEl = (st, date, key, dflt, cls) => '<div class="' + (cls || 'heading') + '" data-hd="' + key + '">' + esc(hd(st, date, key, dflt)) + '</div>';
 const PANEL_TITLES = { info: 'Additional Information', lunch: 'Lunchtime Arrangements', house: 'House Meeting Locations' };
 const HOUSES = [
@@ -1033,7 +1062,9 @@ function defaultState() {
     recentImages: [],                    // the 10 most recent pictures: [{ id, name, gif }] (the files live in IndexedDB)
     teacherInitial: true,
     headings: { all: {}, day: {} },      // your own headings: { all: { key: text }, day: { FRI: { key: text } } } (just-today ones live in overrides)
-    other: per(''), otherTitle: per(''), // the middle "Other info" box                // show "Miss A Woodhouse" (true) or "Miss Woodhouse" (false)
+    other: per(''), otherTitle: per(''), // the middle "Other info" box
+    oneoff: {},                          // { date: { notes, info, lunch, other, prepInfo } }: "just this <weekday>" announcements
+    split: {},                           // { box: false } turns a box back into one list (default: weekly + just-this-week)                // show "Miss A Woodhouse" (true) or "Miss Woodhouse" (false)
     prefNames: {}                        // { form: { name on the spreadsheet: preferred name } }
   };
 }
@@ -1138,6 +1169,8 @@ function pruneOverrides() {
   const cutoff = toISO(addDays(new Date(), -21));
   Object.keys(state.overrides).forEach(k => { if (k < cutoff) delete state.overrides[k]; });
   Object.keys(state.prepTomorrow || {}).forEach(k => { if (k < cutoff) delete state.prepTomorrow[k]; });
+  const yearAgo = toISO(addDays(new Date(), -400));       // one-off announcements are kept for a school year, to look back on
+  Object.keys(state.oneoff || {}).forEach(k => { if (k < yearAgo) delete state.oneoff[k]; });
 }
 let saveTimer = null;
 function save() {
@@ -1223,6 +1256,7 @@ function resolveDay(st, date) {
     showTT: (ovr.ttView || ttViewOf(st, wd)) === 'full',
     otherTitle: ovr.otherTitle != null ? ovr.otherTitle : ((st.otherTitle || {})[wd] || ''),
     otherText: ovr.otherText != null ? ovr.otherText : ((st.other || {})[wd] || ''),
+    prepInfo: ovr.prepInfo != null ? ovr.prepInfo : ((st.prepInfo || {})[wd] || ''),
     whole: ovr.whole != null ? !!ovr.whole : !!(st.freeWhole || {})[wd],
     free: {
       main: freeItem(st, ovr, wd, 'main', ovr.ttView != null),
@@ -1438,7 +1472,7 @@ function panelHTML(st, day, editor) {
         '<div class="house-loc" data-field="house:' + h.name + '">' + esc(day.houses[h.name] || '') + '</div></div>').join('') + '</div></div>';
   }
   return '<div class="card panel bullets region-side">' + (day.panel === 'info' ? '<div class="heading" data-field="panelTitle">' + esc(day.panelTitle) + '</div>' : hdEl(st, day.date, 'lunch')) +
-    '<div class="rich" data-fit="30,18" data-field="panelText">' + richHTML(day.panelText) + '</div></div>';
+    splitHTML(st, day.date, day.panel, 'panelText', day.panelText, '30,18', editor) + '</div>';
 }
 
 /* Timer buttons shown in the timer box on the laptop's preview (never on the projector) */
@@ -1492,10 +1526,10 @@ function renderSlide(host, st, date, editor) {
           (day.ttView === 'first' ? firstLessonHTML(day.firstLesson, hd(st, date, 'first')) : '') +
         '</div>' +
         '<div class="left' + (wide ? '' : ' region-main') + '">' +
-          '<div class="card notes">' + hdEl(st, date, 'notes') + '<div class="rich" data-fit="32,20" data-field="notes">' + richHTML(day.notes) + '</div></div>' +
+          '<div class="card notes">' + hdEl(st, date, 'notes') + splitHTML(st, date, 'notes', 'notes', day.notes, '32,20', editor) + '</div>' +
         '</div>' +
         (day.showTT ? '<div class="card tt region-main">' + hdEl(st, date, 'tt') + timetableHTML(st, day.wd) + '</div>' : '') +
-        (day.ttView === 'text' ? '<div class="card other region-main"><div class="heading" data-field="otherTitle">' + esc(day.otherTitle.trim() || 'Other info') + '</div><div class="rich" data-fit="30,18" data-field="otherText">' + richHTML(day.otherText) + '</div></div>' : '') +
+        (day.ttView === 'text' ? '<div class="card other region-main"><div class="heading" data-field="otherTitle">' + esc(day.otherTitle.trim() || 'Other info') + '</div>' + splitHTML(st, date, 'other', 'otherText', day.otherText, '30,18', editor) + '</div>' : '') +
         (freeMain ? freeHTML('main', day.free.main, editor, 'free-main region-main') : '') +
       '</div>' +
     '</div>');
@@ -1530,7 +1564,8 @@ function fitSlide(slide, panel) {
     }
   });
   // Messages: heading and text shrink together until the whole message fits its box
-  slide.querySelectorAll('.free-message').forEach(card => {
+  new Set([...slide.querySelectorAll('[data-mfit]')].map(el => el.closest('.card'))).forEach(card => {
+    if (!card) return;
     const parts = [...card.querySelectorAll('[data-mfit]')].map(el => { const [max, min] = el.dataset.mfit.split(',').map(Number); el.style.fontSize = max + 'px'; return { el, max, min, size: max }; });
     let guard = 60;
     while (guard-- > 0 && card.scrollHeight > card.clientHeight + 1 && parts.some(q => q.size > q.min)) {
@@ -1636,13 +1671,13 @@ function renderPrep(host, st, date, editor) {
   const shortD = String(n).padStart(2, '0') + '/' + String(date.getMonth() + 1).padStart(2, '0') + '/' + date.getFullYear();
   let second, secondTitle, musicTitle, musicDay, musicEmpty;
   if (morning) {
-    second = resolveDay(st, date).notes; secondTitle = 'notes';
+    second = boxText(st, date, 'notes', resolveDay(st, date).notes); secondTitle = 'notes';
     musicDay = wd; musicTitle = 'music'; musicEmpty = 'No music lessons today';
   } else {
     second = (st.prepTomorrow || {})[toISO(date)] || ''; secondTitle = 'tomorrow';
     musicDay = dayCode(nextSchoolDay(date)); musicTitle = 'tmusic'; musicEmpty = 'No music lessons tomorrow';
   }
-  const info = (st.prepInfo || {})[wd] || '';
+  const info = resolveDay(st, date).prepInfo;
   const pf = prepFreeOf(st, date);
   host.style.background = t.bg;
   if (pf.mode === 'whole') {
@@ -1683,7 +1718,7 @@ function renderPrep(host, st, date, editor) {
         '</div>' +
         (pf.mode === 'bottom' ? freeHTML('prep', pf.item, editor, 'free-pbot') :
         '<div class="prep-low">' +
-          '<div class="card prep-box">' + hdEl(st, date, 'prepInfo') + '<div class="rich" data-fit="30,18" data-field="prepInfo" data-always="No extra instructions">' + richHTML(info) + '</div></div>' +
+          '<div class="card prep-box">' + hdEl(st, date, 'prepInfo') + splitHTML(st, date, 'prepInfo', 'prepInfo', info, '30,18', editor, 'No extra instructions') + '</div>' +
           '<div class="card prep-box">' + hdEl(st, date, secondTitle) + '<div class="rich" data-fit="30,18"' + (morning ? '' : ' data-field="tomorrow"') + '>' + richHTML(second) + '</div></div>' +
         '</div>') +
         '<div class="right">' +
@@ -1992,7 +2027,7 @@ function setOvr(key, val) {
   if (val == null) delete o[key]; else o[key] = val;
   if (Object.keys(o).length) state.overrides[iso] = o; else delete state.overrides[iso];
 }
-const OVR_NAMES = { headings: 'headings', otherTitle: 'other info heading', otherText: 'other info', whole: 'whole slide', free: 'freestyle', pfree: 'prep freestyle', task: 'morning task', at830: '8:30 box', notes: 'What’s happening', panel: 'side panel', panelText: 'side panel text', infoTitle: 'panel heading', house: 'house rooms', ttView: 'main area' };
+const OVR_NAMES = { prepInfo: 'prep info', headings: 'headings', otherTitle: 'other info heading', otherText: 'other info', whole: 'whole slide', free: 'freestyle', pfree: 'prep freestyle', task: 'morning task', at830: '8:30 box', notes: 'What’s happening', panel: 'side panel', panelText: 'side panel text', infoTitle: 'panel heading', house: 'house rooms', ttView: 'main area' };
 function plainFirst(s) {
   const line = String(s || '').replace(/^\s*[-*•]\s+/gm, '').replace(/\*\*|__|\*/g, '').split('\n').map(x => x.trim()).find(Boolean) || '';
   return line.length > 38 ? line.slice(0, 36).trim() + '…' : line;
@@ -2611,7 +2646,7 @@ $('tModeSeg').addEventListener('click', e => {
   });
 });
 $('tomCopy').addEventListener('click', () => {
-  const tm = nextSchoolDay(viewDate), text = resolveDay(state, tm).notes;
+  const tm = nextSchoolDay(viewDate), text = boxText(state, tm, 'notes', resolveDay(state, tm).notes);
   if (!text.trim()) { toast(DAY_NAMES[dayCode(tm)] + '’s “What’s happening today?” is empty.'); return; }
   const iso = toISO(viewDate), cur = state.prepTomorrow[iso] || '';
   if (cur.trim() && cur !== text && !confirm('Replace what’s in “Tomorrow Morning” with a fresh copy?')) return;
@@ -2624,8 +2659,16 @@ $('tomCopy').addEventListener('click', () => {
    Typing on the preview
    ===================================================================== */
 const RICH = new Set(['notes', 'panelText', 'prepInfo', 'tomorrow', 'otherText']);
-const isRich = f => RICH.has(f) || /^free:\w+:text$/.test(f);
-const SCOPED = { task: 'task', at830: 'at830', notes: 'notes', panelTitle: 'infoTitle', panelText: 'panelText', otherTitle: 'otherTitle', otherText: 'otherText' };   // field → override key
+const isRich = f => RICH.has(f) || /^free:\w+:text$/.test(f) || /^once:/.test(f);
+const SCOPED = { task: 'task', at830: 'at830', notes: 'notes', panelTitle: 'infoTitle', panelText: 'panelText', otherTitle: 'otherTitle', otherText: 'otherText', prepInfo: 'prepInfo' };
+// The weekly part of a split box: changes default to "just today" so the usual announcements are safe
+function splitBoxOf(f) {
+  if (f === 'notes') return 'notes';
+  if (f === 'otherText') return 'other';
+  if (f === 'prepInfo') return 'prepInfo';
+  if (f === 'panelText') { const p = resolveDay(state, viewDate).panel; return p === 'info' || p === 'lunch' ? p : null; }
+  return null;
+}   // field → override key
 const PH = { otherTitle: 'Other info', otherText: 'Click to add', task: 'Click to add', at830: 'Click to add', notes: 'Click to add', panelText: 'Click to add', panelTitle: PANEL_TITLES.info, tomorrow: 'Click to add, or copy from tomorrow’s slide' };
 let editing = null;            // { el, field, scope: 'week' | 'today', forceToday }
 let fitTimer = null;
@@ -2642,7 +2685,7 @@ function decoratePreview(slide) {
     el.spellcheck = !f.endsWith(':mins');
     el.dataset.ph = el.dataset.always || PH[f] || (f.startsWith('free:') ? (f.endsWith(':title') ? 'Click to add a heading' : 'Click to add a message') : '') || (f.startsWith('house:') ? 'Click to add' : f.endsWith(':subject') ? 'Click to add a prep' : f.endsWith(':mins') ? '?' : '');
   });
-  if (editMode === 'morning') addDots(slide, resolveDay(state, viewDate));
+  addDots(slide, resolveDay(state, viewDate));
   slide.classList.toggle('hd-mode', !!hdMode);
   if (hdMode) slide.querySelectorAll('[data-hd]').forEach(el => {
     el.dataset.field = 'hd:' + el.dataset.hd;
@@ -2662,13 +2705,22 @@ function addDots(slide, day) {
   slide.querySelectorAll('[data-field]').forEach(el => { if (fieldHasOvr(el.dataset.field, day)) placeDot(el); });
 }
 function placeDot(el) {
+  const lbl = el.previousElementSibling;
+  if (lbl && lbl.classList.contains('split-lbl')) {
+    if (!lbl.querySelector('.ovr-dot')) { const d = document.createElement('span'); d.className = 'ovr-dot'; d.dataset.for = el.dataset.field; lbl.appendChild(d); }
+    return;
+  }
   const host = el.closest('.info, .card'); if (!host) return;
   if (host.querySelector(':scope > .ovr-dot')) return;
   const d = document.createElement('span');
   d.className = 'ovr-dot'; d.dataset.for = el.dataset.field;
   host.appendChild(d);
 }
-function removeDot(el) { const host = el.closest('.info, .card'); const d = host && host.querySelector(':scope > .ovr-dot'); if (d) d.remove(); }
+function removeDot(el) {
+  const lbl = el.previousElementSibling;
+  const d = lbl && lbl.classList.contains('split-lbl') ? lbl.querySelector('.ovr-dot') : (el.closest('.info, .card') || {}).querySelector?.(':scope > .ovr-dot');
+  if (d) d.remove();
+}
 
 /* The day as it would be without one of today's changes */
 function resolveWithout(key) {
@@ -2755,6 +2807,7 @@ function setField(f, v) {
     else if (f === 'panelTitle') { state.infoTitle = state.infoTitle || {}; state.infoTitle[wd] = v; }
     else if (f === 'otherTitle') { state.otherTitle = state.otherTitle || {}; state.otherTitle[wd] = v; }
     else if (f === 'otherText') { state.other = state.other || {}; state.other[wd] = v; }
+    else if (f === 'prepInfo') state.prepInfo[wd] = v;
     else if (f === 'panelText') { const p = resolveDay(state, viewDate).panel; state[p === 'lunch' ? 'lunch' : 'info'][wd] = v; }
   } else if (f.startsWith('house:')) {
     const h = Object.assign({}, resolveDay(state, viewDate).houses); h[f.slice(6)] = v; setOvr('house', h);
@@ -2765,6 +2818,10 @@ function setField(f, v) {
     setHeading(f.slice(3), v);
   } else if (f.startsWith('free:')) {
     const [, slot, key] = f.split(':'); setFreeProp(slot, { [key]: v });
+  } else if (f.startsWith('once:')) {
+    const box = f.slice(5); state.oneoff = state.oneoff || {};
+    const o = state.oneoff[iso] || (state.oneoff[iso] = {});
+    if (v.trim()) o[box] = v; else { delete o[box]; if (!Object.keys(o).length) delete state.oneoff[iso]; }
   } else if (f === 'prepInfo') state.prepInfo[wd] = v;
   else if (f === 'tomorrow') { if (v.trim()) state.prepTomorrow[iso] = v; else delete state.prepTomorrow[iso]; }
 }
@@ -2817,10 +2874,10 @@ function runCmd(cmd) {
 
 function startEdit(el) {
   const f = el.dataset.field;
-  const day = editMode === 'morning' ? resolveDay(state, viewDate) : null;
-  const has = day ? fieldHasOvr(f, day) : false;
-  editing = { el, field: f, scope: has ? 'today' : 'week', forceToday: false };
-  if (f === 'at830' && day && day.at830Source === 'auto') { editing.forceToday = true; }
+  const day = resolveDay(state, viewDate);
+  const has = fieldHasOvr(f, day), sb = splitBoxOf(f);
+  editing = { el, field: f, scope: has || (sb && isSplit(state, sb)) ? 'today' : 'week', forceToday: false };
+  if (editMode === 'morning' && f === 'at830' && day.at830Source === 'auto') { editing.forceToday = true; }
   hideZone();
   if (isRich(f) && !f.startsWith('free:') && !el.textContent.trim() && !el.querySelector('li')) {
     el.innerHTML = '<ul><li><br></li></ul>';
@@ -2889,6 +2946,24 @@ function addPrep() {
   if (el) el.focus();
 }
 els.preview.addEventListener('mousedown', e => { if (e.target.closest('[data-add-prep]')) { e.preventDefault(); addPrep(); } });
+els.preview.addEventListener('click', e => {
+  const t = e.target.closest('[data-split-toggle]');
+  if (t) {
+    const box = t.dataset.splitToggle; state.split = state.split || {};
+    if (isSplit(state, box)) state.split[box] = false; else delete state.split[box];
+    endEditNow(); changed();
+    toast(isSplit(state, box) ? 'Split: announcements for every week, plus ones just for this week.' : 'One list: the same every week, as before. Your one-offs are kept if you switch back.');
+    return;
+  }
+  const c = e.target.closest('[data-copy-last]');
+  if (c) {
+    const box = c.dataset.copyLast, last = oneOff(state, addDays(viewDate, -7), box);
+    if (!last.trim()) return;
+    const iso = toISO(viewDate); state.oneoff = state.oneoff || {};
+    (state.oneoff[iso] = state.oneoff[iso] || {})[box] = last;
+    endEditNow(); changed(); toast('Copied last week’s one-offs. Change them on the slide if you need to.');
+  }
+});
 els.preview.addEventListener('click', e => { if (e.detail === 0 && e.target.closest('[data-add-prep]')) addPrep(); });
 
 /* ---------- Toolbar and "changed just for today" note ---------- */
@@ -2934,10 +3009,11 @@ function rectIn(el) {
 function showBars() {
   const ed = editing; if (!ed) { hideBars(); return; }
   const f = ed.field, rich = isRich(f), wd = DAY_NAMES[wdOf(viewDate)];
-  let scope = !!SCOPED[f] && editMode === 'morning', note = '';
+  let scope = !!SCOPED[f] && (editMode === 'morning' || f === 'prepInfo'), note = '';
   if (f === 'at830' && ed.forceToday && ed.scope !== 'today') { scope = false; note = 'Set by the house meeting schedule: your change is just for ' + dayMonth(viewDate); }
   if (f.startsWith('house:')) note = 'Just for ' + shortDate(viewDate);
-  else if (f.startsWith('prep:') || f === 'prepInfo') note = 'Same every ' + wd;
+  else if (f.startsWith('prep:')) note = 'Same every ' + wd;
+  else if (f.startsWith('once:')) note = 'Just this ' + wd + ' · gone next week';
   else if (f === 'tomorrow') note = 'Just this evening';
   else if (f.startsWith('free:')) note = slotNote(f.split(':')[1]);
   else if (f.startsWith('hd:')) note = hdScopeName() + ' · delete the text to go back to the default';
@@ -2951,8 +3027,8 @@ function showBars() {
   bar.querySelector('.fmt-sep').hidden = !(rich && (scope || note));
   bar.hidden = false;
   // The note under the box
-  const day = editMode === 'morning' ? resolveDay(state, viewDate) : null;
-  if (day && fieldHasOvr(f, day) && (ed.scope === 'today' || f.startsWith('house:'))) {
+  const day = resolveDay(state, viewDate);
+  if (fieldHasOvr(f, day) && (ed.scope === 'today' || f.startsWith('house:'))) {
     tip.dataset.field = f;
     if (f.startsWith('house:')) $('ovrText').textContent = 'Rooms changed just for ' + dayMonth(viewDate) + (day.sched && !day.sched.congers ? ' (the school’s schedule has others)' : '');
     else { const u = plainFirst(usualText(f)); $('ovrText').textContent = 'Changed just for ' + dayMonth(viewDate) + (u ? ' (usually “' + u + '”)' : ' (usually blank)'); }
