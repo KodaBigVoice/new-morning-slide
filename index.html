@@ -123,6 +123,7 @@
 .slide .split-part { flex: none; overflow: visible; min-height: 1.3em; }
 .slide .split-lbl { display: flex; align-items: center; gap: 14px; font-family: var(--ui, sans-serif); font-size: 20px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 4px 0 -8px; }
 .slide .split-lbl + .split-part + .split-lbl { border-top: 2px dashed var(--line, #c5d3df); padding-top: 12px; margin-top: 2px; }
+.slide .split-q { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; border: 2px solid currentColor; font-size: 17px; letter-spacing: 0; cursor: help; flex: none; opacity: 0.75; }
 .slide .split-copy { font: inherit; font-size: 18px; letter-spacing: 0; text-transform: none; border: 2px solid var(--line, #c5d3df); background: #fff; color: var(--main); border-radius: 999px; padding: 2px 14px; cursor: pointer; }
 .slide .split-toggle { display: none; }
 .slide.editor-preview .split-toggle { display: block; position: absolute; right: 18px; bottom: 16px; z-index: 2; font: inherit; font-size: 18px; font-weight: 600; border: 2px solid var(--line, #c5d3df); background: rgba(255, 255, 255, 0.92); color: var(--muted); border-radius: 999px; padding: 4px 14px; cursor: pointer; opacity: 0.7; }
@@ -973,12 +974,12 @@ function hd(st, date, key, dflt) {
   const pick = o => (o && typeof o[key] === 'string' && o[key].trim()) ? o[key].trim() : null;
   return pick(((st.overrides || {})[toISO(date)] || {}).headings) || pick((H.day || {})[wd]) || pick(H.all) || (dflt != null ? dflt : HEADINGS[key]);
 }
-/* Boxes with weekly announcements plus "just this <weekday>" ones. On the projector they're one list, one-offs first. */
+/* Boxes with weekly announcements plus "just this <weekday>" ones. On the projector they're one list, weekly ones first. */
 const isSplit = (st, box) => (st.split || {})[box] !== false;
 function oneOff(st, date, box) { return (((st.oneoff || {})[toISO(date)] || {})[box]) || ''; }
 function boxText(st, date, box, weekly) {
   if (!isSplit(st, box)) return weekly || '';
-  return [oneOff(st, date, box), weekly || ''].filter(s => s.trim()).join('\n');
+  return [weekly || '', oneOff(st, date, box)].filter(s => s.trim()).join('\n');
 }
 function splitHTML(st, date, box, field, weekly, fit, editor, always) {
   const split = isSplit(st, box);
@@ -987,12 +988,13 @@ function splitHTML(st, date, box, field, weekly, fit, editor, always) {
   if (!editor || !split) return toggle + '<div class="rich" data-fit="' + fit + '" data-field="' + field + '"' + (always ? ' data-always="' + always + '"' : '') + '>' + richHTML(editor ? weekly : boxText(st, date, box, weekly)) + '</div>';
   const wdn = DAY_NAMES[dayCode(date) === 'SUN' ? 'MON' : dayCode(date)], [max, min] = fit.split(',');
   const last = oneOff(st, addDays(date, -7), box), now = oneOff(st, date, box);
+  const q = '<span class="split-q" title="These small headings are just for you while editing. On the projector the box looks normal: one list, with this week’s announcements after the weekly ones.">?</span>';
   return toggle +
-    '<div class="split-lbl">Just this ' + wdn + ' · ' + date.getDate() + ' ' + MONTHS[date.getMonth()].slice(0, 3) +
+    '<div class="split-lbl">Every ' + wdn + q + '</div>' +
+    '<div class="rich split-part" data-mfit="' + max + ',' + min + '" data-field="' + field + '">' + richHTML(weekly) + '</div>' +
+    '<div class="split-lbl">Just this ' + wdn + ' · ' + date.getDate() + ' ' + MONTHS[date.getMonth()].slice(0, 3) + q +
       (!now.trim() && last.trim() ? '<button type="button" class="split-copy" data-copy-last="' + box + '">Copy last ' + wdn + '’s</button>' : '') + '</div>' +
-    '<div class="rich split-part" data-mfit="' + max + ',' + min + '" data-field="once:' + box + '">' + richHTML(now) + '</div>' +
-    '<div class="split-lbl">Every ' + wdn + '</div>' +
-    '<div class="rich split-part" data-mfit="' + max + ',' + min + '" data-field="' + field + '">' + richHTML(weekly) + '</div>';
+    '<div class="rich split-part" data-mfit="' + max + ',' + min + '" data-field="once:' + box + '">' + richHTML(now) + '</div>';
 }
 const hdEl = (st, date, key, dflt, cls) => '<div class="' + (cls || 'heading') + '" data-hd="' + key + '">' + esc(hd(st, date, key, dflt)) + '</div>';
 const PANEL_TITLES = { info: 'Additional Information', lunch: 'Lunchtime Arrangements', house: 'House Meeting Locations' };
