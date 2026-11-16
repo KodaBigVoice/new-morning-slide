@@ -539,6 +539,7 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
 .mine-pill.plain { cursor: default; display: inline-block; }
 .sched input:disabled { background: var(--frost); color: var(--slate); }
 
+.tip { position: fixed; z-index: 300; max-width: 290px; padding: 0.45rem 0.7rem; border-radius: 8px; background: var(--ink); color: #fff; font-size: 0.82rem; line-height: 1.4; pointer-events: none; box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.45); }
 .toast { position: fixed; left: 50%; bottom: 5rem; transform: translate(-50%, 1rem); background: var(--ink); color: #fff; padding: 0.6rem 1.05rem; border-radius: 8px; font-size: 0.9rem; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 100; max-width: calc(100% - 2rem); box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.5); }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 .modal-back { position: fixed; inset: 0; background: rgba(28, 48, 72, 0.35); display: grid; place-items: center; z-index: 150; padding: 1rem; }
@@ -642,7 +643,7 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
         <div id="areaBoxes">
         <div class="box areabox top" data-region="top" style="margin-bottom:10px">
           <h3 class="areahead"><span class="ttl"><span class="mm" data-mm="top" aria-hidden="true"></span>Top boxes</span></h3>
-          <div class="labelrow"><span style="display:flex;align-items:center;gap:0.45rem"><span id="taskLbl">Morning task box</span><button type="button" class="info-i" title="The 8:30 box always shows. A first lesson box joins it when the main area shows “First lesson only”." aria-label="About the top boxes">i</button></span><button type="button" class="switch" id="taskSwitch" role="switch" aria-checked="true" aria-labelledby="taskLbl"></button></div>
+          <div class="labelrow"><span style="display:flex;align-items:center;gap:0.45rem"><span id="taskLbl">Morning task box</span><button type="button" class="info-i" data-tip="The 8:30 box always shows. A first lesson box joins it when the main area shows “First lesson only”." aria-label="About the top boxes">i</button></span><button type="button" class="switch" id="taskSwitch" role="switch" aria-checked="true" aria-labelledby="taskLbl"></button></div>
         </div>
 
         <div class="box areabox main" data-region="main" style="margin-bottom:10px">
@@ -939,6 +940,7 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
   <div class="hd-choices" id="hdResetChoices"></div>
   <div class="row" style="justify-content:flex-end"><button type="button" class="btn" data-close>Cancel</button></div>
 </div></div>
+<div class="tip" id="tip" role="tooltip" hidden></div>
 <div class="stage" id="stage" hidden></div>
 <div class="toast" id="toast" role="status"></div>
 <div class="modal-back" id="askBox" hidden>
@@ -988,7 +990,7 @@ function splitHTML(st, date, box, field, weekly, fit, editor, always) {
   if (!editor || !split) return toggle + '<div class="rich" data-fit="' + fit + '" data-field="' + field + '"' + (always ? ' data-always="' + always + '"' : '') + '>' + richHTML(editor ? weekly : boxText(st, date, box, weekly)) + '</div>';
   const wdn = DAY_NAMES[dayCode(date) === 'SUN' ? 'MON' : dayCode(date)], [max, min] = fit.split(',');
   const last = oneOff(st, addDays(date, -7), box), now = oneOff(st, date, box);
-  const q = '<span class="split-q" title="These small headings are just for you while editing. On the projector the box looks normal: one list, with this week’s announcements after the weekly ones.">?</span>';
+  const q = '<span class="split-q" data-tip="These small headings are just for you while editing. On the projector the box looks normal: one list, with this week’s announcements after the weekly ones.">?</span>';
   return toggle +
     '<div class="split-lbl">Every ' + wdn + q + '</div>' +
     '<div class="rich split-part" data-mfit="' + max + ',' + min + '" data-field="' + field + '">' + richHTML(weekly) + '</div>' +
@@ -1479,7 +1481,7 @@ function panelHTML(st, day, editor) {
 
 /* Timer buttons shown in the timer box on the laptop's preview (never on the projector) */
 const BELL = on => '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>' + (on ? '' : '<path d="M3 3l18 18"></path>') + '</svg>';
-const timerBell = st => '<button type="button" class="pt-bell' + (st.prepTimer.chime === false ? ' off' : '') + '" data-t="chime" title="' + (st.prepTimer.chime === false ? 'Chime is off: click to turn it on' : 'Chime is on: click to turn it off') + '" aria-label="Timer chime">' + BELL(st.prepTimer.chime !== false) + '</button>';
+const timerBell = st => '<button type="button" class="pt-bell' + (st.prepTimer.chime === false ? ' off' : '') + '" data-t="chime" data-tip="' + (st.prepTimer.chime === false ? 'Chime is off: click to turn it on' : 'Chime is on: click to turn it off') + '" aria-label="Timer chime">' + BELL(st.prepTimer.chime !== false) + '</button>';
 const TICON = {
   play: '<svg viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true"><path d="M7 4.5l13 7.5-13 7.5z" fill="currentColor"/></svg>',
   pause: '<svg viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true"><rect x="5.5" y="4.5" width="4.5" height="15" rx="1.2" fill="currentColor"/><rect x="14" y="4.5" width="4.5" height="15" rx="1.2" fill="currentColor"/></svg>',
@@ -1487,7 +1489,7 @@ const TICON = {
   reset: '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>',
   back: '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 5L9 12l10 7z" fill="currentColor"/><path d="M5 5v14"/></svg>'
 };
-const tbtn = (k, cls, inner, title) => '<button type="button" class="ticon ' + cls + '" data-t="' + k + '" title="' + title + '" aria-label="' + title + '">' + inner + '</button>';
+const tbtn = (k, cls, inner, title) => '<button type="button" class="ticon ' + cls + '" data-t="' + k + '" data-tip="' + title + '" aria-label="' + title + '">' + inner + '</button>';
 const tPlayBtn = () => tbtn('play', 'solid', TICON.play, 'Start'), tPlusBtn = () => tbtn('plus', 'ghost plus', '+1', 'Add a minute'),
       tSkipBtn = () => tbtn('skip', 'ghost', TICON.skip, 'Skip'), tResetBtn = () => tbtn('reset', 'ghost', TICON.reset, 'Reset'),
       tBackBtn = () => tbtn('back', 'ghost', TICON.back, 'Back');
@@ -1692,7 +1694,7 @@ function renderPrep(host, st, date, editor) {
           '<div class="banner' + (showClock || clockOnly ? '' : ' no-clock') + '">' +
             (showClock || clockOnly ? '<div class="pt-clock">' + clockText(new Date()) + '</div>' : '') +
             '<div class="banner-main">' + DAY_NAMES[wd] + ' Prep</div>' +
-            (clockOnly ? '' : '<div class="ptm"><span class="ptm-label"></span><span class="ptm-time" title="Click to type a time"></span>' + (editor ? timerCtrl('ptm-ctrl') + timerBell(st) : '') + '</div>') +
+            (clockOnly ? '' : '<div class="ptm"><span class="ptm-label"></span><span class="ptm-time" data-tip="Click to type a time"></span>' + (editor ? timerCtrl('ptm-ctrl') + timerBell(st) : '') + '</div>') +
             '<div class="banner-sub">' + shortD + '</div>' +
           '</div>' +
           freeHTML('whole', pf.item, editor, 'free-whole').replace('data-slot="whole"', 'data-slot="prep"').replace(/data-field="free:whole:/g, 'data-field="free:prep:') +
@@ -1726,7 +1728,7 @@ function renderPrep(host, st, date, editor) {
         '<div class="right">' +
           (clockOnly ? '<div class="pt clock-only">' + (editor ? timerBell(st) : '') + hdEl(st, date, 'timeNow', null, 'pt-label') + '<div class="pt-time pt-bigclock"></div>' +
                          (editor ? '<div class="pt-tstat"></div>' + timerCtrl() : '') + '</div>'
-                     : '<div class="pt">' + (editor ? timerBell(st) : '') + '<div class="pt-label"></div><div class="pt-time" title="Click to type a time"></div>' +
+                     : '<div class="pt">' + (editor ? timerBell(st) : '') + '<div class="pt-label"></div><div class="pt-time" data-tip="Click to type a time"></div>' +
                        (editor ? '<div class="pt-barrow pt-ctrl">' + tBackBtn() + tPlayBtn() + tSkipBtn() + '<div class="pt-bars"></div>' + tPlusBtn() + tResetBtn() + '</div>' : '<div class="pt-bars"></div>') +
                        '<div class="pt-sub"></div></div>') +
           '<div class="card music">' + hdEl(st, date, musicTitle) + '<div class="music-body">' + musicHTML(musicRows(st, musicDay), musicEmpty) + '</div></div>' +
@@ -3121,11 +3123,11 @@ function refreshTimerUi() {
   $('tSkip').textContent = kind === 'preps' && nextSeg ? 'Skip to ' + nextSeg.label : 'Skip to next';
   $('tReset').disabled = !t;
   els.preview.querySelectorAll('.pt-ctrl').forEach(c => {
-    const set = (k, src, title) => { const b = c.querySelector('[data-t="' + k + '"]'); if (!b) return; b.disabled = src.disabled; b.hidden = src.hidden; if (b.title !== title) { b.title = title; b.setAttribute('aria-label', title); } };
+    const set = (k, src, title) => { const b = c.querySelector('[data-t="' + k + '"]'); if (!b) return; b.disabled = src.disabled; b.hidden = src.hidden; if (b.dataset.tip !== title) { b.dataset.tip = title; b.setAttribute('aria-label', title); } };
     set('play', $('tPlay'), $('tPlay').textContent); set('plus', $('tPlus'), 'Add a minute'); set('skip', $('tSkip'), $('tSkip').textContent);
     set('reset', $('tReset'), 'Reset: back to the very beginning');
     const bb = c.querySelector('[data-t="back"]'), bt = backTarget();
-    if (bb) { bb.disabled = !bt; const tt = bt ? 'Back to the start of ' + bt : 'Back'; if (bb.title !== tt) { bb.title = tt; bb.setAttribute('aria-label', tt); } }
+    if (bb) { bb.disabled = !bt; const tt = bt ? 'Back to the start of ' + bt : 'Back'; if (bb.dataset.tip !== tt) { bb.dataset.tip = tt; bb.setAttribute('aria-label', tt); } }
     const pb = c.querySelector('[data-t="play"]'), icon = t && t.running ? 'pause' : 'play';
     if (pb && pb.dataset.icon !== icon) { pb.dataset.icon = icon; pb.innerHTML = TICON[icon]; }
   });
@@ -3291,6 +3293,22 @@ makeTicker(() => {
   paintAll();
   if (editMode === 'prep' && timer && timer.running) refreshTimerUi();
 }, 250);
+
+/* Hover help: shows straight away, styled like the rest of the page */
+const tipEl = $('tip');
+let tipFor = null;
+document.addEventListener('mouseover', e => {
+  const el = e.target.closest && e.target.closest('[data-tip]');
+  if (el === tipFor) return;
+  tipFor = el;
+  if (!el || !el.dataset.tip) { tipEl.hidden = true; return; }
+  tipEl.textContent = el.dataset.tip; tipEl.hidden = false;
+  const r = el.getBoundingClientRect(), w = tipEl.offsetWidth, th = tipEl.offsetHeight;
+  let top = r.bottom + 8; if (top + th > innerHeight - 6) top = r.top - th - 8;
+  tipEl.style.left = Math.max(6, Math.min(r.left + r.width / 2 - w / 2, innerWidth - w - 6)) + 'px';
+  tipEl.style.top = Math.max(6, top) + 'px';
+});
+document.addEventListener('mousedown', () => { tipEl.hidden = true; tipFor = null; }, true);
 
 /* =====================================================================
    SETUP
