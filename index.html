@@ -416,8 +416,9 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
 .slide.editor-preview .pt:not(.clock-only) { cursor: pointer; }
 .slide.editor-preview .pt:not(.clock-only) .pt-time { cursor: text; border-radius: 16px; }
 .slide.editor-preview .pt:not(.clock-only) .pt-time:hover { background: rgba(255, 255, 255, 0.12); }
-.pt-edit { position: absolute; z-index: 22; border: 3px solid #fff; border-radius: 10px; background: var(--ink); color: #fff; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; padding: 0; }
-.pt-edit:focus { outline: none; }
+.pt-edit { position: absolute; z-index: 22; border: 0; outline: 3px solid #fff; outline-offset: 2px; border-radius: 8px; background: var(--ink); color: #fff; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; padding: 0; box-sizing: border-box; }
+.pt-edit:focus { outline: 3px solid #fff; }
+.pt-edit::selection { background: rgba(255, 255, 255, 0.3); color: inherit; }
 .vlabel { font-size: 0.8rem; color: #B9C8D8; }
 .ovrtip { position: absolute; z-index: 19; display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0.6rem 0.45rem 0.75rem; border-radius: 10px; background: #fff; box-shadow: 0 10px 24px -10px rgba(28, 48, 72, 0.5); font-size: 0.82rem; white-space: nowrap; }
 .ovrtip .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--ovr); }
@@ -3148,7 +3149,13 @@ function editTimeOnSlide(timeEl) {
   const r = rectIn(timeEl), pe = $('ptEdit');
   const scale = timeEl.getBoundingClientRect().width / timeEl.offsetWidth || 1;
   const fs = parseFloat(getComputedStyle(timeEl).fontSize) * scale;
-  Object.assign(pe.style, { left: r.l + 'px', top: r.t + 'px', width: (r.r - r.l) + 'px', height: (r.b - r.t) + 'px', fontSize: Math.round(fs * 0.8) + 'px' });
+  // Look exactly like the timer: same font, size, spacing and background
+  const cs = getComputedStyle(timeEl);
+  let bgEl = timeEl, bg = 'transparent';
+  while (bgEl && bgEl !== els.preview) { const c = getComputedStyle(bgEl).backgroundColor; if (c && !/rgba\(.*,\s*0\)$|transparent/.test(c)) { bg = c; break; } bgEl = bgEl.parentElement; }
+  if (/rgba/.test(bg)) bg = getComputedStyle(timeEl.closest('.slide')).getPropertyValue('--main') || bg;   // see-through box: use the day's colour
+  Object.assign(pe.style, { left: r.l + 'px', top: r.t + 'px', width: (r.r - r.l) + 'px', height: (r.b - r.t) + 'px', fontSize: fs + 'px',
+    fontFamily: cs.fontFamily, fontWeight: cs.fontWeight, letterSpacing: (parseFloat(cs.letterSpacing) || 0) * scale + 'px', lineHeight: (r.b - r.t) + 'px', background: bg, color: cs.color });
   pe.value = timeEl.textContent.trim();
   pe.hidden = false; pe.focus();
 }
