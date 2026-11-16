@@ -241,6 +241,7 @@
   --side: #7F6BC0; --side-bg: #F6F3FC; --side-line: #DCD3F2;
   --ovr: #E08A1E;
 }
+#mainScreen { background: var(--page, #F3F7FB); }
 body.modern { --disp: "Bricolage Grotesque", "Segoe UI", sans-serif; }
 * { box-sizing: border-box; }
 html, body { margin: 0; }
@@ -256,7 +257,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .btn { padding: 0.5rem 0.95rem; border-radius: 8px; border: 1px solid var(--steel); background: #fff; color: var(--steel); font-weight: 700; cursor: pointer; }
 .btn:hover:not(:disabled) { background: var(--mist); }
 .btn.primary { background: var(--steel); color: #fff; }
-.btn.primary:hover:not(:disabled) { background: #345677; }
+.btn.primary:hover:not(:disabled) { background: var(--steel-dark, #345677); }
 .btn.small { padding: 0.35rem 0.7rem; font-size: 0.88rem; font-weight: 400; border-color: var(--line); color: var(--ink); }
 .btn.small.strong { border-color: var(--steel); color: var(--steel); font-weight: 700; }
 .btn.danger { border-color: #B54848; color: #B54848; }
@@ -264,6 +265,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #fff; }
 .seg button { border: 0; background: none; padding: 0.45rem 0.3rem; cursor: pointer; font-size: 0.84rem; line-height: 1.2; color: var(--slate); }
 .seg button + button { border-left: 1px solid var(--line); }
+.seg:has(> [data-scope]) { grid-auto-columns: auto; }
+.seg > button[data-scope] { white-space: nowrap; padding: 0.45rem 0.5rem; }
 .seg button[aria-pressed="true"] { background: var(--steel); color: #fff; font-weight: 700; }
 .switch { position: relative; width: 42px; height: 24px; flex: none; border: 0; border-radius: 999px; background: #B9C6D4; cursor: pointer; transition: background 0.15s; }
 .switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform 0.15s; }
@@ -303,7 +306,7 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
 .topbtn { flex: none; display: inline-flex; align-items: center; gap: 0.5rem; border: 1px solid var(--line); border-radius: 10px; padding: 0.45rem 0.85rem; background: #fff; font-weight: 700; cursor: pointer; color: var(--ink); }
 .topbtn:hover { background: var(--frost); }
 .present-btn { flex: none; display: inline-flex; align-items: center; gap: 0.5rem; border: 0; border-radius: 10px; padding: 0.55rem 1.15rem; background: var(--steel); color: #fff; font-weight: 700; font-size: 1rem; cursor: pointer; }
-.present-btn:hover { background: #345677; }
+.present-btn:hover { background: var(--steel-dark, #345677); }
 .end-btn { flex: none; border: 1px solid #B54848; border-radius: 10px; padding: 0.5rem 1.1rem; background: #fff; color: #B54848; font-weight: 700; font-size: 1rem; cursor: pointer; }
 
 /* Main screen */
@@ -987,7 +990,7 @@ function hd(st, date, key, dflt) {
   return pick(((st.overrides || {})[toISO(date)] || {}).headings) || pick((H.day || {})[wd]) || pick(H.all) || (dflt != null ? dflt : HEADINGS[key]);
 }
 /* Boxes with weekly announcements plus "just this <weekday>" ones. On the projector they're one list, weekly ones first. */
-const isSplit = (st, box) => (st.split || {})[box] !== false;
+const isSplit = (st, box) => (st.split || {})[box] === true;   // opt-in: boxes are one list until someone presses "Split"
 function oneOff(st, date, box) { return (((st.oneoff || {})[toISO(date)] || {})[box]) || ''; }
 function boxText(st, date, box, weekly) {
   if (!isSplit(st, box)) return box === 'tomorrow' ? oneOff(st, date, box) : (weekly || '');
@@ -1081,7 +1084,7 @@ function defaultState() {
     headings: { all: {}, day: {} },      // your own headings: { all: { key: text }, day: { FRI: { key: text } } } (just-today ones live in overrides)
     other: per(''), otherTitle: per(''), // the middle "Other info" box
     oneoff: {},                          // { date: { notes, info, lunch, other, prepInfo } }: "just this <weekday>" announcements
-    split: {},                           // { box: false } turns a box back into one list (default: weekly + just-this-week)                // show "Miss A Woodhouse" (true) or "Miss Woodhouse" (false)
+    split: {},                           // { box: true } splits a box into weekly + just-this-week (default: one list)                // show "Miss A Woodhouse" (true) or "Miss Woodhouse" (false)
     prefNames: {}                        // { form: { name on the spreadsheet: preferred name } }
   };
 }
@@ -2069,6 +2072,20 @@ function paintSaveState() {
       : 'This browser’s storage is full, so your latest changes aren’t saved. A smaller timetable image usually fixes it. Save a copy to be safe.';
   });
 }
+/* The main editing screen takes the colours of the day you're looking at (Setup stays as it is) */
+function mixHex(a, b, t) {
+  const p = x => [1, 3, 5].map(i => parseInt(x.slice(i, i + 2), 16));
+  const A = p(a), B = p(b);
+  return '#' + A.map((v, i) => Math.round(v + (B[i] - v) * t).toString(16).padStart(2, '0')).join('');
+}
+function applyAppTheme() {
+  const t = themeFor(state, wdOf(viewDate)), s = $('mainScreen').style;
+  const vars = {
+    '--steel': t.main, '--steel-dark': mixHex(t.main, '#000000', 0.22), '--ink': t.ink, '--slate': t.muted,
+    '--mist': t.tint, '--frost': t.soft, '--line': mixHex(t.tint, t.muted, 0.28), '--soft-line': mixHex(t.tint, '#ffffff', 0.35), '--page': t.bg
+  };
+  Object.keys(vars).forEach(k => s.setProperty(k, vars[k]));
+}
 function applyDesignClass() { document.body.classList.toggle('modern', state.design === 'modern'); }
 
 /* =====================================================================
@@ -2122,6 +2139,7 @@ $('formChip').addEventListener('click', () => openSetup('form'));
 $('setupBtn').addEventListener('click', () => openSetup());
 
 function refreshUi() {
+  applyAppTheme();
   refreshWeek();
   const fc = $('formChip');
   fc.textContent = state.form || 'Choose your form';
@@ -2991,7 +3009,7 @@ els.preview.addEventListener('click', e => {
   const t = e.target.closest('[data-split-toggle]');
   if (t) {
     const box = t.dataset.splitToggle; state.split = state.split || {};
-    if (isSplit(state, box)) state.split[box] = false; else delete state.split[box];
+    if (isSplit(state, box)) delete state.split[box]; else state.split[box] = true;
     endEditNow(); changed();
     toast(isSplit(state, box) ? 'Split: announcements for every week, plus ones just for this week.' : 'One list: the same every week, as before. Your one-offs are kept if you switch back.');
     return;
