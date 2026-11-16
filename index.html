@@ -120,6 +120,13 @@
 
 .slide .panel { padding: 32px; display: flex; flex-direction: column; gap: 18px; min-height: 0; }
 .slide .panel.bullets { flex: 1 1 0; min-height: 300px; }
+.slide .other { grid-column: 2; grid-row: 3; padding: 32px; display: flex; flex-direction: column; gap: 18px; min-height: 0; }
+.slide .other .heading { font-size: 40px; line-height: 1.05; }
+.slide .other .rich { font-size: 30px; }
+/* Without teachers' first initials the music column needs less room */
+.slide.short-teachers .grid { grid-template-columns: 660px 520px 580px; }
+.slide.short-teachers .pair { grid-template-columns: 660px 520px; }
+.slide.prep.short-teachers .grid { grid-template-columns: 1212px 580px; }
 .slide .panel.house { flex: none; }
 .slide .panel .heading { font-size: 40px; line-height: 1.05; }
 .slide .panel.house .heading { font-size: 36px; white-space: nowrap; }
@@ -169,7 +176,7 @@
 .slide .right .free-side { flex: 1 1 0; min-height: 300px; }
 .slide.whole .banner { grid-column: 1 / 4; }
 .slide .free-whole { grid-column: 1 / 4; grid-row: 2 / 4; }
-.slide.prep.whole .grid { grid-template-columns: minmax(0, 1fr); }
+.slide.prep.whole .grid, .slide.prep.whole.short-teachers .grid { grid-template-columns: minmax(0, 1fr); }
 .slide.prep.whole .banner, .slide.prep.whole .free-whole { grid-column: 1; }
 .slide .free-pbot { grid-column: 1; grid-row: 3; }
 .slide .free-image { background: var(--soft); }
@@ -374,6 +381,25 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
 .slide.editor-preview .free.zone-sel { outline: 8px solid #3E6489; outline-offset: 6px; }
 .slide.editor-preview .free.drop-over { outline: 8px dashed #3E6489; outline-offset: 6px; }
 .vgroup { gap: 0.4rem; flex-wrap: nowrap; }
+.bb-btn.hd-btn { white-space: nowrap; width: auto; min-width: 34px; padding: 0 0.55rem; gap: 0.45rem; display: inline-flex; align-items: center; }
+.bb-btn.hd-btn.on { background: #fff; color: var(--ink); font-weight: 700; border-color: #fff; }
+.hd-choices { display: flex; flex-direction: column; gap: 8px; margin-bottom: 0.9rem; }
+.hd-choices button { text-align: left; border: 1px solid var(--line); border-radius: 10px; background: #fff; padding: 0.6rem 0.8rem; cursor: pointer; display: flex; flex-direction: column; gap: 2px; }
+.hd-choices button:hover { border-color: var(--steel); background: var(--frost); }
+.hd-choices button span { font-size: 0.82rem; color: var(--slate); }
+.slide.editor-preview.hd-mode [data-hd] { outline: 4px dashed rgba(62, 100, 137, 0.7); outline-offset: 6px; border-radius: 6px; cursor: text; }
+.slide.editor-preview.hd-mode [data-hd]:focus { outline: 5px solid #3E6489; }
+.slide.editor-preview .pt-sub { display: none; }
+.slide .pt-ctrl { display: none; }
+.slide.editor-preview .pt-ctrl { display: flex; gap: 16px; justify-content: center; }
+.slide .pt-ctrl button { font: inherit; font-size: 28px; font-weight: 700; border: 0; border-radius: 14px; padding: 8px 26px; cursor: pointer; background: rgba(255, 255, 255, 0.92); color: var(--main); }
+.slide .pt-ctrl button.ghost { background: rgba(255, 255, 255, 0.18); color: inherit; }
+.slide .pt-ctrl button:disabled { opacity: 0.4; cursor: default; }
+.slide.editor-preview .pt:not(.clock-only) { cursor: pointer; }
+.slide.editor-preview .pt:not(.clock-only) .pt-time { cursor: text; border-radius: 16px; }
+.slide.editor-preview .pt:not(.clock-only) .pt-time:hover { background: rgba(255, 255, 255, 0.12); }
+.pt-edit { position: absolute; z-index: 22; border: 3px solid #fff; border-radius: 10px; background: var(--ink); color: #fff; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; padding: 0; }
+.pt-edit:focus { outline: none; }
 .vlabel { font-size: 0.8rem; color: #B9C8D8; }
 .ovrtip { position: absolute; z-index: 19; display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0.6rem 0.45rem 0.75rem; border-radius: 10px; background: #fff; box-shadow: 0 10px 24px -10px rgba(28, 48, 72, 0.5); font-size: 0.82rem; white-space: nowrap; }
 .ovrtip .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--ovr); }
@@ -558,6 +584,7 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
           <span class="sep"></span><span class="fnote" id="zbNote"></span>
         </div>
         <div class="recentpop" id="recentPop" hidden></div>
+        <input class="pt-edit" id="ptEdit" hidden autocomplete="off" spellcheck="false" aria-label="Type a time for the timer">
         <input type="file" id="freeFile" accept="image/*" hidden>
         <div class="ovrtip" id="ovrtip" role="note" hidden><span class="dot"></span><span id="ovrText"></span><button type="button" class="btn small strong" id="ovrUndo">Undo</button></div>
       </div>
@@ -596,6 +623,7 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
           <select class="text" id="ttViewSel" aria-label="What the main area shows">
             <option value="full">Full timetable</option>
             <option value="first">First lesson only</option>
+            <option value="text">Other info box</option>
             <option value="off">Nothing (notes use the space)</option>
             <optgroup label="Freestyle"><option value="free-image">Image or GIF</option><option value="free-video">YouTube video</option><option value="free-message">Message</option></optgroup>
           </select>
@@ -642,8 +670,7 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
         <div class="seg" id="tShowSeg"><button type="button" data-v="timer">Timer</button><button type="button" data-v="clock">Clock</button><button type="button" data-v="both">Both</button></div>
       </div>
       <div class="box" id="tomBox">
-        <p class="subtle"><b style="color:var(--ink)">Tomorrow Morning</b> starts blank each evening. Copy tomorrow’s “What’s happening today?” and trim it.</p>
-        <button type="button" class="btn" id="tomCopy">Copy from tomorrow’s slide</button>
+        <button type="button" class="btn" id="tomCopy" title="Tomorrow Morning starts blank each evening. This copies tomorrow’s “What’s happening today?” so you can trim it.">Copy tomorrow’s notes into Tomorrow Morning</button>
       </div>
       <div class="box" id="mpNote" hidden>
         <p class="subtle"><b style="color:var(--ink)">Morning prep today.</b> The prep slide shows today’s “What’s happening today?” and music lessons. Change your morning prep days in Setup.</p>
@@ -652,6 +679,9 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
   </main>
 
   <footer class="bottombar">
+    <button type="button" class="bb-btn bb-icon hd-btn" id="hdEdit" title="Change the headings" aria-label="Change the headings"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg><span class="hd-on" hidden></span></button>
+    <button type="button" class="bb-btn bb-icon" id="hdReset" title="Put headings back to default" aria-label="Put headings back to default" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 4v5h5"></path></svg></button>
+    <span class="vsep"></span>
     <div class="row" id="timerGroup" hidden style="gap:0.6rem;flex-wrap:nowrap">
       <input class="timebox" id="timeBox" readonly aria-label="Timer: click to type a time" title="Click to type a time" autocomplete="off" spellcheck="false">
       <div class="tlabel"><span id="tLabel"></span><div class="tbars" id="tBars"></div></div>
@@ -667,7 +697,6 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
       <button type="button" class="bb-btn" id="vRestart">Start again</button>
       <button type="button" class="bb-btn" id="vSound">Sound off</button>
     </div>
-    <span class="bbhint" id="bbHint"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg><span id="previewHint"></span></span>
     <span class="grow"></span>
     <span class="projstatus off" id="projStatus"><span class="led"></span><span id="projText">Not on the projector</span></span>
     <button type="button" class="bb-btn" id="projSwap" hidden>Show this instead</button>
@@ -866,6 +895,23 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
 </div>
 </div>
 
+<div class="modal-back" id="hdModal" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="hdTitle">
+  <h3 id="hdTitle">Change the headings</h3>
+  <p>Click any heading on the slide and type. The dates stay as they are.</p>
+  <div class="hd-choices">
+    <button type="button" data-scope="all"><b>Every day</b><span>Stays until you put it back</span></button>
+    <button type="button" data-scope="day"><b id="hdDayLbl">Every Friday</b><span>Only on this day of the week</span></button>
+    <button type="button" data-scope="today"><b id="hdTodayLbl">Just today</b><span>Back to normal tomorrow</span></button>
+  </div>
+  <p class="hint">You can always go back to the default headings with the ↺ button next to the pencil, or by deleting a heading’s text.</p>
+  <div class="row" style="justify-content:flex-end"><button type="button" class="btn" data-close>Cancel</button></div>
+</div></div>
+<div class="modal-back" id="hdResetModal" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="hdResetTitle">
+  <h3 id="hdResetTitle">Put headings back to default</h3>
+  <p>Which changes should go?</p>
+  <div class="hd-choices" id="hdResetChoices"></div>
+  <div class="row" style="justify-content:flex-end"><button type="button" class="btn" data-close>Cancel</button></div>
+</div></div>
 <div class="stage" id="stage" hidden></div>
 <div class="toast" id="toast" role="status"></div>
 <div class="modal-back" id="askBox" hidden>
@@ -890,6 +936,18 @@ const STORE_KEY = 'morningSlide.v2.state';
 const V1_KEY = 'morningSlide.state.v1';      // the original Morning Slide: copied once the first time v2 opens, never changed
 let copiedFromV1 = false;
 const PANEL_DEFAULT = { MON: 'none', TUE: 'none', WED: 'lunch', THU: 'house', FRI: 'none', SAT: 'lunch' };
+/* Headings you can rename (pencil in the bottom bar). Just today beats every <weekday>, which beats every day. */
+const HEADINGS = {
+  task: 'Today’s morning task', at830: 'then at 8:30…', first: 'First lesson', notes: 'What’s happening today?', tt: 'Timetable',
+  music: 'Music Lessons', lunch: 'Lunchtime Arrangements', house: 'House Meeting Locations',
+  prepInfo: 'Prep Info', tomorrow: 'Tomorrow Morning', tmusic: 'Tomorrow’s Music Lessons', timeNow: 'Time now'
+};
+function hd(st, date, key, dflt) {
+  const wd = dayCode(date) === 'SUN' ? 'MON' : dayCode(date), H = st.headings || {};
+  const pick = o => (o && typeof o[key] === 'string' && o[key].trim()) ? o[key].trim() : null;
+  return pick(((st.overrides || {})[toISO(date)] || {}).headings) || pick((H.day || {})[wd]) || pick(H.all) || (dflt != null ? dflt : HEADINGS[key]);
+}
+const hdEl = (st, date, key, dflt, cls) => '<div class="' + (cls || 'heading') + '" data-hd="' + key + '">' + esc(hd(st, date, key, dflt)) + '</div>';
 const PANEL_TITLES = { info: 'Additional Information', lunch: 'Lunchtime Arrangements', house: 'House Meeting Locations' };
 const HOUSES = [
   { name: 'Athlone', bg: '#3f8f5a', fg: '#ffffff', tint: '#d9ecdf' },
@@ -955,7 +1013,9 @@ function defaultState() {
     freeWhole: per(false),               // whole-slide freestyle every <weekday>
     prepFree: per('off'),                // prep slide freestyle every <weekday>: 'off' | 'bottom' | 'whole'
     recentImages: [],                    // the 10 most recent pictures: [{ id, name, gif }] (the files live in IndexedDB)
-    teacherInitial: true,                // show "Miss A Woodhouse" (true) or "Miss Woodhouse" (false)
+    teacherInitial: true,
+    headings: { all: {}, day: {} },      // your own headings: { all: { key: text }, day: { FRI: { key: text } } } (just-today ones live in overrides)
+    other: per(''), otherTitle: per(''), // the middle "Other info" box                // show "Miss A Woodhouse" (true) or "Miss Woodhouse" (false)
     prefNames: {}                        // { form: { name on the spreadsheet: preferred name } }
   };
 }
@@ -1133,7 +1193,7 @@ function resolveDay(st, date) {
   else if (sched && !sched.congers) { houses = housesOf(sched); houseSource = 'schedule'; }
 
   return {
-    wd, iso, panel, defaultPanel, sched,
+    wd, iso, date, panel, defaultPanel, sched,
     task: ovr.task != null ? ovr.task : (st.task[wd] || ''),
     showTask: st.showTask !== false,
     at830, houses, houseSource,
@@ -1143,6 +1203,8 @@ function resolveDay(st, date) {
     panelTitle: panel === 'info' ? ((ovr.infoTitle != null ? ovr.infoTitle : ((st.infoTitle || {})[wd] || '')).trim() || PANEL_TITLES.info) : (PANEL_TITLES[panel] || ''),
     ttView: ovr.ttView || ttViewOf(st, wd),
     showTT: (ovr.ttView || ttViewOf(st, wd)) === 'full',
+    otherTitle: ovr.otherTitle != null ? ovr.otherTitle : ((st.otherTitle || {})[wd] || ''),
+    otherText: ovr.otherText != null ? ovr.otherText : ((st.other || {})[wd] || ''),
     whole: ovr.whole != null ? !!ovr.whole : !!(st.freeWhole || {})[wd],
     free: {
       main: freeItem(st, ovr, wd, 'main', ovr.ttView != null),
@@ -1308,9 +1370,9 @@ function musicHTML(rows, emptyText) {
   return html;
 }
 
-function firstLessonHTML(r) {
-  const label = ['First lesson'].concat(r && (r.time || '').trim() ? [r.time.trim()] : [], r && (r.room || '').trim() ? [r.room.trim()] : []).join(' \u00b7 ');
-  return '<div class="info"><div class="info-label">' + esc(label) + '</div><div class="info-value" data-fit="44,26">' + esc(r ? r.subject : 'No timetable yet') + '</div></div>';
+function firstLessonHTML(r, title) {
+  const rest = [].concat(r && (r.time || '').trim() ? [r.time.trim()] : [], r && (r.room || '').trim() ? [r.room.trim()] : []).join(' \u00b7 ');
+  return '<div class="info"><div class="info-label"><span data-hd="first">' + esc(title || 'First lesson') + '</span>' + (rest ? ' \u00b7 ' + esc(rest) : '') + '</div><div class="info-value" data-fit="44,26">' + esc(r ? r.subject : 'No timetable yet') + '</div></div>';
 }
 
 const MSG_COLOURS = {
@@ -1353,11 +1415,11 @@ function panelHTML(st, day, editor) {
   if (day.panel === 'none') return '';
   if (day.panel === 'free') return freeHTML('side', day.free.side, editor, 'free-side region-side');
   if (day.panel === 'house') {
-    return '<div class="card panel house region-side"><div class="heading">House Meeting Locations</div><div class="houses">' +
+    return '<div class="card panel house region-side">' + hdEl(st, day.date, 'house') + '<div class="houses">' +
       HOUSES.map(h => '<div class="house-tile" style="background:' + h.tint + '"><div class="house-name" style="background:' + h.bg + ';color:' + h.fg + '">' + h.name + '</div>' +
         '<div class="house-loc" data-field="house:' + h.name + '">' + esc(day.houses[h.name] || '') + '</div></div>').join('') + '</div></div>';
   }
-  return '<div class="card panel bullets region-side"><div class="heading"' + (day.panel === 'info' ? ' data-field="panelTitle"' : '') + '>' + esc(day.panelTitle) + '</div>' +
+  return '<div class="card panel bullets region-side">' + (day.panel === 'info' ? '<div class="heading" data-field="panelTitle">' + esc(day.panelTitle) + '</div>' : hdEl(st, day.date, 'lunch')) +
     '<div class="rich" data-fit="30,18" data-field="panelText">' + richHTML(day.panelText) + '</div></div>';
 }
 
@@ -1380,26 +1442,27 @@ function renderSlide(host, st, date, editor) {
     fitSlide(host.querySelector('.slide'), 'none');
     return host.querySelector('.slide');
   }
-  const freeMain = day.ttView === 'free';
+  const freeMain = day.ttView === 'free', wide = day.showTT || freeMain || day.ttView === 'text';
   setSlideHTML(host,
-    '<div class="slide' + (day.showTT || freeMain ? '' : ' no-tt') + (day.ttView === 'first' ? ' first' : '') + (st.design === 'modern' ? ' modern' : '') + (day.panel === 'none' ? ' no-panel' : '') + '" style="' + themeVars(t) + '">' +
+    '<div class="slide' + (wide ? '' : ' no-tt') + (st.teacherInitial === false ? ' short-teachers' : '') + (day.ttView === 'first' ? ' first' : '') + (st.design === 'modern' ? ' modern' : '') + (day.panel === 'none' ? ' no-panel' : '') + '" style="' + themeVars(t) + '">' +
       '<div class="circle" style="width:900px;height:900px;left:-300px;bottom:-480px"></div>' +
       '<div class="circle" style="width:700px;height:700px;right:-260px;top:-360px"></div>' +
       '<div class="grid">' +
         '<div class="banner">' + dateHTML(date) + '</div>' +
         '<div class="right">' +
-          '<div class="card music' + (day.panel === 'info' || day.panel === 'lunch' || day.panel === 'free' ? ' natural' : '') + '"><div class="heading">Music Lessons</div><div class="music-body">' + musicHTML(rows) + '</div></div>' +
+          '<div class="card music' + (day.panel === 'info' || day.panel === 'lunch' || day.panel === 'free' ? ' natural' : '') + '">' + hdEl(st, date, 'music') + '<div class="music-body">' + musicHTML(rows) + '</div></div>' +
           panelHTML(st, day, editor) +
         '</div>' +
         '<div class="pair region-top' + (day.showTask || day.ttView === 'first' ? '' : ' single') + '" style="--boxes:' + ((day.showTask ? 1 : 0) + 1 + (day.ttView === 'first' ? 1 : 0)) + '">' +
-          (day.showTask ? '<div class="info"><div class="info-label">Today\u2019s morning task</div><div class="info-value" data-fit="44,30" data-field="task">' + esc(day.task) + '</div></div>' : '') +
-          '<div class="info"><div class="info-label">' + (day.showTask ? 'then at 8:30\u2026' : 'At 8:30\u2026') + '</div><div class="info-value" data-fit="44,30" data-field="at830">' + esc(day.at830) + '</div></div>' +
-          (day.ttView === 'first' ? firstLessonHTML(day.firstLesson) : '') +
+          (day.showTask ? '<div class="info">' + hdEl(st, date, 'task', null, 'info-label') + '<div class="info-value" data-fit="44,30" data-field="task">' + esc(day.task) + '</div></div>' : '') +
+          '<div class="info">' + hdEl(st, date, 'at830', day.showTask ? 'then at 8:30\u2026' : 'At 8:30\u2026', 'info-label') + '<div class="info-value" data-fit="44,30" data-field="at830">' + esc(day.at830) + '</div></div>' +
+          (day.ttView === 'first' ? firstLessonHTML(day.firstLesson, hd(st, date, 'first')) : '') +
         '</div>' +
-        '<div class="left' + (day.showTT || freeMain ? '' : ' region-main') + '">' +
-          '<div class="card notes"><div class="heading">What\u2019s happening today?</div><div class="rich" data-fit="32,20" data-field="notes">' + richHTML(day.notes) + '</div></div>' +
+        '<div class="left' + (wide ? '' : ' region-main') + '">' +
+          '<div class="card notes">' + hdEl(st, date, 'notes') + '<div class="rich" data-fit="32,20" data-field="notes">' + richHTML(day.notes) + '</div></div>' +
         '</div>' +
-        (day.showTT ? '<div class="card tt region-main"><div class="heading">Timetable</div>' + timetableHTML(st, day.wd) + '</div>' : '') +
+        (day.showTT ? '<div class="card tt region-main">' + hdEl(st, date, 'tt') + timetableHTML(st, day.wd) + '</div>' : '') +
+        (day.ttView === 'text' ? '<div class="card other region-main"><div class="heading" data-field="otherTitle">' + esc(day.otherTitle.trim() || 'Other info') + '</div><div class="rich" data-fit="30,18" data-field="otherText">' + richHTML(day.otherText) + '</div></div>' : '') +
         (freeMain ? freeHTML('main', day.free.main, editor, 'free-main region-main') : '') +
       '</div>' +
     '</div>');
@@ -1540,11 +1603,11 @@ function renderPrep(host, st, date, editor) {
   const shortD = String(n).padStart(2, '0') + '/' + String(date.getMonth() + 1).padStart(2, '0') + '/' + date.getFullYear();
   let second, secondTitle, musicTitle, musicDay, musicEmpty;
   if (morning) {
-    second = resolveDay(st, date).notes; secondTitle = 'What’s happening today?';
-    musicDay = wd; musicTitle = 'Music Lessons'; musicEmpty = 'No music lessons today';
+    second = resolveDay(st, date).notes; secondTitle = 'notes';
+    musicDay = wd; musicTitle = 'music'; musicEmpty = 'No music lessons today';
   } else {
-    second = (st.prepTomorrow || {})[toISO(date)] || ''; secondTitle = 'Tomorrow Morning';
-    musicDay = dayCode(nextSchoolDay(date)); musicTitle = 'Tomorrow’s Music Lessons'; musicEmpty = 'No music lessons tomorrow';
+    second = (st.prepTomorrow || {})[toISO(date)] || ''; secondTitle = 'tomorrow';
+    musicDay = dayCode(nextSchoolDay(date)); musicTitle = 'tmusic'; musicEmpty = 'No music lessons tomorrow';
   }
   const info = (st.prepInfo || {})[wd] || '';
   const pf = prepFreeOf(st, date);
@@ -1570,7 +1633,7 @@ function renderPrep(host, st, date, editor) {
     return s;
   }
   setSlideHTML(host,
-    '<div class="slide prep' + (morning ? '' : ' evening') + (st.design === 'modern' ? ' modern' : '') + '" data-wd="' + wd + '" style="' + themeVars(t) + '">' +
+    '<div class="slide prep' + (morning ? '' : ' evening') + (st.design === 'modern' ? ' modern' : '') + (st.teacherInitial === false ? ' short-teachers' : '') + '" data-wd="' + wd + '" style="' + themeVars(t) + '">' +
       '<div class="circle" style="width:900px;height:900px;left:-300px;bottom:-480px"></div>' +
       '<div class="circle" style="width:700px;height:700px;right:-260px;top:-360px"></div>' +
       '<div class="grid">' +
@@ -1587,13 +1650,14 @@ function renderPrep(host, st, date, editor) {
         '</div>' +
         (pf.mode === 'bottom' ? freeHTML('prep', pf.item, editor, 'free-pbot') :
         '<div class="prep-low">' +
-          '<div class="card prep-box"><div class="heading">Prep Info</div><div class="rich" data-fit="30,18" data-field="prepInfo" data-always="No extra instructions">' + richHTML(info) + '</div></div>' +
-          '<div class="card prep-box"><div class="heading">' + secondTitle + '</div><div class="rich" data-fit="30,18"' + (morning ? '' : ' data-field="tomorrow"') + '>' + richHTML(second) + '</div></div>' +
+          '<div class="card prep-box">' + hdEl(st, date, 'prepInfo') + '<div class="rich" data-fit="30,18" data-field="prepInfo" data-always="No extra instructions">' + richHTML(info) + '</div></div>' +
+          '<div class="card prep-box">' + hdEl(st, date, secondTitle) + '<div class="rich" data-fit="30,18"' + (morning ? '' : ' data-field="tomorrow"') + '>' + richHTML(second) + '</div></div>' +
         '</div>') +
         '<div class="right">' +
-          (clockOnly ? '<div class="pt clock-only"><div class="pt-label">Time now</div><div class="pt-time pt-bigclock"></div></div>'
-                     : '<div class="pt"><div class="pt-label"></div><div class="pt-time"></div><div class="pt-bars"></div><div class="pt-sub"></div></div>') +
-          '<div class="card music"><div class="heading">' + musicTitle + '</div><div class="music-body">' + musicHTML(musicRows(st, musicDay), musicEmpty) + '</div></div>' +
+          (clockOnly ? '<div class="pt clock-only">' + hdEl(st, date, 'timeNow', null, 'pt-label') + '<div class="pt-time pt-bigclock"></div></div>'
+                     : '<div class="pt"><div class="pt-label"></div><div class="pt-time" title="Click to type a time"></div><div class="pt-bars"></div><div class="pt-sub"></div>' +
+                       (editor ? '<div class="pt-ctrl"><button type="button" data-t="play">Start</button><button type="button" class="ghost" data-t="reset">Reset</button></div>' : '') + '</div>') +
+          '<div class="card music">' + hdEl(st, date, musicTitle) + '<div class="music-body">' + musicHTML(musicRows(st, musicDay), musicEmpty) + '</div></div>' +
         '</div>' +
       '</div>' +
     '</div>');
@@ -1893,7 +1957,7 @@ function setOvr(key, val) {
   if (val == null) delete o[key]; else o[key] = val;
   if (Object.keys(o).length) state.overrides[iso] = o; else delete state.overrides[iso];
 }
-const OVR_NAMES = { whole: 'whole slide', free: 'freestyle', pfree: 'prep freestyle', task: 'morning task', at830: '8:30 box', notes: 'What’s happening', panel: 'side panel', panelText: 'side panel text', infoTitle: 'panel heading', house: 'house rooms', ttView: 'main area' };
+const OVR_NAMES = { headings: 'headings', otherTitle: 'other info heading', otherText: 'other info', whole: 'whole slide', free: 'freestyle', pfree: 'prep freestyle', task: 'morning task', at830: '8:30 box', notes: 'What’s happening', panel: 'side panel', panelText: 'side panel text', infoTitle: 'panel heading', house: 'house rooms', ttView: 'main area' };
 function plainFirst(s) {
   const line = String(s || '').replace(/^\s*[-*•]\s+/gm, '').replace(/\*\*|__|\*/g, '').split('\n').map(x => x.trim()).find(Boolean) || '';
   return line.length > 38 ? line.slice(0, 36).trim() + '…' : line;
@@ -1923,7 +1987,6 @@ function setMode(m) {
   $('sideMorning').hidden = m !== 'morning';
   $('sidePrep').hidden = m !== 'prep';
   $('timerGroup').hidden = m !== 'prep';
-  $('bbHint').hidden = m === 'prep';
   if (m === 'prep' && viewDate.getDay() === 6) viewDate = addDays(viewDate, -1);
   endEditNow(); hideZone();
   refreshUi(); renderAll();
@@ -1931,6 +1994,7 @@ function setMode(m) {
 $('modeSwitch').addEventListener('click', e => { const b = e.target.closest('button'); if (b && b.dataset.m !== editMode) setMode(b.dataset.m); });
 
 function setDate(d) {
+  if (typeof refreshHdUi === 'function') setTimeout(refreshHdUi, 0);
   viewDate = schoolDay(d);
   if (editMode === 'prep' && viewDate.getDay() === 6) viewDate = addDays(viewDate, -1);
   scopePending = {};
@@ -1969,10 +2033,7 @@ function refreshUi() {
   fc.textContent = state.form || 'Choose your form';
   fc.classList.toggle('empty', !state.form);
   if (editMode === 'morning') refreshMorningSide(); else refreshPrepSide();
-  $('previewHint').textContent = editMode === 'morning'
-    ? 'Click the morning task, 8:30, What’s happening or the side panel to type on them'
-    : isMorningPrep(state, wdOf(viewDate)) ? 'Click the preps, minutes or Prep Info to type on them'
-    : 'Click the preps, minutes, Prep Info or Tomorrow Morning to type on them';
+  refreshHdUi();
   refreshTimerUi();
   paintSaveState();
 }
@@ -2044,8 +2105,8 @@ function paintMap(day) {
   // A small map of the slide in each area's heading, with that area lit
   const cell = (col, row, region) => '<i' + (region ? ' data-r="' + region + '"' : '') + ' style="grid-column:' + col + ';grid-row:' + row + '"></i>';
   let cells = cell('1 / 3', '1') + cell('1 / 3', '2', 'top');
-  cells += day.showTT ? cell('1', '3') + cell('2', '3', 'main') : cell('1 / 3', '3', 'main');
-  cells += day.panel === 'none' ? cell('3', '1 / 4') : cell('3', '1 / 3') + cell('3', '3', 'side');
+  cells += day.showTT || day.ttView === 'free' || day.ttView === 'text' ? cell('1', '3') + cell('2', '3', 'main') : cell('1 / 3', '3', 'main');
+  cells += day.panel === 'none' ? cell('3', '1 / 4', 'side') : cell('3', '1 / 3') + cell('3', '3', 'side');
   document.querySelectorAll('.mm[data-mm]').forEach(mm => {
     mm.innerHTML = cells;
     mm.querySelectorAll('i[data-r="' + mm.dataset.mm + '"]').forEach(i => i.classList.add('on'));
@@ -2115,6 +2176,68 @@ function scopeClick(segId, key, ovrKey, slot) {
 }
 scopeClick('mainScope', 'main', 'ttView', 'main');
 scopeClick('sideScope', 'side', 'panel', 'side');
+
+/* ---------- Headings (pencil in the bottom bar) ---------- */
+let hdMode = null;                      // null, or where changes go: 'all' | 'day' | 'today'
+function hdScopeName() { return hdMode === 'all' ? 'Every day' : hdMode === 'day' ? 'Every ' + DAY_NAMES[wdOf(viewDate)] : 'Just for ' + shortDate(viewDate); }
+function hdStore(scope, create) {
+  const H = state.headings || (state.headings = { all: {}, day: {} });
+  H.all = H.all || {}; H.day = H.day || {};
+  if (scope === 'all') return H.all;
+  if (scope === 'day') { const wd = wdOf(viewDate); return H.day[wd] || (create ? (H.day[wd] = {}) : {}); }
+  const o = ovr(); if (o.headings) return o.headings;
+  if (!create) return {};
+  const iso = toISO(viewDate), oo = state.overrides[iso] || (state.overrides[iso] = {});
+  return (oo.headings = {});
+}
+function setHeading(key, v) {
+  const s = hdStore(hdMode || 'today', true);
+  if (v.trim()) s[key] = v.trim(); else delete s[key];
+  if (hdMode === 'today' && !Object.keys(s).length) setOvr('headings', null);
+}
+function hdCounts() { return { today: Object.keys(hdStore('today')).length, day: Object.keys(hdStore('day')).length, all: Object.keys(hdStore('all')).length }; }
+function refreshHdUi() {
+  const c = hdCounts(), btn = $('hdEdit'), on = btn.querySelector('.hd-on');
+  btn.classList.toggle('on', !!hdMode);
+  on.hidden = !hdMode;
+  on.textContent = hdMode ? 'Headings: ' + (hdMode === 'all' ? 'every day' : hdMode === 'day' ? 'every ' + DAY_NAMES[wdOf(viewDate)] : 'just today') + ' · Done' : '';
+  btn.title = hdMode ? 'Finish changing headings' : 'Change the headings';
+  $('hdReset').disabled = !(c.today || c.day || c.all);
+}
+function openModal(id) { $(id).hidden = false; const b = $(id).querySelector('button'); if (b) b.focus(); }
+document.querySelectorAll('#hdModal, #hdResetModal').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m || e.target.closest('[data-close]')) m.hidden = true; });
+  m.addEventListener('keydown', e => { if (e.key === 'Escape') m.hidden = true; });
+});
+$('hdEdit').addEventListener('click', () => {
+  if (hdMode) { hdMode = null; endEditNow(); refreshHdUi(); renderAll({ forcePreview: true }); return; }
+  $('hdDayLbl').textContent = 'Every ' + DAY_NAMES[wdOf(viewDate)];
+  $('hdTodayLbl').textContent = 'Just today (' + shortDate(viewDate) + ')';
+  openModal('hdModal');
+});
+$('hdModal').querySelector('.hd-choices').addEventListener('click', e => {
+  const b = e.target.closest('button[data-scope]'); if (!b) return;
+  hdMode = b.dataset.scope; $('hdModal').hidden = true;
+  hideZone(); refreshHdUi(); renderAll({ forcePreview: true });
+  toast('Click a heading on the slide to change it. Press Done when you’ve finished.');
+});
+$('hdReset').addEventListener('click', () => {
+  const c = hdCounts(), wdn = DAY_NAMES[wdOf(viewDate)];
+  const opts = [['today', 'Just today’s changes', c.today], ['day', 'Every ' + wdn + '’s changes', c.day], ['all', 'Every day’s changes', c.all]].filter(o => o[2]);
+  const n = c.today + c.day + c.all;
+  $('hdResetChoices').innerHTML = opts.map(o => '<button type="button" data-scope="' + o[0] + '"><b>' + o[1] + '</b><span>' + o[2] + (o[2] === 1 ? ' heading' : ' headings') + '</span></button>').join('') +
+    (opts.length > 1 ? '<button type="button" data-scope="every"><b>All of them</b><span>' + n + ' headings on this slide go back to the default</span></button>' : '');
+  openModal('hdResetModal');
+});
+$('hdResetChoices').addEventListener('click', e => {
+  const b = e.target.closest('button[data-scope]'); if (!b) return;
+  const s = b.dataset.scope, H = state.headings || (state.headings = { all: {}, day: {} });
+  if (s === 'today' || s === 'every') setOvr('headings', null);
+  if (s === 'day' || s === 'every') { if (H.day) delete H.day[wdOf(viewDate)]; }
+  if (s === 'all' || s === 'every') H.all = {};
+  $('hdResetModal').hidden = true;
+  endEditNow(); changed(); refreshUi(); toast('Headings put back to default.');
+});
 
 /* ---------- Freestyle ---------- */
 function slotToday(slot) {
@@ -2465,10 +2588,10 @@ $('tomCopy').addEventListener('click', () => {
 /* =====================================================================
    Typing on the preview
    ===================================================================== */
-const RICH = new Set(['notes', 'panelText', 'prepInfo', 'tomorrow']);
+const RICH = new Set(['notes', 'panelText', 'prepInfo', 'tomorrow', 'otherText']);
 const isRich = f => RICH.has(f) || /^free:\w+:text$/.test(f);
-const SCOPED = { task: 'task', at830: 'at830', notes: 'notes', panelTitle: 'infoTitle', panelText: 'panelText' };   // field → override key
-const PH = { task: 'Click to add', at830: 'Click to add', notes: 'Click to add', panelText: 'Click to add', panelTitle: PANEL_TITLES.info, tomorrow: 'Click to add, or copy from tomorrow’s slide' };
+const SCOPED = { task: 'task', at830: 'at830', notes: 'notes', panelTitle: 'infoTitle', panelText: 'panelText', otherTitle: 'otherTitle', otherText: 'otherText' };   // field → override key
+const PH = { otherTitle: 'Other info', otherText: 'Click to add', task: 'Click to add', at830: 'Click to add', notes: 'Click to add', panelText: 'Click to add', panelTitle: PANEL_TITLES.info, tomorrow: 'Click to add, or copy from tomorrow’s slide' };
 let editing = null;            // { el, field, scope: 'week' | 'today', forceToday }
 let fitTimer = null;
 
@@ -2485,6 +2608,14 @@ function decoratePreview(slide) {
     el.dataset.ph = el.dataset.always || PH[f] || (f.startsWith('free:') ? (f.endsWith(':title') ? 'Click to add a heading' : 'Click to add a message') : '') || (f.startsWith('house:') ? 'Click to add' : f.endsWith(':subject') ? 'Click to add a prep' : f.endsWith(':mins') ? '?' : '');
   });
   if (editMode === 'morning') addDots(slide, resolveDay(state, viewDate));
+  slide.classList.toggle('hd-mode', !!hdMode);
+  if (hdMode) slide.querySelectorAll('[data-hd]').forEach(el => {
+    el.dataset.field = 'hd:' + el.dataset.hd;
+    el.setAttribute('contenteditable', 'plaintext-only');
+    if (el.contentEditable !== 'plaintext-only') el.setAttribute('contenteditable', 'true');
+    el.setAttribute('role', 'textbox');
+    el.dataset.ph = HEADINGS[el.dataset.hd] || '';
+  });
 }
 function fieldHasOvr(field, day) {
   if (field.startsWith('house:')) return !!day.ovr.house;
@@ -2587,12 +2718,16 @@ function setField(f, v) {
     else if (f === 'at830') state.at830[wd] = v;
     else if (f === 'notes') state.notes[wd] = v;
     else if (f === 'panelTitle') { state.infoTitle = state.infoTitle || {}; state.infoTitle[wd] = v; }
+    else if (f === 'otherTitle') { state.otherTitle = state.otherTitle || {}; state.otherTitle[wd] = v; }
+    else if (f === 'otherText') { state.other = state.other || {}; state.other[wd] = v; }
     else if (f === 'panelText') { const p = resolveDay(state, viewDate).panel; state[p === 'lunch' ? 'lunch' : 'info'][wd] = v; }
   } else if (f.startsWith('house:')) {
     const h = Object.assign({}, resolveDay(state, viewDate).houses); h[f.slice(6)] = v; setOvr('house', h);
   } else if (f.startsWith('prep:')) {
     const [, i, k] = f.split(':'), list = state.preps[wd] || [];
     if (list[+i]) list[+i][k] = v;
+  } else if (f.startsWith('hd:')) {
+    setHeading(f.slice(3), v);
   } else if (f.startsWith('free:')) {
     const [, slot, key] = f.split(':'); setFreeProp(slot, { [key]: v });
   } else if (f === 'prepInfo') state.prepInfo[wd] = v;
@@ -2770,6 +2905,7 @@ function showBars() {
   else if (f.startsWith('prep:') || f === 'prepInfo') note = 'Same every ' + wd;
   else if (f === 'tomorrow') note = 'Just this evening';
   else if (f.startsWith('free:')) note = slotNote(f.split(':')[1]);
+  else if (f.startsWith('hd:')) note = hdScopeName() + ' · delete the text to go back to the default';
   $('fmtColours').hidden = !f.startsWith('free:');
   if (f.startsWith('free:')) paintSwatches($('fmtColours'), currentFree(f.split(':')[1]).colour);
   bar.querySelector('.fmt-rich').hidden = !rich;
@@ -2869,6 +3005,9 @@ function refreshTimerUi() {
   const nextSeg = segs[Math.min(idx + 1, segs.length - 1)];
   $('tSkip').textContent = kind === 'preps' && nextSeg ? 'Skip to ' + nextSeg.label : 'Skip to next';
   $('tReset').disabled = !t;
+  const pb = els.preview.querySelector('.pt-ctrl [data-t="play"]'), rb = els.preview.querySelector('.pt-ctrl [data-t="reset"]');
+  if (pb && pb.textContent !== $('tPlay').textContent) pb.textContent = $('tPlay').textContent;
+  if (rb) rb.disabled = !t;
   $('tHint').hidden = !(paused && !t.waiting) || boxEditing;
 }
 function startTimer(plan) {
@@ -2913,7 +3052,7 @@ function parseDuration(str) {
   if ((m = str.match(/^\d+(\.\d+)?$/))) return Number(str);
   return null;
 }
-const box = $('timeBox');
+let box = $('timeBox');
 function beginBox() {
   if (boxEditing) return;
   boxEditing = true;
@@ -2956,14 +3095,34 @@ function cancelBox() {
   pausedByClick = false;
   refreshTimerUi(); box.blur();
 }
-box.addEventListener('focus', beginBox);
-box.addEventListener('mousedown', () => { if (document.activeElement === box && !boxEditing) beginBox(); });
-box.addEventListener('input', () => { const c = box.value.replace(/[^\d:.]/g, '').slice(0, 6); if (c !== box.value) box.value = c; });
-box.addEventListener('keydown', e => {
-  if (e.key === 'Enter') { e.preventDefault(); finishBox(true); box.blur(); }
-  else if (e.key === 'Escape') { e.preventDefault(); cancelBox(); }
+[$('timeBox'), $('ptEdit')].forEach(inp => {
+  inp.addEventListener('focus', () => { box = inp; beginBox(); });
+  inp.addEventListener('mousedown', () => { if (document.activeElement === inp && !boxEditing) { box = inp; beginBox(); } });
+  inp.addEventListener('input', () => { const c = inp.value.replace(/[^\d:.]/g, '').slice(0, 6); if (c !== inp.value) inp.value = c; });
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); finishBox(true); inp.blur(); }
+    else if (e.key === 'Escape') { e.preventDefault(); cancelBox(); inp.blur(); }
+  });
+  inp.addEventListener('blur', () => { finishBox(false); if (inp.id === 'ptEdit') { inp.hidden = true; box = $('timeBox'); } });
 });
-box.addEventListener('blur', () => finishBox(false));
+// On the prep slide preview: click the time to type one, click the buttons (or anywhere on the timer) to start/pause
+function editTimeOnSlide(timeEl) {
+  const r = rectIn(timeEl), pe = $('ptEdit');
+  const scale = timeEl.getBoundingClientRect().width / timeEl.offsetWidth || 1;
+  const fs = parseFloat(getComputedStyle(timeEl).fontSize) * scale;
+  Object.assign(pe.style, { left: r.l + 'px', top: r.t + 'px', width: (r.r - r.l) + 'px', height: (r.b - r.t) + 'px', fontSize: Math.round(fs * 0.8) + 'px' });
+  pe.value = timeEl.textContent.trim();
+  pe.hidden = false; pe.focus();
+}
+els.preview.addEventListener('click', e => {
+  if (editMode !== 'prep') return;
+  const btn = e.target.closest('.pt-ctrl button');
+  if (btn) { (btn.dataset.t === 'reset' ? $('tReset') : $('tPlay')).click(); return; }
+  const pt = e.target.closest('.pt:not(.clock-only)'); if (!pt) return;
+  const time = e.target.closest('.pt-time');
+  if (time) { editTimeOnSlide(time); return; }
+  $('tPlay').click();
+});
 
 // Several times a second: move the timer on (from its fixed end time) and repaint the clock and timer
 makeTicker(() => {
