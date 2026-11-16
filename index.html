@@ -391,22 +391,28 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
 .slide.editor-preview.hd-mode [data-hd]:focus { outline: 5px solid #3E6489; }
 .slide.editor-preview .pt-sub { display: none; }
 .slide .pt-ctrl { display: none; }
-.slide.editor-preview .pt-ctrl { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-.slide .pt-ctrl button { font: inherit; font-size: 23px; font-weight: 700; border: 0; border-radius: 12px; padding: 6px 14px; cursor: pointer; background: rgba(255, 255, 255, 0.92); color: var(--main); white-space: nowrap; max-width: 250px; overflow: hidden; text-overflow: ellipsis; }
-.slide .pt-ctrl button[hidden] { display: none; }
+.slide.editor-preview .pt-ctrl { display: flex; gap: 10px; justify-content: center; align-items: center; }
+.slide .pt-barrow .pt-bars { flex: 1; min-width: 0; }
+.slide .ticon { flex: none; width: 54px; height: 54px; padding: 0; border: 0; border-radius: 50%; display: grid; place-items: center; font: inherit; font-size: 26px; font-weight: 800; cursor: pointer; }
+.slide .ticon.solid { background: rgba(255, 255, 255, 0.95); color: var(--main); }
+.slide .ticon.ghost { background: rgba(255, 255, 255, 0.18); color: inherit; }
+.slide .ticon.plus { font-size: 22px; letter-spacing: -1px; }
+.slide .ticon:disabled { opacity: 0.35; cursor: default; }
+.slide .ticon[hidden] { display: none; }
+.slide .ptm-ctrl .ticon { width: 44px; height: 44px; font-size: 21px; }
+.slide .ptm-ctrl .ticon.plus { font-size: 18px; }
 .slide .pt { position: relative; }
 .slide .pt-bell { display: none; }
 .slide.editor-preview .pt-bell { display: grid; place-items: center; position: absolute; z-index: 3; top: 18px; left: 20px; width: 56px; height: 56px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, 0.18); color: inherit; font-size: 32px; cursor: pointer; }
 .slide.editor-preview .pt-bell.off { opacity: 0.6; }
 .slide.editor-preview .ptm .pt-bell { position: static; width: 48px; height: 48px; font-size: 26px; flex: none; }
 .slide.editor-preview .ptm-ctrl { gap: 8px; flex-wrap: nowrap; }
-.slide .ptm-ctrl button { font-size: 20px; padding: 6px 12px; border-radius: 10px; }
+
 .slide.editor-preview .ptm-time { cursor: text; }
 .slide.editor-preview .pt > .pt-label { padding: 0 60px; }
 .slide .pt-tstat { display: none; }
 .slide.editor-preview .pt-tstat { display: block; font-size: 26px; text-align: center; opacity: 0.85; min-height: 1.2em; }
-.slide .pt-ctrl button.ghost { background: rgba(255, 255, 255, 0.18); color: inherit; }
-.slide .pt-ctrl button:disabled { opacity: 0.4; cursor: default; }
+
 .slide.editor-preview .pt:not(.clock-only) { cursor: pointer; }
 .slide.editor-preview .pt:not(.clock-only) .pt-time { cursor: text; border-radius: 16px; }
 .slide.editor-preview .pt:not(.clock-only) .pt-time:hover { background: rgba(255, 255, 255, 0.12); }
@@ -691,7 +697,7 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
   </main>
 
   <footer class="bottombar">
-    <button type="button" class="bb-btn bb-icon hd-btn" id="hdEdit" title="Change the headings" aria-label="Change the headings"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg><span class="hd-on" hidden></span></button>
+    <button type="button" class="bb-btn bb-icon hd-btn" id="hdEdit" title="Change the headings" aria-label="Change the headings"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg><span class="hd-on">Change headings</span></button>
     <button type="button" class="bb-btn bb-icon" id="hdReset" title="Put headings back to default" aria-label="Put headings back to default" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 4v5h5"></path></svg></button>
     <span class="vsep"></span>
     <div class="row" id="timerGroup" hidden style="gap:0.6rem;flex-wrap:nowrap">
@@ -1438,7 +1444,16 @@ function panelHTML(st, day, editor) {
 /* Timer buttons shown in the timer box on the laptop's preview (never on the projector) */
 const BELL = on => '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>' + (on ? '' : '<path d="M3 3l18 18"></path>') + '</svg>';
 const timerBell = st => '<button type="button" class="pt-bell' + (st.prepTimer.chime === false ? ' off' : '') + '" data-t="chime" title="' + (st.prepTimer.chime === false ? 'Chime is off: click to turn it on' : 'Chime is on: click to turn it off') + '" aria-label="Timer chime">' + BELL(st.prepTimer.chime !== false) + '</button>';
-const timerCtrl = cls => '<div class="pt-ctrl' + (cls ? ' ' + cls : '') + '"><button type="button" data-t="play">Start</button><button type="button" class="ghost" data-t="plus">+1 min</button><button type="button" class="ghost" data-t="skip">Skip</button><button type="button" class="ghost" data-t="reset">Reset</button></div>';
+const TICON = {
+  play: '<svg viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true"><path d="M7 4.5l13 7.5-13 7.5z" fill="currentColor"/></svg>',
+  pause: '<svg viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true"><rect x="5.5" y="4.5" width="4.5" height="15" rx="1.2" fill="currentColor"/><rect x="14" y="4.5" width="4.5" height="15" rx="1.2" fill="currentColor"/></svg>',
+  skip: '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5l10 7-10 7z" fill="currentColor"/><path d="M19 5v14"/></svg>',
+  reset: '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>'
+};
+const tbtn = (k, cls, inner, title) => '<button type="button" class="ticon ' + cls + '" data-t="' + k + '" title="' + title + '" aria-label="' + title + '">' + inner + '</button>';
+const tPlayBtn = () => tbtn('play', 'solid', TICON.play, 'Start'), tPlusBtn = () => tbtn('plus', 'ghost plus', '+1', 'Add a minute'),
+      tSkipBtn = () => tbtn('skip', 'ghost', TICON.skip, 'Skip'), tResetBtn = () => tbtn('reset', 'ghost', TICON.reset, 'Reset');
+const timerCtrl = cls => '<div class="pt-ctrl' + (cls ? ' ' + cls : '') + '">' + tPlayBtn() + tPlusBtn() + tSkipBtn() + tResetBtn() + '</div>';
 function setSlideHTML(host, html) {      // replaces the slide but keeps anything else in the host (the video player, hints)
   host.querySelectorAll(':scope > .slide').forEach(s => s.remove());
   host.insertAdjacentHTML('afterbegin', html);
@@ -1672,8 +1687,9 @@ function renderPrep(host, st, date, editor) {
         '<div class="right">' +
           (clockOnly ? '<div class="pt clock-only">' + (editor ? timerBell(st) : '') + hdEl(st, date, 'timeNow', null, 'pt-label') + '<div class="pt-time pt-bigclock"></div>' +
                          (editor ? '<div class="pt-tstat"></div>' + timerCtrl() : '') + '</div>'
-                     : '<div class="pt">' + (editor ? timerBell(st) : '') + '<div class="pt-label"></div><div class="pt-time" title="Click to type a time"></div><div class="pt-bars"></div><div class="pt-sub"></div>' +
-                       (editor ? timerCtrl() : '') + '</div>') +
+                     : '<div class="pt">' + (editor ? timerBell(st) : '') + '<div class="pt-label"></div><div class="pt-time" title="Click to type a time"></div>' +
+                       (editor ? '<div class="pt-barrow pt-ctrl">' + tPlayBtn() + tPlusBtn() + '<div class="pt-bars"></div>' + tSkipBtn() + tResetBtn() + '</div>' : '<div class="pt-bars"></div>') +
+                       '<div class="pt-sub"></div></div>') +
           '<div class="card music">' + hdEl(st, date, musicTitle) + '<div class="music-body">' + musicHTML(musicRows(st, musicDay), musicEmpty) + '</div></div>' +
         '</div>' +
       '</div>' +
@@ -2216,8 +2232,8 @@ function hdCounts() { return { today: Object.keys(hdStore('today')).length, day:
 function refreshHdUi() {
   const c = hdCounts(), btn = $('hdEdit'), on = btn.querySelector('.hd-on');
   btn.classList.toggle('on', !!hdMode);
-  on.hidden = !hdMode;
-  on.textContent = hdMode ? 'Headings: ' + (hdMode === 'all' ? 'every day' : hdMode === 'day' ? 'every ' + DAY_NAMES[wdOf(viewDate)] : 'just today') + ' · Done' : '';
+  on.hidden = false;
+  on.textContent = hdMode ? 'Headings: ' + (hdMode === 'all' ? 'every day' : hdMode === 'day' ? 'every ' + DAY_NAMES[wdOf(viewDate)] : 'just today') + ' · Done' : 'Change headings';
   btn.title = hdMode ? 'Finish changing headings' : 'Change the headings';
   $('hdReset').disabled = !(c.today || c.day || c.all);
 }
@@ -3023,9 +3039,10 @@ function refreshTimerUi() {
   $('tSkip').textContent = kind === 'preps' && nextSeg ? 'Skip to ' + nextSeg.label : 'Skip to next';
   $('tReset').disabled = !t;
   els.preview.querySelectorAll('.pt-ctrl').forEach(c => {
-    const set = (k, src) => { const b = c.querySelector('[data-t="' + k + '"]'); if (!b) return; if (b.textContent !== src.textContent) b.textContent = src.textContent; b.disabled = src.disabled; b.hidden = src.hidden; };
-    set('play', $('tPlay')); set('plus', $('tPlus')); set('skip', $('tSkip')); set('reset', $('tReset'));
-    const sk = c.querySelector('[data-t="skip"]'); if (sk) sk.title = $('tSkip').textContent;
+    const set = (k, src, title) => { const b = c.querySelector('[data-t="' + k + '"]'); if (!b) return; b.disabled = src.disabled; b.hidden = src.hidden; if (b.title !== title) { b.title = title; b.setAttribute('aria-label', title); } };
+    set('play', $('tPlay'), $('tPlay').textContent); set('plus', $('tPlus'), 'Add a minute'); set('skip', $('tSkip'), $('tSkip').textContent); set('reset', $('tReset'), 'Reset');
+    const pb = c.querySelector('[data-t="play"]'), icon = t && t.running ? 'pause' : 'play';
+    if (pb && pb.dataset.icon !== icon) { pb.dataset.icon = icon; pb.innerHTML = TICON[icon]; }
   });
   const ts = els.preview.querySelector('.pt-tstat');
   if (ts) { const s = t ? 'Timer ' + v.time + (v.sub ? ' · ' + v.sub : v.label ? ' · ' + v.label : '') : ''; if (ts.textContent !== s) ts.textContent = s; }
