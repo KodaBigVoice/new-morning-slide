@@ -552,6 +552,35 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
 .tip { position: fixed; z-index: 300; max-width: 290px; padding: 0.45rem 0.7rem; border-radius: 8px; background: var(--ink); color: #fff; font-size: 0.82rem; line-height: 1.4; pointer-events: none; box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.45); }
 .toast { position: fixed; left: 50%; bottom: 5rem; transform: translate(-50%, 1rem); background: var(--ink); color: #fff; padding: 0.6rem 1.05rem; border-radius: 8px; font-size: 0.9rem; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 100; max-width: calc(100% - 2rem); box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.5); }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
+/* Accounts */
+.badge { display: inline-grid; place-items: center; min-width: 1.25rem; height: 1.25rem; padding: 0 0.3rem; border-radius: 999px; background: #C2453D; color: #fff; font-size: 0.72rem; font-weight: 700; line-height: 1; }
+.topbtn .badge { margin-left: -0.15rem; }
+.setupnav button b .badge { margin-left: 0.4rem; vertical-align: 1px; }
+#acctBody, #adminBody { display: flex; flex-direction: column; gap: 18px; }
+.acct-form { display: grid; gap: 12px; max-width: 420px; }
+.acct-form input, .acct-form textarea { font-weight: 400; }
+.acct-form label { display: grid; gap: 4px; font-size: 0.86rem; font-weight: 700; color: var(--ink); }
+.acct-form label small { font-weight: 400; color: var(--slate); }
+.acct-form .pair { display: grid; grid-template-columns: 1fr 7rem; gap: 10px; }
+.acct-msg { border-radius: 10px; padding: 0.7rem 0.9rem; font-size: 0.9rem; background: var(--mist); color: var(--ink); }
+.acct-msg.err { background: #FDEEEE; color: #8E2F2F; }
+.acct-msg.ok { background: #E8F4EC; color: #24563A; }
+.acct-who { display: flex; align-items: center; gap: 14px; }
+.acct-who .av { flex: none; width: 3rem; height: 3rem; border-radius: 50%; background: var(--steel); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 1.05rem; letter-spacing: 0.02em; }
+.acct-who b { display: block; font-size: 1.05rem; }
+.acct-who span { font-size: 0.86rem; color: var(--slate); }
+.pill { display: inline-block; padding: 0.1rem 0.5rem; border-radius: 999px; font-size: 0.74rem; font-weight: 700; background: var(--mist); color: var(--steel); vertical-align: 1px; }
+.pill.warn { background: #FFF2D9; color: #8A5A00; }
+.people { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.people th { text-align: left; font-size: 0.75rem; color: var(--slate); font-weight: 700; padding: 0 0.5rem 0.4rem 0; }
+.people td { padding: 0.5rem 0.5rem 0.5rem 0; border-top: 1px solid var(--soft-line); vertical-align: middle; }
+.people td.acts { text-align: right; white-space: nowrap; }
+.people td.acts .btn + .btn { margin-left: 6px; }
+.people select { padding: 0.3rem 0.4rem; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+.people .muted { color: var(--slate); }
+.empty-note { color: var(--slate); font-size: 0.9rem; margin: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips span { padding: 0.2rem 0.55rem; border: 1px solid var(--line); border-radius: 999px; font-size: 0.82rem; background: var(--frost); }
 .modal-back { position: fixed; inset: 0; background: rgba(28, 48, 72, 0.35); display: grid; place-items: center; z-index: 150; padding: 1rem; }
 .modal { background: #fff; border-radius: 14px; padding: 1.3rem 1.4rem; max-width: 27rem; box-shadow: 0 20px 50px -20px rgba(28, 48, 72, 0.5); }
 .modal h3 { margin: 0 0 0.4rem; font-family: var(--disp); font-size: 1.15rem; }
@@ -580,7 +609,7 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
     <button type="button" class="formchip" id="formChip" title="Your form (change it in Setup)"></button>
     <nav class="week" id="week" aria-label="Choose a day"></nav>
     <button type="button" class="topbtn" id="setupBtn">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"></path></svg>Setup
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"></path></svg>Setup<span class="badge" id="setupBadge" hidden data-tip="People waiting for you to approve them"></span>
     </button>
     <button type="button" class="end-btn" id="endBtn" hidden>End</button>
     <button type="button" class="present-btn" id="presentBtn">
@@ -764,6 +793,8 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
       <button type="button" data-sec="prep"><b>Prep</b><span>Morning prep days, timer</span></button>
       <button type="button" data-sec="house"><b>House meetings</b><span>This term’s schedule</span></button>
       <button type="button" data-sec="backup"><b>Backup &amp; reset</b><span>Save, open or start again</span></button>
+      <button type="button" data-sec="account"><b>Account</b><span id="acctNavSub">Sign in with your school email</span></button>
+      <button type="button" data-sec="admin" id="adminNav" hidden><b>Admin<span class="badge" id="adminNavBadge" hidden></span></b><span>Access requests and staff</span></button>
       <a class="linkbtn v1link" href="https://morning-slide.netlify.app/" style="margin:14px 0 0 0.85rem;font-size:0.85rem">Back to the original Morning Slide</a>
     </nav>
     <div>
@@ -930,6 +961,20 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
           <div style="flex:1"><h3 style="margin-bottom:4px">Start again</h3><p class="hint" style="margin:0">Clears everything in v2 on this browser: timetable, notes, preps, design and music lessons. The original Morning Slide isn’t affected. Save a copy first if you might want it back.</p></div>
           <button type="button" class="btn danger" id="resetAll">Reset everything</button>
         </div>
+      </section>
+
+      <!-- Account -->
+      <section class="setsec" data-sec="account" hidden>
+        <h2>Account</h2>
+        <p class="lead">Staff accounts will let Morning Slide share things across the school, like notices and music lessons. You don’t need one: without signing in, everything works just as it does now. Signing in never changes anything already on this laptop.</p>
+        <div id="acctBody"><div class="card2"><p class="empty-note">Loading…</p></div></div>
+      </section>
+
+      <!-- Admin -->
+      <section class="setsec" data-sec="admin" hidden>
+        <h2>Admin</h2>
+        <p class="lead">Approve new staff, choose who else is an admin, and keep the list of emails that are let straight in.</p>
+        <div id="adminBody"><div class="card2"><p class="empty-note">Loading…</p></div></div>
       </section>
     </div>
   </div>
@@ -3936,6 +3981,327 @@ function afterLoad() {
 if (document.fonts) document.fonts.ready.then(() => renderAll());
 afterLoad();
 if (copiedFromV1) toast('Welcome to Morning Slide v2! Your settings from the original have been copied over.');
+/* =====================================================================
+   STAFF ACCOUNTS (Supabase). Only in the editor, never in the projector window.
+   Signed out, nothing here runs until someone opens Setup → Account.
+   ===================================================================== */
+(() => {
+if (location.hash === '#slide') return;
+const SB_URL = 'https://jbvemxhfndjkofcbubmn.supabase.co';
+const SB_KEY = 'sb_publishable_oPEAFTgMAq94UaWYsLgD-Q_LR5u-cNP';
+const SB_JS = window.MS_SUPABASE_JS || 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js';
+const SB_STORE = 'sb-jbvemxhfndjkofcbubmn-auth-token';
+const DOMAIN = '@lambrookschool.co.uk';
+
+let sb = null, loading = null;
+let me = null;            // { id, email, name, initials, role, status }
+let session = null;
+let view = 'signin';      // signin | signup | forgot | recovery | sent | resetSent
+let msg = null;           // { kind: 'err' | 'ok' | '', text }
+let sentTo = '';
+let admin = { requests: [], staff: [], allowed: [], forms: [], loaded: false, noConfirm: false };
+
+function loadLib() {
+  if (window.supabase && window.supabase.createClient) return Promise.resolve();
+  if (loading) return loading;
+  loading = new Promise((ok, bad) => {
+    const s = document.createElement('script');
+    s.src = SB_JS; s.async = true;
+    s.onload = ok; s.onerror = () => { loading = null; bad(new Error('offline')); };
+    document.head.appendChild(s);
+  });
+  return loading;
+}
+async function client() {
+  if (sb) return sb;
+  await loadLib();
+  sb = window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storageKey: SB_STORE } });
+  sb.auth.onAuthStateChange((event, s) => {
+    session = s;
+    if (event === 'PASSWORD_RECOVERY') { view = 'recovery'; msg = null; setTimeout(() => openSetup('account'), 0); }
+    // Avoid calling Supabase inside the callback itself (supabase-js can deadlock); do it on the next tick.
+    setTimeout(() => refreshMe(event), 0);
+  });
+  return sb;
+}
+
+async function refreshMe(event) {
+  if (!session) { me = null; admin.loaded = false; paint(); return; }
+  const { data, error } = await sb.from('ms_staff').select('*').eq('id', session.user.id).maybeSingle();
+  const was = me;
+  me = error ? null : data;
+  if (event === 'SIGNED_IN' && fromEmailLink && me) {
+    fromEmailLink = false;
+    toast(me.status === 'approved' ? 'Email confirmed. You’re signed in.' : 'Email confirmed. An admin will approve your account soon.');
+    if (view !== 'recovery') openSetup('account');
+  }
+  if (me && me.role === 'admin' && me.status === 'approved') await loadAdmin(); else admin.loaded = false;
+  if (!was || !me || was.id !== me.id || was.status !== me.status || was.role !== me.role || view === 'recovery') { if (view !== 'recovery') view = 'signin'; }
+  paint();
+}
+
+const isAdmin = () => !!(me && me.status === 'approved' && me.role === 'admin');
+
+async function loadAdmin() {
+  const [req, staff, allowed, forms] = await Promise.all([
+    sb.rpc('ms_requests'),
+    sb.from('ms_staff').select('*').eq('status', 'approved').order('name'),
+    sb.from('ms_allowed').select('*').order('email'),
+    sb.rpc('ms_forms'),
+  ]);
+  if (req.error) {   // 02-requests.sql not run yet: fall back to the plain table
+    admin.noConfirm = true;
+    const r = await sb.from('ms_staff').select('*').eq('status', 'pending').order('created_at');
+    admin.requests = (r.data || []).map(x => ({ ...x, confirmed: null }));
+  } else { admin.noConfirm = false; admin.requests = req.data || []; }
+  admin.staff = staff.data || [];
+  admin.allowed = allowed.data || [];
+  admin.forms = Array.isArray(forms.data) ? forms.data : [];
+  admin.loaded = true;
+}
+
+/* ---------- painting ---------- */
+const waiting = () => admin.requests.filter(r => r.confirmed !== false).length;
+function paintBadges() {
+  const n = isAdmin() ? waiting() : 0;
+  for (const id of ['setupBadge', 'adminNavBadge']) { const b = $(id); if (b) { b.hidden = !n; b.textContent = n; } }
+  $('adminNav').hidden = !isAdmin();
+  $('acctNavSub').textContent = me ? (me.status === 'approved' ? 'Signed in as ' + me.name : 'Waiting for approval') : 'Sign in with your school email';
+  if (!isAdmin() && setupSec === 'admin' && !$('setupScreen').hidden) showSection('account');
+}
+function paint() {
+  paintBadges();
+  if (!$('setupScreen').hidden && setupSec === 'account') paintAccount();
+  if (!$('setupScreen').hidden && setupSec === 'admin') paintAdmin();
+}
+const msgHTML = () => msg ? '<div class="acct-msg ' + (msg.kind || '') + '" role="status">' + msg.text + '</div>' : '';
+function field(id, label, type, extra) {
+  return '<label>' + label + '<input class="text" id="' + id + '" type="' + type + '"' + (extra || '') + '></label>';
+}
+
+function paintAccount() {
+  const body = $('acctBody'); let html = '';
+  if (offline) {
+    html = '<div class="card2"><h3>Can’t reach the account service</h3><p class="hint" style="margin:0">This laptop may be offline. Everything else in Morning Slide still works.</p><div class="row"><button type="button" class="btn" data-act="retry">Try again</button></div></div>';
+  } else if (!sb) {
+    html = '<div class="card2"><p class="empty-note">Loading…</p></div>';
+  } else if (view === 'recovery') {
+    html = '<div class="card2"><h3>Choose a new password</h3>' + msgHTML() + '<form class="acct-form" data-form="recovery">' +
+      field('acNewPw', 'New password <small>at least 8 characters</small>', 'password', ' autocomplete="new-password" minlength="8" required') +
+      '<div class="row"><button class="btn primary">Save new password</button></div></form></div>';
+  } else if (me) {
+    const pending = me.status !== 'approved';
+    html = '<div class="card2"><div class="acct-who"><span class="av">' + esc(me.initials) + '</span><div><b>' + esc(me.name) + ' ' +
+      (pending ? '<span class="pill warn">Waiting for approval</span>' : me.role === 'admin' ? '<span class="pill">Admin</span>' : '') +
+      '</b><span>' + esc(me.email) + '</span></div><span style="flex:1"></span><button type="button" class="btn small" data-act="signout">Sign out</button></div>' + msgHTML() +
+      (pending ? '<p class="hint" style="margin:0">An admin has been asked to approve your account. Once they have, you’ll be signed in here automatically next time you open Morning Slide.</p>' : '') +
+      '</div>' +
+      '<div class="card2"><h3>Your details</h3><form class="acct-form" data-form="details"><div class="pair">' +
+      field('acName', 'Title and surname <small>as on iSAMS</small>', 'text', ' value="' + esc(me.name) + '" maxlength="60" required') +
+      field('acInit', 'Initials', 'text', ' value="' + esc(me.initials) + '" maxlength="5" required style="text-transform:uppercase"') +
+      '</div><div class="row"><button class="btn small strong">Save</button></div></form></div>' +
+      '<div class="card2"><h3>Change password</h3><form class="acct-form" data-form="password">' +
+      field('acPw2', 'New password <small>at least 8 characters</small>', 'password', ' autocomplete="new-password" minlength="8" required') +
+      '<div class="row"><button class="btn small strong">Change password</button></div></form></div>';
+  } else if (view === 'sent' || view === 'resetSent') {
+    html = '<div class="card2"><h3>Check your email</h3><p style="margin:0">We’ve sent a link to <b>' + esc(sentTo) + '</b> from morningslide@crooket.com. ' +
+      (view === 'sent' ? 'Click it to confirm your email and you’ll come straight back here, signed in.' : 'Click it to choose a new password.') +
+      '</p><p class="hint" style="margin:0">Can’t see it after a few minutes? Check your Junk folder.</p><div class="row"><button type="button" class="linkbtn" data-view="signin">Back to sign in</button></div></div>';
+  } else if (view === 'forgot') {
+    html = '<div class="card2"><h3>Forgotten your password?</h3><p class="hint" style="margin:0">We’ll email you a link to choose a new one.</p>' + msgHTML() +
+      '<form class="acct-form" data-form="forgot">' + field('acEmail', 'School email', 'email', ' autocomplete="email" required placeholder="name' + DOMAIN + '"') +
+      '<div class="row"><button class="btn primary">Send the link</button><button type="button" class="linkbtn" data-view="signin">Back to sign in</button></div></form></div>';
+  } else {
+    const up = view === 'signup';
+    html = '<div class="card2"><div class="seg" style="max-width:320px"><button type="button" data-view="signin" aria-pressed="' + !up + '">Sign in</button><button type="button" data-view="signup" aria-pressed="' + up + '">Create an account</button></div>' + msgHTML() +
+      (up
+        ? '<form class="acct-form" data-form="signup"><div class="pair">' +
+          field('acName', 'Title and surname <small>as on iSAMS, e.g. Mr Joshi</small>', 'text', ' autocomplete="off" maxlength="60" required') +
+          field('acInit', 'Initials', 'text', ' autocomplete="off" maxlength="5" required style="text-transform:uppercase" placeholder="TSJ"') + '</div>' +
+          field('acEmail', 'School email', 'email', ' autocomplete="email" required placeholder="name' + DOMAIN + '"') +
+          field('acPw', 'Password <small>at least 8 characters</small>', 'password', ' autocomplete="new-password" minlength="8" required') +
+          '<div class="row"><button class="btn primary">Create account</button></div>' +
+          '<p class="hint" style="margin:0">Only ' + DOMAIN + ' addresses can sign up. We’ll email you a link to confirm it’s you; new staff may also need an admin to approve them.</p></form>'
+        : '<form class="acct-form" data-form="signin">' +
+          field('acEmail', 'School email', 'email', ' autocomplete="email" required placeholder="name' + DOMAIN + '"') +
+          field('acPw', 'Password', 'password', ' autocomplete="current-password" required') +
+          '<div class="row"><button class="btn primary">Sign in</button><button type="button" class="linkbtn" data-view="forgot">Forgotten your password?</button></div></form>') +
+      '</div>';
+  }
+  body.innerHTML = html;
+}
+
+function paintAdmin() {
+  const body = $('adminBody');
+  if (!isAdmin()) { body.innerHTML = '<div class="card2"><p class="empty-note">Only admins can see this.</p></div>'; return; }
+  if (!admin.loaded) { body.innerHTML = '<div class="card2"><p class="empty-note">Loading…</p></div>'; return; }
+  const when = t => { const d = new Date(t); return d.getDate() + ' ' + MONTHS[d.getMonth()]; };
+  const reqs = admin.requests;
+  let html = '<div class="card2"><h3>Access requests' + (waiting() ? ' <span class="badge">' + waiting() + '</span>' : '') + '</h3>' +
+    (reqs.length ? '<table class="people"><thead><tr><th>Name</th><th>Initials</th><th>Email</th><th>Asked</th><th></th></tr></thead><tbody>' +
+      reqs.map(r => '<tr><td><b>' + esc(r.name) + '</b>' + (r.confirmed === false ? ' <span class="pill warn" data-tip="They haven’t clicked the link in their confirmation email yet">Email not confirmed</span>' : '') +
+        '</td><td>' + esc(r.initials) + '</td><td class="muted">' + esc(r.email) + '</td><td class="muted">' + when(r.created_at) +
+        '</td><td class="acts"><button type="button" class="btn small strong" data-approve="' + r.id + '">Approve</button><button type="button" class="btn small" data-decline="' + r.id + '">Decline</button></td></tr>').join('') +
+      '</tbody></table><p class="hint" style="margin:0">Approving someone also adds their email to the approved list below and their name to Timetable Maker’s staff list.</p>'
+      : '<p class="empty-note">Nobody is waiting. New staff whose email isn’t on the approved list will appear here once they’ve confirmed their email.</p>') + '</div>';
+
+  html += '<div class="card2"><h3>Staff with accounts</h3><table class="people"><thead><tr><th>Name</th><th>Initials</th><th>Email</th><th>Role</th><th></th></tr></thead><tbody>' +
+    admin.staff.map(s => {
+      const self = s.id === me.id;
+      return '<tr><td><b>' + esc(s.name) + '</b>' + (self ? ' <span class="muted">(you)</span>' : '') + '</td><td>' + esc(s.initials) + '</td><td class="muted">' + esc(s.email) +
+        '</td><td><select data-role="' + s.id + '"' + (self ? ' disabled data-tip="You can’t remove your own admin role"' : '') + '><option value="teacher"' + (s.role === 'teacher' ? ' selected' : '') + '>Teacher</option><option value="admin"' + (s.role === 'admin' ? ' selected' : '') + '>Admin</option></select></td>' +
+        '<td class="acts">' + (self ? '' : '<button type="button" class="btn small" data-remove="' + s.id + '">Remove</button>') + '</td></tr>';
+    }).join('') + '</tbody></table><p class="hint" style="margin:0">Admins can approve staff and see this page. Removing someone deletes their account; they can sign up again and you’d need to approve them.</p></div>';
+
+  const has = new Set(admin.staff.map(s => s.email).concat(admin.requests.map(r => r.email)));
+  html += '<div class="card2"><h3>Approved emails</h3><p class="hint" style="margin:0">Anyone on this list is let straight in when they create an account. Only admins can see it.</p>' +
+    '<form class="acct-form" data-form="allow" style="max-width:none"><label>Add emails <small>one or more, separated by commas, spaces or new lines</small><textarea class="text" id="acAllow" rows="2" style="width:100%;padding:0.5rem 0.65rem;border:1px solid var(--line);border-radius:8px;font:inherit;resize:vertical" placeholder="name' + DOMAIN + '"></textarea></label>' +
+    '<div class="row"><button class="btn small strong">Add to the list</button></div></form>' +
+    (admin.allowed.length ? '<table class="people"><thead><tr><th>Email</th><th>Role</th><th>Account</th><th></th></tr></thead><tbody>' +
+      admin.allowed.map(a => '<tr><td>' + esc(a.email) + '</td><td class="muted">' + (a.role === 'admin' ? 'Admin' : 'Teacher') + '</td><td class="muted">' + (has.has(a.email) ? 'Yes' : 'Not yet') +
+        '</td><td class="acts">' + (a.email === me.email ? '' : '<button type="button" class="btn small" data-unallow="' + esc(a.email) + '">Remove</button>') + '</td></tr>').join('') + '</tbody></table>' : '') +
+    '<p class="hint" style="margin:0">Removing an email only stops new sign-ups going straight through. It doesn’t delete an account that already exists.</p></div>';
+
+  html += '<div class="card2"><h3>Forms</h3>' + (admin.forms.length ? '<div class="chips">' + admin.forms.map(f => '<span>' + esc(f.form || f) + '</span>').join('') + '</div>' : '<p class="empty-note">No forms found.</p>') +
+    '<p class="hint" style="margin:0">These come from Timetable Maker, so you only keep one list. Change them there.</p></div>';
+  body.innerHTML = html;
+}
+
+/* ---------- actions ---------- */
+let offline = false, fromEmailLink = /access_token=|type=signup|type=recovery|error_description=/.test(location.hash);
+function friendly(e) {
+  const m = (e && (e.message || e.error_description || e.msg)) || String(e);
+  if (/invalid login credentials/i.test(m)) return 'That email and password don’t match. Check them, or reset your password.';
+  if (/email not confirmed/i.test(m)) return 'Please confirm your email first: click the link we sent you. Check your Junk folder too.';
+  if (/database error saving new user|lambrook school email/i.test(m)) return 'Only ' + DOMAIN + ' addresses can sign up.';
+  if (/already registered|already exists/i.test(m)) return 'There’s already an account with that email. Sign in, or reset your password.';
+  if (/rate limit|too many|security purposes/i.test(m)) return 'Too many attempts. Wait a minute and try again.';
+  if (/password should be|weak/i.test(m)) return 'Choose a longer password: at least 8 characters.';
+  if (/failed to fetch|network/i.test(m)) return 'Couldn’t reach the account service. Check your internet connection.';
+  return esc(m);
+}
+function busy(form, on) { form.querySelectorAll('button, input, textarea').forEach(b => b.disabled = on); }
+const val = id => ($(id) ? $(id).value.trim() : '');
+const here = () => location.origin + location.pathname;
+
+async function onSubmit(e) {
+  const form = e.target.closest('form[data-form]'); if (!form) return;
+  e.preventDefault();
+  const kind = form.dataset.form; msg = null; busy(form, true);
+  try {
+    if (kind === 'signin') {
+      const email = val('acEmail').toLowerCase();
+      const { error } = await sb.auth.signInWithPassword({ email, password: $('acPw').value });
+      if (error) throw error;
+      toast('Signed in');
+      return;   // onAuthStateChange repaints
+    }
+    if (kind === 'signup') {
+      const email = val('acEmail').toLowerCase(), name = val('acName').replace(/\s+/g, ' '), initials = val('acInit').toUpperCase().replace(/[^A-Z]/g, '');
+      if (!email.endsWith(DOMAIN)) throw new Error('Only ' + DOMAIN + ' addresses can sign up.');
+      if (!/^(mr|mrs|miss|ms|mx|dr|prof|rev)\.?\s+\S/i.test(name)) throw new Error('Please put your title first, as on iSAMS, e.g. Mr Joshi or Mrs Smith.');
+      if (!initials) throw new Error('Please add your initials.');
+      const { data, error } = await sb.auth.signUp({ email, password: $('acPw').value, options: { data: { name, initials }, emailRedirectTo: here() } });
+      if (error) throw error;
+      if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) throw new Error('already registered');
+      sentTo = email; view = 'sent';
+    }
+    if (kind === 'forgot') {
+      const email = val('acEmail').toLowerCase();
+      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: here() });
+      if (error) throw error;
+      sentTo = email; view = 'resetSent';
+    }
+    if (kind === 'recovery' || kind === 'password') {
+      const pw = $(kind === 'recovery' ? 'acNewPw' : 'acPw2').value;
+      const { error } = await sb.auth.updateUser({ password: pw });
+      if (error) throw error;
+      view = 'signin'; toast('Password changed');
+    }
+    if (kind === 'details') {
+      const { error } = await sb.rpc('ms_update_me', { new_name: val('acName'), new_initials: val('acInit').toUpperCase() });
+      if (error) throw error;
+      await refreshMe(); toast('Saved'); return;
+    }
+    if (kind === 'allow') {
+      const list = [...new Set(val('acAllow').toLowerCase().split(/[\s,;]+/).filter(Boolean))];
+      const bad = list.filter(x => !x.endsWith(DOMAIN) || !/^[^@\s]+@/.test(x));
+      if (!list.length) return;
+      if (bad.length) throw new Error('Not a ' + DOMAIN + ' address: ' + bad.join(', '));
+      const { error } = await sb.from('ms_allowed').upsert(list.map(email => ({ email })), { onConflict: 'email', ignoreDuplicates: true });
+      if (error) throw error;
+      await loadAdmin(); toast(list.length === 1 ? 'Added' : 'Added ' + list.length + ' emails'); paint(); return;
+    }
+  } catch (err) {
+    const text = friendly(err);
+    busy(form, false);
+    if (kind === 'allow') { toast(text.replace(/<[^>]+>/g, '')); return; }
+    // Show the message without redrawing the form, so nothing typed is lost
+    msg = null;
+    let box = form.parentNode.querySelector('.acct-msg');
+    if (!box) { box = document.createElement('div'); box.setAttribute('role', 'status'); form.parentNode.insertBefore(box, form); }
+    box.className = 'acct-msg err'; box.innerHTML = text;
+    return;
+  } finally {
+    if (document.body.contains(form)) busy(form, false);
+  }
+  paint();
+}
+
+async function adminAct(fn, okText) {
+  try { const { error } = await fn(); if (error) throw error; await loadAdmin(); if (okText) toast(okText); }
+  catch (err) { toast(friendly(err).replace(/<[^>]+>/g, '')); }
+  paint();
+}
+
+function onClick(e) {
+  const t = e.target.closest('button'); if (!t) return;
+  const d = t.dataset;
+  if (d.view) { view = d.view; msg = null; paint(); const f = $('acEmail'); if (f) f.focus(); return; }
+  if (d.act === 'retry') { offline = false; start(true); return; }
+  if (d.act === 'signout') { sb.auth.signOut().then(() => { toast('Signed out. Everything on this laptop is still here.'); view = 'signin'; }); return; }
+  const find = id => admin.requests.concat(admin.staff).find(x => x.id === id) || {};
+  if (d.approve) return adminAct(() => sb.rpc('ms_approve', { uid: d.approve }), find(d.approve).name + ' approved');
+  if (d.decline) { if (!confirm('Decline ' + find(d.decline).name + '? Their account request will be deleted.')) return; return adminAct(() => sb.rpc('ms_decline', { uid: d.decline }), 'Declined'); }
+  if (d.remove) { if (!confirm('Remove ' + find(d.remove).name + '’s account? They won’t be able to sign in.')) return; return adminAct(() => sb.rpc('ms_decline', { uid: d.remove }), 'Removed'); }
+  if (d.unallow) { if (!confirm('Remove ' + d.unallow + ' from the approved list?')) return; return adminAct(() => sb.from('ms_allowed').delete().eq('email', d.unallow), 'Removed from the list'); }
+}
+function onChange(e) {
+  const s = e.target.closest('select[data-role]'); if (!s) return;
+  const who = admin.staff.find(x => x.id === s.dataset.role) || {};
+  adminAct(() => sb.rpc('ms_set_role', { uid: s.dataset.role, new_role: s.value }), who.name + (s.value === 'admin' ? ' is now an admin' : ' is now a teacher'));
+}
+for (const id of ['acctBody', 'adminBody']) {
+  $(id).addEventListener('submit', onSubmit);
+  $(id).addEventListener('click', onClick);
+  $(id).addEventListener('change', onChange);
+}
+
+/* ---------- start ---------- */
+async function start(show) {
+  try {
+    await client();
+    const { data } = await sb.auth.getSession();
+    session = data.session;
+    await refreshMe();
+  } catch (err) { offline = true; }
+  paint();
+}
+const _show = showSection;
+showSection = function (sec) {
+  _show(sec);
+  if (sec === 'account' || sec === 'admin') {
+    if (!sb && !offline) start();
+    else if (sec === 'admin' && isAdmin()) loadAdmin().then(paint);
+    paint();
+  }
+};
+// Only talk to Supabase straight away if this browser has signed in before, or has just come back from an email link.
+let hadSession = false; try { hadSession = !!localStorage.getItem(SB_STORE); } catch (e) {}
+if (hadSession || fromEmailLink) start();
+// Admins: check for new requests now and then
+setInterval(() => { if (isAdmin() && document.visibilityState === 'visible') loadAdmin().then(paint).catch(() => {}); }, 120000);
+})();
 })();
 </script>
 </body>
