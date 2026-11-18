@@ -3998,7 +3998,7 @@ let me = null;            // { id, email, name, initials, role, status }
 let session = null;
 let view = 'signin';      // signin | signup | forgot | recovery | sent | resetSent
 let msg = null;           // { kind: 'err' | 'ok' | '', text }
-let sentTo = '';
+let sentTo = '', meError = '';
 let admin = { requests: [], staff: [], allowed: [], forms: [], loaded: false, noConfirm: false };
 
 function loadLib() {
@@ -4030,6 +4030,7 @@ async function refreshMe(event) {
   const { data, error } = await sb.from('ms_staff').select('*').eq('id', session.user.id).maybeSingle();
   const was = me;
   me = error ? null : data;
+  meError = error ? (error.message || String(error)) : (data ? '' : 'No account record found for ' + session.user.email + '.');
   if (event === 'SIGNED_IN' && fromEmailLink && me) {
     fromEmailLink = false;
     toast(me.status === 'approved' ? 'Email confirmed. You’re signed in.' : 'Email confirmed. An admin will approve your account soon.');
@@ -4066,7 +4067,7 @@ function paintBadges() {
   const n = isAdmin() ? waiting() : 0;
   for (const id of ['setupBadge', 'adminNavBadge']) { const b = $(id); if (b) { b.hidden = !n; b.textContent = n; } }
   $('adminNav').hidden = !isAdmin();
-  $('acctNavSub').textContent = me ? (me.status === 'approved' ? 'Signed in as ' + me.name : 'Waiting for approval') : 'Sign in with your school email';
+  $('acctNavSub').textContent = session && !me ? 'Signed in as ' + session.user.email : me ? (me.status === 'approved' ? 'Signed in as ' + me.name : 'Waiting for approval') : 'Sign in with your school email';
   if (!isAdmin() && setupSec === 'admin' && !$('setupScreen').hidden) showSection('account');
 }
 function paint() {
@@ -4089,6 +4090,10 @@ function paintAccount() {
     html = '<div class="card2"><h3>Choose a new password</h3>' + msgHTML() + '<form class="acct-form" data-form="recovery">' +
       field('acNewPw', 'New password <small>at least 8 characters</small>', 'password', ' autocomplete="new-password" minlength="8" required') +
       '<div class="row"><button class="btn primary">Save new password</button></div></form></div>';
+  } else if (session && !me) {
+    html = '<div class="card2"><div class="acct-who"><span class="av">?</span><div><b>Signed in</b><span>' + esc(session.user.email) + '</span></div><span style="flex:1"></span><button type="button" class="btn small" data-act="signout">Sign out</button></div>' +
+      '<div class="acct-msg err">You’re signed in, but Morning Slide couldn’t load your account details. ' + esc(meError) + '</div>' +
+      '<div class="row"><button type="button" class="btn small strong" data-act="reload">Try again</button></div></div>';
   } else if (me) {
     const pending = me.status !== 'approved';
     html = '<div class="card2"><div class="acct-who"><span class="av">' + esc(me.initials) + '</span><div><b>' + esc(me.name) + ' ' +
@@ -4258,6 +4263,7 @@ function onClick(e) {
   const t = e.target.closest('button'); if (!t) return;
   const d = t.dataset;
   if (d.view) { view = d.view; msg = null; paint(); const f = $('acEmail'); if (f) f.focus(); return; }
+  if (d.act === 'reload') { refreshMe(); return; }
   if (d.act === 'retry') { offline = false; start(true); return; }
   if (d.act === 'signout') { sb.auth.signOut().then(() => { toast('Signed out. Everything on this laptop is still here.'); view = 'signin'; }); return; }
   const find = id => admin.requests.concat(admin.staff).find(x => x.id === id) || {};
