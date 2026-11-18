@@ -4635,6 +4635,8 @@ function summaryText(tree) {
   return 'Goes to ' + describeAudience(audienceOf(picked, tree)).replace(/^Whole school$/, 'the whole school') + ' (' + n + ' form' + (n === 1 ? '' : 's') + ') ' + when +
     (draft.prep && draft.when !== 'today' ? ', and on prep slides the evening before.' : '.');
 }
+const firstDay = n => (n.start_date > todayISO() ? n.start_date : todayISO());
+const seeBtn = n => '<button type="button" class="btn small" data-goto="' + firstDay(n) + '">See it on the slide</button>';
 function itemHTML(n, acts, sub) {
   return '<div class="np-item' + (acts.hidden ? ' hidden-n' : '') + '"><div class="np-text"><b>' + esc(n.body) + '</b><span>' + sub + '</span></div><div class="np-acts">' + acts.html + '</div></div>';
 }
@@ -4644,7 +4646,7 @@ function formTabHTML() {
   const head = state.form ? '' : '<p class="np-empty">Choose your form in Setup to see the notices meant for it. Until then you’ll only see whole-school notices.</p>';
   if (!list.length) return '<div class="np-body">' + head + '<p class="np-empty">No notices for ' + esc(state.form || 'your form') + ' at the moment.</p></div>';
   const now = list.filter(n => n.start_date <= t), later = list.filter(n => n.start_date > t);
-  const row = n => itemHTML(n, { hidden: hides.has(n.id), html: '<button type="button" class="btn small" data-hide="' + esc(n.id) + '">' + (hides.has(n.id) ? 'Show on my slide' : 'Hide on my slide') + '</button>' },
+  const row = n => itemHTML(n, { hidden: hides.has(n.id), html: (hides.has(n.id) ? '' : seeBtn(n)) + '<button type="button" class="btn small" data-hide="' + esc(n.id) + '">' + (hides.has(n.id) ? 'Show on my slide' : 'Hide on my slide') + '</button>' },
     '– ' + esc(n.author_name || n.author_initials) + ' · ' + esc(datesText(n)) + (hides.has(n.id) ? ' · hidden on your slide' : ''));
   return '<div class="np-body">' + head + '<div class="np-list">' +
     (now.length ? '<div class="np-group">On the slide today</div>' + now.map(row).join('') : '') +
@@ -4654,7 +4656,7 @@ function formTabHTML() {
 function mineTabHTML() {
   const list = ((noticeCache || {}).notices || []).filter(n => n.author === me.id && n.end_date >= todayISO());
   if (!list.length) return '<div class="np-body"><p class="np-empty">You haven’t posted any notices that are still to come.</p></div>';
-  return '<div class="np-body"><div class="np-list">' + list.map(n => itemHTML(n, { html: '<button type="button" class="btn small" data-edit="' + esc(n.id) + '">Edit</button><button type="button" class="btn small" data-del="' + esc(n.id) + '">Delete</button>' },
+  return '<div class="np-body"><div class="np-list">' + list.map(n => itemHTML(n, { html: seeBtn(n) + '<button type="button" class="btn small" data-edit="' + esc(n.id) + '">Edit</button><button type="button" class="btn small" data-del="' + esc(n.id) + '">Delete</button>' },
     esc(describeAudience(n.audience)) + ' · ' + esc(datesText(n)) + (n.prep_eve ? ' · also at evening prep' : ''))).join('') + '</div></div>';
 }
 function allTabHTML() {
@@ -4692,7 +4694,8 @@ async function postDraft() {
   const r = d.id ? await sb.from('ms_notices').update(row).eq('id', d.id) : await sb.from('ms_notices').insert(row);
   npBusy = false;
   if (r.error) { toast('Couldn’t save the notice: ' + r.error.message); paintPanel(); return; }
-  toast(d.id ? 'Notice updated' : 'Notice posted. It’ll reach other laptops within a few minutes.');
+  const v = toISO(viewDate), off = editMode === 'morning' && (v < a || v > b);
+  toast((d.id ? 'Notice updated.' : 'Notice posted.') + (off ? ' It’s on ' + DAY_NAMES[dayCode(fromISO(a))] + '’s slide, and you’re looking at ' + DAY_NAMES[dayCode(viewDate)] + '’s: use “See it on the slide” to go there.' : ' It’ll reach other laptops within a few minutes.'));
   draft = newDraft(); npTab = 'mine';
   await fetchNotices();
   paintPanel();
@@ -4705,6 +4708,7 @@ $('noticePanel').addEventListener('click', async e => {
   const tree = schoolTree(), d = draft, ds = b.dataset;
   if (ds.tab) { npTab = ds.tab; paintPanel(); const t = $('noticeDialog').querySelector('[data-tab="' + ds.tab + '"]'); if (t) t.focus(); return; }
   if (ds.np === 'close') return closeNotices();
+  if (ds.goto) { closeNotices(); if (editMode !== 'morning') document.querySelector('#modeSwitch [data-m=morning]').click(); setDate(fromISO(ds.goto)); return; }
   if (ds.np === 'years') { d.yearsOpen = !d.yearsOpen; if (!d.yearsOpen) d.formsOpen = false; return paintPanel(); }
   if (ds.np === 'forms') { d.formsOpen = !d.formsOpen; return paintPanel(); }
   if (ds.np === 'post') return postDraft();
