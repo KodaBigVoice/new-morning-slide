@@ -147,6 +147,11 @@
 .slide .panel .heading { font-size: 40px; line-height: 1.05; }
 .slide .panel.house .heading { font-size: 36px; white-space: nowrap; }
 .slide .panel .rich { font-size: 30px; }
+.slide .panel .rich.mday { flex: 0 1 auto; min-height: 0; overflow: hidden; font-size: 28px; }
+.slide .panel .rich.mday ~ .rich:not(:empty), .slide .panel .rich.mday ~ .split-scroll { min-height: 26%; }
+.slide:not(.editor-preview) .panel .rich.mday ~ .rich:empty { display: none; }
+.slide.editor-preview .panel:has(> .split-toggle):has(> .mday) { padding-bottom: 64px; }
+.slide.editor-preview .panel .rich.mday ~ .rich:empty { flex: none; min-height: 44px; }
 .slide .houses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .slide .house-tile { display: flex; flex-direction: column; gap: 6px; border-radius: 16px; padding: 8px 8px 10px; }
 .slide .house-name { border-radius: 8px; padding: 6px 0; text-align: center; font-size: 27px; font-weight: 700; }
@@ -888,6 +893,7 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
           <select class="text" id="formSelect" style="max-width:320px"></select>
           <p class="hint">Only your form’s lessons appear on the slide. Your form also shows at the top of the main screen.</p>
           <label class="check"><input type="checkbox" id="teacherInitial"><span>Show music teachers’ first initial (Miss A Woodhouse, not Miss Woodhouse)</span></label>
+          <label class="check"><input type="checkbox" id="matchMeet"><span>On matchdays, add each team’s meet time to Lunchtime Arrangements</span></label>
           <div id="pupilsWrap" hidden>
             <h3 style="margin-top:8px">Preferred names</h3>
             <p class="hint" style="margin:0">Pupils come from the spreadsheet. Type the name a pupil goes by and the slide uses it; leave it blank to use the spreadsheet’s name. Names are kept for future weeks.</p>
@@ -1151,6 +1157,17 @@ const BUILTIN_SCHEDULE = [
   { date: '2026-11-26', Athlone: 'DJC (Talent show)', Alexander: 'Sports Hall', Goodhart: 'BG Room', Dewar: 'Dining Room' },
   { date: '2026-12-03', Athlone: 'Sports Hall', Alexander: 'BG Room', Goodhart: 'Dining Room', Dewar: 'DJC' }
 ];
+/* The school's schedule and matchday lunch queues also live online (no names in either), so everyone,
+   signed in or not, gets updates without a new version of the page. A copy is kept on this laptop. */
+const SUPA = { url: 'https://jbvemxhfndjkofcbubmn.supabase.co', key: 'sb_publishable_oPEAFTgMAq94UaWYsLgD-Q_LR5u-cNP' };
+const SHARED_KEY = 'morningSlide.v2.shared';
+function loadShared() { try { return JSON.parse(localStorage.getItem(SHARED_KEY)) || null; } catch (e) { return null; } }
+let shared = loadShared();
+function schoolSchedule() {
+  const rows = shared && Array.isArray(shared.house) ? shared.house : null;
+  if (!rows || !rows.length) return BUILTIN_SCHEDULE;
+  return rows.map(r => r.congers ? { date: r.date, congers: true } : Object.assign({ date: r.date }, { Athlone: '', Alexander: '', Goodhart: '', Dewar: '' }, r.rooms || {}));
+}
 const DEFAULT_THEMES = { MON: 'blueberry', TUE: 'sage', WED: 'lavender', THU: 'teal', FRI: 'rose', SAT: 'dusk' };
 const HIGHLIGHT = /^(break|lunch|prep)$/i;
 
@@ -1195,6 +1212,7 @@ function defaultState() {
     prepFree: per('off'),                // prep slide freestyle every <weekday>: 'off' | 'bottom' | 'whole'
     recentImages: [],                    // the 10 most recent pictures: [{ id, name, gif }] (the files live in IndexedDB)
     teacherInitial: true,
+    matchMeet: false,                    // matchday lunch lines also give each team's meet time
     headings: { all: {}, day: {} },      // your own headings: { all: { key: text }, day: { FRI: { key: text } } } (just-today ones live in overrides)
     other: per(''), otherTitle: per(''), // the middle "Other info" box
     oneoff: {},                          // { date: { notes, info, lunch, other, prepInfo } }: "just this <weekday>" announcements
@@ -1293,7 +1311,7 @@ function migrateSchedule(st) {
   if (Array.isArray(st.schedule)) {
     st.schedEdits = st.schedEdits || {};
     st.schedule.forEach(r => { if (r && r.date) {
-      const b = BUILTIN_SCHEDULE.find(x => x.date === r.date);
+      const b = schoolSchedule().find(x => x.date === r.date);
       if (!b || JSON.stringify(b) !== JSON.stringify(r)) st.schedEdits[r.date] = r;
     } });
     delete st.schedule;
@@ -1326,7 +1344,7 @@ function save() {
 /* ---------- House meeting schedule (see BUILTIN_SCHEDULE at the top) ---------- */
 function scheduleList(st) {
   const ed = st.schedEdits || {}, out = [];
-  BUILTIN_SCHEDULE.forEach(r => { if (!ed[r.date]) out.push(r); });
+  schoolSchedule().forEach(r => { if (!ed[r.date]) out.push(r); });
   Object.values(ed).forEach(e => { if (!e.deleted) out.push(e); });
   return out;
 }
@@ -1604,6 +1622,46 @@ function freeHTML(slot, it, editor, cls) {
   return '<div class="card free free-image ' + cls + '"' + attrs + '>' + inner + '</div>';
 }
 
+/* Matchday Queues: the lines for this form's year group, written the way tutors write them:
+   - **Boys – away**            (team names only when teams do different things)
+     - Lunch @ 12:50 via Art Door
+     - Meet @ 13:45            (only if this teacher turned meet times on) */
+function matchdayText(st, date) {
+  const data = shared && shared.matchday && shared.matchday[toISO(date)];
+  const year = formYear(st.form);
+  if (!data || !Array.isArray(data.teams) || !(year >= 5 && year <= 8)) return '';
+  const meetOn = !!st.matchMeet;
+  const teams = data.teams.filter(t => (t.years || []).includes(year));
+  if (!teams.length) return '';
+  const GORDER = { Boys: 0, Girls: 1, Mixed: 2 };
+  const cats = [];
+  teams.forEach(t => {
+    const title = [t.gender, t.named ? t.sport : ''].filter(Boolean).join(' ') || t.sport || 'Teams';
+    let c = cats.find(x => x.title === title);
+    if (!c) cats.push(c = { title, rank: (t.gender in GORDER ? GORDER[t.gender] : 3) + (t.named ? 0.5 : 0), teams: [] });
+    c.teams.push(t);
+  });
+  cats.sort((a, b) => a.rank - b.rank);
+  const joinL = ls => ls.length > 1 ? ls.slice(0, -1).join(', ') + ' & ' + ls[ls.length - 1] : ls[0];
+  const out = [];
+  cats.forEach(c => {
+    const groups = [];
+    c.teams.forEach(t => {
+      const k = [t.away ? 'a' : 'h', t.time, t.door, meetOn ? t.meet || '' : ''].join('|');
+      let g = groups.find(x => x.k === k);
+      if (!g) groups.push(g = { k, away: !!t.away, time: t.time, door: t.door, meet: t.meet, labels: [] });
+      if (t.label && !g.labels.includes(t.label)) g.labels.push(t.label);
+    });
+    groups.sort((a, b) => (a.away === b.away ? 0 : a.away ? -1 : 1) || String(a.time).localeCompare(String(b.time)));
+    groups.forEach(g => {
+      const who = groups.length > 1 && g.labels.length ? c.title + ' ' + joinL(g.labels) : c.title;
+      out.push('- **' + who + ' – ' + (g.away ? 'away' : 'home') + '**');
+      out.push('  - Lunch @ ' + g.time + ' via ' + g.door);
+      if (meetOn && g.meet) out.push('  - Meet @ ' + g.meet);
+    });
+  });
+  return out.join('\n');
+}
 function panelHTML(st, day, editor) {
   if (day.panel === 'none') return '';
   if (day.panel === 'free') return freeHTML('side', day.free.side, editor, 'free-side region-side');
@@ -1612,7 +1670,9 @@ function panelHTML(st, day, editor) {
       HOUSES.map(h => '<div class="house-tile" style="background:' + h.tint + '"><div class="house-name" style="background:' + h.bg + ';color:' + h.fg + '">' + h.name + '</div>' +
         '<div class="house-loc" data-field="house:' + h.name + '">' + esc(day.houses[h.name] || '') + '</div></div>').join('') + '</div></div>';
   }
+  const mday = day.panel === 'lunch' ? matchdayText(st, day.date) : '';
   return '<div class="card panel bullets region-side">' + (day.panel === 'info' ? '<div class="heading" data-field="panelTitle">' + esc(day.panelTitle) + '</div>' : hdEl(st, day.date, 'lunch')) +
+    (mday ? '<div class="rich mday" data-fit="28,15"' + (editor ? ' data-tip="From Matchday Queues, for your year group. Your own notes go underneath."' : '') + '>' + richHTML(mday) + '</div>' : '') +
     splitHTML(st, day.date, day.panel, 'panelText', day.panelText, '30,18', editor) + '</div>';
 }
 
@@ -2133,6 +2193,7 @@ if (location.hash === '#slide') {
   window.addEventListener('storage', e => {
     if (e.key === STORE_KEY) { state = loadState(); draw(); }
     if (e.key === NOTICE_KEY) { noticeCache = loadNoticeCache(); draw(); }
+    if (e.key === SHARED_KEY) { shared = loadShared(); draw(); }
     if (e.key === TIMER_KEY) { timer = loadTimer(); paint(); }
   });
   // The projector keeps time too, so the timer moves on even if the laptop tab is in the background
@@ -3607,9 +3668,11 @@ function refreshSetupForm() {
 }
 $('formSelect').addEventListener('change', () => { state.form = $('formSelect').value; changed(); refreshSetupForm(); });
 $('teacherInitial').addEventListener('change', () => { state.teacherInitial = $('teacherInitial').checked; changed(); });
+$('matchMeet').addEventListener('change', () => { state.matchMeet = $('matchMeet').checked; changed(); });
 function refreshPupils() {
   const L = state.lessons, form = state.form;
   $('teacherInitial').checked = state.teacherInitial !== false;
+  $('matchMeet').checked = !!state.matchMeet;
   $('pupilsWrap').hidden = !(L && form);
   if (!L || !form) return;
   const saved = (state.prefNames || {})[form] || {};
@@ -3778,19 +3841,19 @@ $('tTotalSeg').addEventListener('click', e => { const b = e.target.closest('butt
    built-in schedule still reach you for every date you haven't changed. */
 function edits() { return state.schedEdits || (state.schedEdits = {}); }
 function rowSource(date) {
-  const e = (state.schedEdits || {})[date], b = BUILTIN_SCHEDULE.find(r => r.date === date);
+  const e = (state.schedEdits || {})[date], b = schoolSchedule().find(r => r.date === date);
   if (!e) return 'builtin';
   return b ? 'changed' : 'added';
 }
 function effectiveRow(date) { return scheduleList(state).find(r => r.date === date) || null; }
 function blankRow(date) { return { date, Athlone: '', Alexander: '', Goodhart: '', Dewar: '' }; }
 function setEdit(date, row) {
-  const b = BUILTIN_SCHEDULE.find(r => r.date === date);
+  const b = schoolSchedule().find(r => r.date === date);
   if (b && row && JSON.stringify(Object.assign({}, b, { date })) === JSON.stringify(Object.assign({}, row, { date }))) delete edits()[date];
   else edits()[date] = Object.assign({}, row, { date });
 }
 function removeDate(date) {
-  if (BUILTIN_SCHEDULE.some(r => r.date === date)) edits()[date] = { date, deleted: true };
+  if (schoolSchedule().some(r => r.date === date)) edits()[date] = { date, deleted: true };
   else delete edits()[date];
 }
 const srcCell = src => src === 'changed' ? '<button type="button" class="mine-pill" data-undo title="Go back to the school’s version of this date">Changed by you · Undo</button>'
@@ -3800,7 +3863,7 @@ function refreshSchedule() {
   const today = toISO(new Date()), showPast = $('schedPast').checked;
   const all = Object.values(state.schedEdits || {});
   const changes = all.filter(e => !e.deleted).length, removed = all.filter(e => e.deleted).length;
-  $('schedSource').textContent = (BUILTIN_SCHEDULE.length ? 'The school’s schedule' : 'No school schedule yet') +
+  $('schedSource').textContent = (schoolSchedule().length ? 'The school’s schedule' + (shared && shared.at ? ' (updated ' + shortDate(new Date(shared.at)) + ')' : '') : 'No school schedule yet') +
     (changes ? ' + ' + changes + (changes === 1 ? ' change of yours' : ' changes of yours') : '');
   $('schedReset').hidden = !(changes || removed);
   $('schedRestore').hidden = !removed;
@@ -3954,6 +4017,31 @@ function renderAll(opts = {}) {
   updatePresenting();
   sendToSlide();
 }
+// The school's schedule and matchday queues: everyone reads these, signed in or not
+async function fetchShared() {
+  const get = async (path) => {
+    const r = await fetch(SUPA.url + '/rest/v1/' + path, { headers: { apikey: SUPA.key } });
+    if (!r.ok) throw new Error(r.status);
+    return r.json();
+  };
+  try {
+    const [house, md] = await Promise.all([
+      get('ms_house?select=date,congers,rooms&date=gte.' + toISO(addDays(new Date(), -150)) + '&order=date'),
+      get('ms_matchday?select=date,data,published_at&date=gte.' + toISO(addDays(new Date(), -1))),
+    ]);
+    const matchday = {};
+    md.forEach(r => { matchday[r.date] = r.data; });
+    const next = { at: Date.now(), house, matchday };
+    const same = shared && JSON.stringify(shared.house) === JSON.stringify(house) && JSON.stringify(shared.matchday) === JSON.stringify(matchday);
+    shared = next;
+    try { localStorage.setItem(SHARED_KEY, JSON.stringify(shared)); } catch (e) {}
+    if (!same) { renderAll(); if (!$('setupScreen').hidden && setupSec === 'house') refreshSchedule(); }
+  } catch (e) { /* offline, or the tables aren't set up yet: keep the copy we have */ }
+}
+setTimeout(fetchShared, 800);
+setInterval(() => { if (document.visibilityState === 'visible') fetchShared(); }, 300000);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && (!shared || Date.now() - shared.at > 120000)) fetchShared(); });
+
 // Freestyle covering the box where notices go: say so, and offer a strip along the bottom
 function updateNoticeHint() {
   const hint = $('noticeHint'); if (!hint) return;
@@ -4113,8 +4201,8 @@ if (copiedFromV1) toast('Welcome to Morning Slide v2! Your settings from the ori
    ===================================================================== */
 (() => {
 if (location.hash === '#slide') return;
-const SB_URL = 'https://jbvemxhfndjkofcbubmn.supabase.co';
-const SB_KEY = 'sb_publishable_oPEAFTgMAq94UaWYsLgD-Q_LR5u-cNP';
+const SB_URL = SUPA.url;
+const SB_KEY = SUPA.key;
 const SB_JS = window.MS_SUPABASE_JS || 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js';
 const SB_STORE = 'sb-jbvemxhfndjkofcbubmn-auth-token';
 const DOMAIN = '@lambrookschool.co.uk';
@@ -4199,6 +4287,7 @@ async function loadAdmin() {
   admin.staff = staff.data || [];
   admin.allowed = allowed.data || [];
   admin.forms = Array.isArray(forms.data) ? forms.data : [];
+  if (!hs || !hs.dirty) await loadHouseAdmin();
   admin.loaded = true;
 }
 
@@ -4321,6 +4410,7 @@ function paintAdmin() {
         '</td><td class="acts">' + (a.email === me.email ? '' : '<button type="button" class="btn small" data-unallow="' + esc(a.email) + '">Remove</button>') + '</td></tr>').join('') + '</tbody></table>' : '') +
     '<p class="hint" style="margin:0">Removing an email only stops new sign-ups going straight through. It doesn’t delete an account that already exists.</p></div>';
 
+  html += houseAdminHTML();
   html += '<div class="card2"><h3>Forms</h3>' + (admin.forms.length ? '<div class="chips">' + admin.forms.map(f => '<span>' + esc(f.form || f) + '</span>').join('') + '</div>' : '<p class="empty-note">No forms found.</p>') +
     '<p class="hint" style="margin:0">These come from Timetable Maker, so you only keep one list. Change them there.</p></div>';
   body.innerHTML = html;
@@ -4427,6 +4517,110 @@ async function onSubmit(e) {
   }
   paint();
 }
+
+/* ---------- Admin: the school's house meeting schedule (everyone gets it) ---------- */
+let hs = null;            // { rows: [...], orig: {date: json}, removed: Set, dirty, past, paste }
+async function loadHouseAdmin() {
+  const { data, error } = await sb.from('ms_house').select('*').order('date');
+  if (error) { hs = { error: error.message }; return; }
+  const rows = (data || []).map(r => ({ date: r.date, congers: !!r.congers, rooms: Object.assign({ Athlone: '', Alexander: '', Goodhart: '', Dewar: '' }, r.rooms || {}) }));
+  hs = { rows, orig: Object.fromEntries(rows.map(r => [r.date, JSON.stringify(r)])), removed: new Set(), dirty: false, past: false, paste: false, parsed: null };
+}
+function houseAdminHTML() {
+  if (!hs) return '<div class="card2"><h3>House meetings for everyone</h3><p class="empty-note">Loading…</p></div>';
+  if (hs.error) return '<div class="card2"><h3>House meetings for everyone</h3><div class="acct-msg err">Couldn’t load the school’s schedule: ' + esc(hs.error) + '</div></div>';
+  const today = toISO(new Date());
+  const rows = hs.rows.slice().sort((a, b) => a.date.localeCompare(b.date));
+  const past = rows.filter(r => r.date < today).length, shown = rows.filter(r => hs.past || r.date >= today);
+  return '<div class="card2" id="houseAdmin"><h3>House meetings for everyone</h3>' +
+    '<p class="hint" style="margin:0">This is the school’s schedule. Every laptop gets it within a few minutes, signed in or not. Teachers can still change a date on their own laptop.</p>' +
+    '<div class="sched-wrap"><table class="sched"><thead><tr><th>Date</th>' +
+      HOUSES.map(x => '<th class="hh" style="background:' + x.bg + ';color:' + x.fg + '">' + x.name + '</th>').join('') +
+      '<th style="text-align:center">Congers</th><th></th></tr></thead><tbody>' +
+    (shown.length ? shown.map(r => '<tr data-hd="' + r.date + '" class="' + (r.congers ? 'cg' : '') + '"><td class="sd"><input type="date" data-hf="date" value="' + r.date + '" aria-label="Date"></td>' +
+      HOUSES.map(x => '<td><input data-hf="' + x.name + '" value="' + esc(r.congers ? '' : r.rooms[x.name] || '') + '"' + (r.congers ? ' disabled' : '') + ' aria-label="' + x.name + '"></td>').join('') +
+      '<td class="cgc"><input type="checkbox" data-hf="congers"' + (r.congers ? ' checked' : '') + ' aria-label="Congers"></td>' +
+      '<td><button type="button" class="mini" data-hdel aria-label="Remove this date">✕</button></td></tr>').join('')
+      : '<tr><td colspan="7" class="hint" style="padding:0.6rem 0.2rem">' + (rows.length ? 'No upcoming dates.' : 'No dates yet. Add one, or paste in a term.') + '</td></tr>') +
+    '</tbody></table></div>' +
+    '<div class="row"><button type="button" class="btn small strong" data-hact="add">Add a date</button>' +
+      '<label class="check"><input type="checkbox" data-hact="past"' + (hs.past ? ' checked' : '') + '><span>Show past dates' + (past ? ' (' + past + ')' : '') + '</span></label>' +
+      '<span style="flex:1"></span><button type="button" class="btn small" data-hact="paste">Paste in a term</button></div>' +
+    (hs.paste ? '<div class="pastebox"><p class="hint" style="margin-top:0">Paste from Excel: either <b>Date | Athlone | Alexander | Goodhart | Dewar</b>, or the school’s sheet with a row of rooms and a house in each cell. Write Congers for a Congers week.</p>' +
+      '<textarea id="hsPaste" spellcheck="false" aria-label="Pasted schedule"></textarea><div id="hsPastePrev"></div>' +
+      '<div class="row"><button type="button" class="btn small strong" data-hact="pasteAdd" disabled>Add these dates</button><button type="button" class="btn small" data-hact="pasteCancel">Cancel</button></div></div>' : '') +
+    '<div class="row" style="border-top:1px solid var(--soft-line);padding-top:12px"><span class="hint" style="margin:0;flex:1">' + (hs.dirty ? 'You have changes that only you can see so far.' : 'Everyone has the latest version.') + '</span>' +
+      '<button type="button" class="btn small" data-hact="discard"' + (hs.dirty ? '' : ' disabled') + '>Discard changes</button>' +
+      '<button type="button" class="btn small strong" data-hact="save"' + (hs.dirty ? '' : ' disabled') + '>Save for everyone</button></div></div>';
+}
+function hsRow(date) { return hs.rows.find(r => r.date === date); }
+function hsSetRow(date, row) {
+  const i = hs.rows.findIndex(r => r.date === date);
+  if (i >= 0) hs.rows[i] = row; else hs.rows.push(row);
+  hs.removed.delete(row.date); hs.dirty = true;
+}
+function paintHouseAdmin() { const el = $('houseAdmin'); if (el) el.outerHTML = houseAdminHTML(); }
+async function saveHouseAdmin() {
+  const changedRows = hs.rows.filter(r => hs.orig[r.date] !== JSON.stringify(r)).map(r => ({ date: r.date, congers: r.congers, rooms: r.congers ? {} : r.rooms }));
+  const gone = [...hs.removed].filter(d => hs.orig[d] && !hsRow(d));
+  if (changedRows.length) { const { error } = await sb.from('ms_house').upsert(changedRows, { onConflict: 'date' }); if (error) throw error; }
+  if (gone.length) { const { error } = await sb.from('ms_house').delete().in('date', gone); if (error) throw error; }
+  await loadHouseAdmin(); fetchShared();
+  return changedRows.length + gone.length;
+}
+document.addEventListener('click', async e => {
+  const host = e.target.closest && e.target.closest('#houseAdmin'); if (!host || !hs) return;
+  const b = e.target.closest('[data-hact], [data-hdel]'); if (!b) return;
+  if (b.matches('[data-hdel]')) { const d = b.closest('tr').dataset.hd; hs.rows = hs.rows.filter(r => r.date !== d); hs.removed.add(d); hs.dirty = true; return paintHouseAdmin(); }
+  const a = b.dataset.hact;
+  if (a === 'past') { hs.past = b.checked; return paintHouseAdmin(); }
+  if (a === 'add') {
+    const dates = hs.rows.map(r => r.date).sort();
+    let d = dates.length ? addDays(fromISO(dates[dates.length - 1]), 1) : new Date();
+    while (d.getDay() !== 4 || dates.includes(toISO(d))) d = addDays(d, 1);
+    hsSetRow(toISO(d), { date: toISO(d), congers: false, rooms: { Athlone: '', Alexander: '', Goodhart: '', Dewar: '' } });
+    return paintHouseAdmin();
+  }
+  if (a === 'paste') { hs.paste = !hs.paste; paintHouseAdmin(); const t = $('hsPaste'); if (t) t.focus(); return; }
+  if (a === 'pasteCancel') { hs.paste = false; hs.parsed = null; return paintHouseAdmin(); }
+  if (a === 'pasteAdd') {
+    (hs.parsed ? hs.parsed.rows : []).forEach(r => hsSetRow(r.date, { date: r.date, congers: !!r.congers, rooms: r.congers ? { Athlone: '', Alexander: '', Goodhart: '', Dewar: '' } : { Athlone: r.Athlone || '', Alexander: r.Alexander || '', Goodhart: r.Goodhart || '', Dewar: r.Dewar || '' } }));
+    const n = hs.parsed ? hs.parsed.rows.length : 0; hs.paste = false; hs.parsed = null; paintHouseAdmin();
+    toast('Added ' + n + ' dates. Press “Save for everyone” when you’re happy.'); return;
+  }
+  if (a === 'discard') { await loadHouseAdmin(); return paintHouseAdmin(); }
+  if (a === 'save') {
+    b.disabled = true;
+    try { const n = await saveHouseAdmin(); toast('Saved. Every laptop gets the new schedule within a few minutes.'); }
+    catch (err) { toast('Couldn’t save: ' + (err.message || err)); }
+    return paintHouseAdmin();
+  }
+});
+document.addEventListener('input', e => {
+  if (!hs || !e.target.closest || !e.target.closest('#houseAdmin')) return;
+  if (e.target.id === 'hsPaste') {
+    hs.parsed = parseSchedule(e.target.value);
+    const n = hs.parsed.rows.length;
+    $('hsPastePrev').innerHTML = (n ? '<p class="hint" style="margin-top:0">Found ' + n + (n === 1 ? ' date' : ' dates') + '. They’re added, or replace the same dates.</p>' : '') +
+      (hs.parsed.skipped.length ? '<p class="warnline">' + hs.parsed.skipped.length + ' lines couldn’t be read: ' + esc(hs.parsed.skipped.slice(0, 3).join(' / ')) + '</p>' : '');
+    document.querySelector('#houseAdmin [data-hact=pasteAdd]').disabled = !n;
+    return;
+  }
+  const f = e.target.dataset.hf, tr = e.target.closest('tr'); if (!f || !tr) return;
+  const r = hsRow(tr.dataset.hd); if (!r) return;
+  if (HOUSES.some(x => x.name === f)) { r.rooms[f] = e.target.value; hs.dirty = true; const s = document.querySelector('#houseAdmin [data-hact=save]'); if (s) { s.disabled = false; document.querySelector('#houseAdmin [data-hact=discard]').disabled = false; } }
+});
+document.addEventListener('change', e => {
+  if (!hs || !e.target.closest || !e.target.closest('#houseAdmin')) return;
+  const f = e.target.dataset.hf, tr = e.target.closest('tr'); if (!f || !tr) return;
+  const r = hsRow(tr.dataset.hd); if (!r) return;
+  if (f === 'congers') { r.congers = e.target.checked; hs.dirty = true; return paintHouseAdmin(); }
+  if (f === 'date') {
+    const nd = e.target.value; if (!nd || nd === r.date) return;
+    if (hsRow(nd)) { toast('That date is already in the schedule.'); e.target.value = r.date; return; }
+    hs.removed.add(r.date); r.date = nd; hs.dirty = true; return paintHouseAdmin();
+  }
+});
 
 async function adminAct(fn, okText) {
   try { const { error } = await fn(); if (error) throw error; await loadAdmin(); if (okText) toast(okText); }
@@ -4795,7 +4989,7 @@ let hadSession = false; try { hadSession = !!localStorage.getItem(SB_STORE); } c
 if (hadSession || fromEmailLink) start();
 if (/^link/.test(view)) setTimeout(() => openSetup('account'), 0);
 // Admins: check for new requests now and then
-setInterval(() => { if (isAdmin() && document.visibilityState === 'visible') loadAdmin().then(paint).catch(() => {}); }, 120000);
+setInterval(() => { const ae = document.activeElement; if (isAdmin() && document.visibilityState === 'visible' && !(hs && hs.dirty) && !(ae && $('adminBody').contains(ae))) loadAdmin().then(paint).catch(() => {}); }, 120000);
 })();
 })();
 </script>
