@@ -3996,7 +3996,18 @@ const DOMAIN = '@lambrookschool.co.uk';
 let sb = null, loading = null;
 let me = null;            // { id, email, name, initials, role, status }
 let session = null;
-let view = 'signin';      // signin | signup | forgot | recovery | sent | resetSent
+let view = 'signin';      // signin | signup | forgot | recovery | sent | resetSent | linkConfirm | linkReset | linkBad
+// Email links carry a code in the address (#ms_confirm=… or #ms_reset=…). Opening the page does NOT use it up:
+// only pressing the button does. School email scanners open every link first, which would otherwise spend it.
+let linkCode = null;
+(() => {
+  const hs = new URLSearchParams(location.hash.slice(1));
+  if (hs.get('ms_confirm')) { linkCode = hs.get('ms_confirm'); view = 'linkConfirm'; }
+  else if (hs.get('ms_reset')) { linkCode = hs.get('ms_reset'); view = 'linkReset'; }
+  else if (hs.get('error_code') || hs.get('error')) view = 'linkBad';
+  else return;
+  try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+})();
 let msg = null;           // { kind: 'err' | 'ok' | '', text }
 let sentTo = '', meError = '';
 let admin = { requests: [], staff: [], allowed: [], forms: [], loaded: false, noConfirm: false };
@@ -4018,8 +4029,10 @@ async function client() {
   sb = window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, storageKey: SB_STORE } });
   sb.auth.onAuthStateChange((event, s) => {
     session = s;
-    if (event === 'PASSWORD_RECOVERY') { view = 'recovery'; msg = null; setTimeout(() => openSetup('account'), 0); }
+    if (event === 'PASSWORD_RECOVERY' && view !== 'linkReset') { view = 'recovery'; msg = null; setTimeout(() => openSetup('account'), 0); }
     // Avoid calling Supabase inside the callback itself (supabase-js can deadlock); do it on the next tick.
+    // Same person signing in again (checking their current password) or a token refresh: nothing to reload
+    if (me && s && s.user.id === me.id && /^(SIGNED_IN|TOKEN_REFRESHED|USER_UPDATED)$/.test(event) && !/^link/.test(view)) return;
     setTimeout(() => refreshMe(event), 0);
   });
   return sb;
@@ -4031,13 +4044,13 @@ async function refreshMe(event) {
   const was = me;
   me = error ? null : data;
   meError = error ? (error.message || String(error)) : (data ? '' : 'No account record found for ' + session.user.email + '.');
-  if (event === 'SIGNED_IN' && fromEmailLink && me) {
+  if (event === 'SIGNED_IN' && fromEmailLink && me && !/^link/.test(view)) {
     fromEmailLink = false;
     toast(me.status === 'approved' ? 'Email confirmed. You’re signed in.' : 'Email confirmed. An admin will approve your account soon.');
     if (view !== 'recovery') openSetup('account');
   }
   if (me && me.role === 'admin' && me.status === 'approved') await loadAdmin(); else admin.loaded = false;
-  if (!was || !me || was.id !== me.id || was.status !== me.status || was.role !== me.role || view === 'recovery') { if (view !== 'recovery') view = 'signin'; }
+  if (!was || !me || was.id !== me.id || was.status !== me.status || was.role !== me.role || view === 'recovery') { if (!/^(recovery|link)/.test(view)) view = 'signin'; }
   paint();
 }
 
@@ -4086,10 +4099,17 @@ function paintAccount() {
     html = '<div class="card2"><h3>Can’t reach the account service</h3><p class="hint" style="margin:0">This laptop may be offline. Everything else in Morning Slide still works.</p><div class="row"><button type="button" class="btn" data-act="retry">Try again</button></div></div>';
   } else if (!sb) {
     html = '<div class="card2"><p class="empty-note">Loading…</p></div>';
-  } else if (view === 'recovery') {
-    html = '<div class="card2"><h3>Choose a new password</h3>' + msgHTML() + '<form class="acct-form" data-form="recovery">' +
+  } else if (view === 'linkConfirm') {
+    html = '<div class="card2"><h3>Confirm your email</h3><p style="margin:0">One more click and your Morning Slide account is ready.</p>' + msgHTML() +
+      '<form class="acct-form" data-form="linkConfirm"><div class="row"><button class="btn primary">Confirm my email</button></div></form></div>';
+  } else if (view === 'linkReset' || view === 'recovery') {
+    html = '<div class="card2"><h3>Choose a new password</h3>' + msgHTML() + '<form class="acct-form" data-form="' + (view === 'linkReset' ? 'linkReset' : 'recovery') + '">' +
       field('acNewPw', 'New password <small>at least 8 characters</small>', 'password', ' autocomplete="new-password" minlength="8" required') +
+      field('acNewPw2', 'New password again', 'password', ' autocomplete="new-password" minlength="8" required') +
       '<div class="row"><button class="btn primary">Save new password</button></div></form></div>';
+  } else if (view === 'linkBad') {
+    html = '<div class="card2"><h3>That link didn’t work</h3><div class="acct-msg err">It has expired or has already been used. Links last an hour and work once; school email sometimes opens them first to check them for safety.</div>' +
+      '<div class="row"><button type="button" class="btn primary" data-view="forgot">Send a new password link</button><button type="button" class="linkbtn" data-view="signin">Sign in</button></div></div>';
   } else if (session && !me) {
     html = '<div class="card2"><div class="acct-who"><span class="av">?</span><div><b>Signed in</b><span>' + esc(session.user.email) + '</span></div><span style="flex:1"></span><button type="button" class="btn small" data-act="signout">Sign out</button></div>' +
       '<div class="acct-msg err">You’re signed in, but Morning Slide couldn’t load your account details. ' + esc(meError) + '</div>' +
@@ -4106,7 +4126,9 @@ function paintAccount() {
       field('acInit', 'Initials', 'text', ' value="' + esc(me.initials) + '" maxlength="5" required style="text-transform:uppercase"') +
       '</div><div class="row"><button class="btn small strong">Save</button></div></form></div>' +
       '<div class="card2"><h3>Change password</h3><form class="acct-form" data-form="password">' +
-      field('acPw2', 'New password <small>at least 8 characters</small>', 'password', ' autocomplete="new-password" minlength="8" required') +
+      field('acPwOld', 'Current password', 'password', ' autocomplete="current-password" required') +
+      field('acNewPw', 'New password <small>at least 8 characters</small>', 'password', ' autocomplete="new-password" minlength="8" required') +
+      field('acNewPw2', 'New password again', 'password', ' autocomplete="new-password" minlength="8" required') +
       '<div class="row"><button class="btn small strong">Change password</button></div></form></div>';
   } else if (view === 'sent' || view === 'resetSent') {
     html = '<div class="card2"><h3>Check your email</h3><p style="margin:0">We’ve sent a link to <b>' + esc(sentTo) + '</b> from morningslide@crooket.com. ' +
@@ -4173,10 +4195,12 @@ function paintAdmin() {
 }
 
 /* ---------- actions ---------- */
-let offline = false, fromEmailLink = /access_token=|type=signup|type=recovery|error_description=/.test(location.hash);
+let offline = false, fromEmailLink = !!linkCode || view === 'linkBad' || /access_token=|type=signup|type=recovery|error_description=/.test(location.hash);
 function friendly(e) {
   const m = (e && (e.message || e.error_description || e.msg)) || String(e);
   if (/invalid login credentials/i.test(m)) return 'That email and password don’t match. Check them, or reset your password.';
+  if (/expired|invalid.*(link|otp|token)|otp_expired|token has expired/i.test(m)) return 'This link has expired or has already been used. <button type="button" class="linkbtn" data-view="forgot">Send a new one</button>';
+  if (/same.*password|different from the old/i.test(m)) return 'Your new password needs to be different from your current one.';
   if (/email not confirmed/i.test(m)) return 'Please confirm your email first: click the link we sent you. Check your Junk folder too.';
   if (/database error saving new user|lambrook school email/i.test(m)) return 'Only ' + DOMAIN + ' addresses can sign up.';
   if (/already registered|already exists/i.test(m)) return 'There’s already an account with that email. Sign in, or reset your password.';
@@ -4217,8 +4241,26 @@ async function onSubmit(e) {
       if (error) throw error;
       sentTo = email; view = 'resetSent';
     }
-    if (kind === 'recovery' || kind === 'password') {
-      const pw = $(kind === 'recovery' ? 'acNewPw' : 'acPw2').value;
+    if (kind === 'linkConfirm') {
+      const { error } = await sb.auth.verifyOtp({ token_hash: linkCode, type: 'email' });
+      if (error) throw error;
+      linkCode = null; view = 'signin'; fromEmailLink = false;
+      await refreshMe();
+      toast(me && me.status === 'approved' ? 'Email confirmed. You’re signed in.' : 'Email confirmed. An admin will approve your account soon.');
+      return;
+    }
+    if (kind === 'recovery' || kind === 'password' || kind === 'linkReset') {
+      const pw = $('acNewPw').value;
+      if (pw !== $('acNewPw2').value) throw new Error('The two new passwords don’t match.');
+      if (kind === 'password') {   // check the current password first, like any other site
+        const { error } = await sb.auth.signInWithPassword({ email: session.user.email, password: $('acPwOld').value });
+        if (error) throw new Error(/invalid login/i.test(error.message) ? 'Your current password isn’t right.' : error.message);
+      }
+      if (kind === 'linkReset') {
+        const { error } = await sb.auth.verifyOtp({ token_hash: linkCode, type: 'recovery' });
+        if (error) throw error;
+        linkCode = null;
+      }
       const { error } = await sb.auth.updateUser({ password: pw });
       if (error) throw error;
       view = 'signin'; toast('Password changed');
@@ -4241,6 +4283,7 @@ async function onSubmit(e) {
     const text = friendly(err);
     busy(form, false);
     if (kind === 'allow') { toast(text.replace(/<[^>]+>/g, '')); return; }
+    if (!document.body.contains(form)) { msg = { kind: 'err', text }; paint(); return; }
     // Show the message without redrawing the form, so nothing typed is lost
     msg = null;
     let box = form.parentNode.querySelector('.acct-msg');
@@ -4305,6 +4348,7 @@ showSection = function (sec) {
 // Only talk to Supabase straight away if this browser has signed in before, or has just come back from an email link.
 let hadSession = false; try { hadSession = !!localStorage.getItem(SB_STORE); } catch (e) {}
 if (hadSession || fromEmailLink) start();
+if (/^link/.test(view)) setTimeout(() => openSetup('account'), 0);
 // Admins: check for new requests now and then
 setInterval(() => { if (isAdmin() && document.visibilityState === 'visible') loadAdmin().then(paint).catch(() => {}); }, 120000);
 })();
