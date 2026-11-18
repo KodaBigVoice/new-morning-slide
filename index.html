@@ -4040,6 +4040,7 @@ async function client() {
 
 async function refreshMe(event) {
   if (!session) { me = null; admin.loaded = false; paint(); return; }
+  if (!me || me.id !== session.user.id) { me = null; meError = ''; }   // still loading: show "Loading…", not an error
   const { data, error } = await sb.from('ms_staff').select('*').eq('id', session.user.id).maybeSingle();
   const was = me;
   me = error ? null : data;
@@ -4110,6 +4111,8 @@ function paintAccount() {
   } else if (view === 'linkBad') {
     html = '<div class="card2"><h3>That link didn’t work</h3><div class="acct-msg err">It has expired or has already been used. Links last an hour and work once; school email sometimes opens them first to check them for safety.</div>' +
       '<div class="row"><button type="button" class="btn primary" data-view="forgot">Send a new password link</button><button type="button" class="linkbtn" data-view="signin">Sign in</button></div></div>';
+  } else if (session && !me && !meError) {
+    html = '<div class="card2"><p class="empty-note">Loading your account…</p></div>';
   } else if (session && !me) {
     html = '<div class="card2"><div class="acct-who"><span class="av">?</span><div><b>Signed in</b><span>' + esc(session.user.email) + '</span></div><span style="flex:1"></span><button type="button" class="btn small" data-act="signout">Sign out</button></div>' +
       '<div class="acct-msg err">You’re signed in, but Morning Slide couldn’t load your account details. ' + esc(meError) + '</div>' +
