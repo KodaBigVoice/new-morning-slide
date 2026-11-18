@@ -186,6 +186,16 @@
 .slide .pt-bar { flex: 1 1 0; height: 16px; border-radius: 8px; background: rgba(255, 255, 255, 0.22); overflow: hidden; }
 .slide .pt-bar i { display: block; height: 100%; width: 0; border-radius: 8px; background: #fff; }
 .slide .rich[data-always]:empty::before { content: attr(data-always); color: var(--muted); }
+/* School notices: faint outlined boxes below the form's own notes */
+.slide .notices { flex: none; display: flex; flex-direction: column; gap: 12px; max-height: 58%; overflow: hidden; }
+.slide .notice { border: 3px solid color-mix(in srgb, var(--dot) 34%, transparent); border-radius: 22px; padding: 10px 20px 12px; font-size: 27px; line-height: 1.28; color: var(--ink); text-wrap: pretty; }
+.slide .notices.many .notice { font-size: 23px; padding: 8px 18px 10px; }
+.slide .notice .by { color: var(--label); font-size: 0.82em; white-space: nowrap; }
+.slide .prep-box .notice { font-size: 24px; }
+.slide .notice-strip { position: absolute; left: 48px; right: 48px; bottom: 26px; z-index: 4; display: flex; flex-direction: row; flex-wrap: wrap; align-items: flex-start; gap: 14px; max-height: 40%; }
+.slide .notice-strip .notice { flex: 1 1 380px; font-size: 30px; background: #fff; box-shadow: 0 10px 28px -14px rgba(23, 50, 79, 0.35); }
+.slide.editor-preview .notice { cursor: pointer; }
+.slide.editor-preview .card:has(> .split-toggle) .notices { margin-bottom: 46px; }
 /* Freestyle */
 .slide .free { position: relative; min-height: 0; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .slide .free-main { grid-column: 2; grid-row: 3; }
@@ -552,6 +562,59 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
 .tip { position: fixed; z-index: 300; max-width: 290px; padding: 0.45rem 0.7rem; border-radius: 8px; background: var(--ink); color: #fff; font-size: 0.82rem; line-height: 1.4; pointer-events: none; box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.45); }
 .toast { position: fixed; left: 50%; bottom: 5rem; transform: translate(-50%, 1rem); background: var(--ink); color: #fff; padding: 0.6rem 1.05rem; border-radius: 8px; font-size: 0.9rem; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 100; max-width: calc(100% - 2rem); box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.5); }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
+/* Notices panel */
+.np-back { position: fixed; inset: 0; z-index: 140; background: rgba(28, 48, 72, 0.38); display: grid; place-items: start center; padding: 64px 1rem 1rem; overflow: auto; }
+.np { width: min(780px, 100%); background: #fff; border-radius: 16px; box-shadow: 0 24px 60px -20px rgba(28, 48, 72, 0.55); display: flex; flex-direction: column; max-height: calc(100vh - 84px); }
+.np-head { flex: none; display: flex; align-items: center; gap: 2px; padding: 0 12px 0 24px; border-bottom: 1px solid var(--soft-line); min-height: 56px; overflow-x: auto; }
+.np-head [role=tab] { border: 0; background: none; min-height: 56px; padding: 0 12px; font-weight: 400; color: var(--slate); border-bottom: 3px solid transparent; cursor: pointer; white-space: nowrap; }
+.np-head [role=tab][aria-selected=true] { color: var(--steel); font-weight: 700; border-bottom-color: var(--steel); }
+.np-head .np-x { margin-left: auto; width: 44px; height: 44px; border: 0; background: none; border-radius: 8px; color: var(--slate); cursor: pointer; display: grid; place-items: center; flex: none; }
+.np-head .np-x:hover { background: var(--mist); }
+.np-body { flex: 1; min-height: 0; overflow-y: auto; padding: 24px 28px; display: flex; flex-direction: column; gap: 28px; }
+.np-foot { flex: none; display: flex; align-items: center; gap: 12px; padding: 14px 28px; border-top: 1px solid var(--soft-line); background: var(--frost); border-radius: 0 0 16px 16px; }
+.np-foot p { margin: 0; flex: 1; font-size: 0.95rem; }
+.np h3 { margin: 0 0 10px; font-family: var(--disp); font-size: 1.2rem; color: var(--ink); }
+.np-write { border: 2px solid #B9D3D2; border-radius: 14px; padding: 14px 18px 10px; display: flex; flex-direction: column; gap: 4px; }
+.np-write:focus-within { border-color: var(--steel); }
+.np-write textarea { border: 0; resize: none; padding: 0; background: none; font-family: var(--disp); font-size: 1.45rem; line-height: 1.4; color: var(--ink); width: 100%; }
+.np-write textarea:focus { outline: none; }
+.np-write .np-by { align-self: flex-end; font-family: var(--disp); font-size: 1.1rem; color: #5A6E82; }
+.np-under { display: flex; justify-content: space-between; gap: 12px; font-size: 0.82rem; color: #5A6E82; margin-top: 6px; }
+.np-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.np-chip { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1.5px solid var(--line); background: #fff; color: var(--ink); font-weight: 700; cursor: pointer; }
+.np-chip.big { font-size: 1.02rem; padding: 0 18px; }
+.np-chip.sm { min-height: 40px; padding: 0 13px; font-size: 0.92rem; }
+.np-chip[data-st=on] { background: var(--steel); border-color: var(--steel); color: #fff; }
+.np-chip[data-st=part] { background: var(--mist); border-style: dashed; border-color: var(--steel); color: #2C4A68; }
+.np-chip small { font-weight: 400; font-size: 0.8rem; }
+.np-sep { width: 1px; height: 28px; background: var(--line); margin: 0 4px; }
+.np-more { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px 0 12px; margin-top: 12px; border-radius: 999px; border: 1.5px solid var(--line); background: #fff; color: var(--steel); font-weight: 700; font-size: 0.9rem; cursor: pointer; }
+.np-more[aria-expanded=true] { background: var(--mist); border-color: var(--steel); }
+.np-more svg { transition: transform 0.15s; }
+.np-more[aria-expanded=true] svg { transform: rotate(180deg); }
+.np-years { margin-top: 12px; padding: 12px 14px; border-radius: 14px; background: var(--frost); }
+.np-years .np-chips { gap: 8px; }
+.np-years .np-chips .gapl { margin-left: 12px; }
+.np-forms { margin-top: 10px; padding: 12px 14px; border-radius: 12px; background: #fff; border: 1px solid var(--soft-line); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 24px; }
+.np-forms > div { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.np-forms .yl { width: 56px; font-size: 0.8rem; font-weight: 700; color: #5A6E82; }
+.np-when { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+.np-when .seg { width: min(500px, 100%); grid-auto-columns: 1fr; }
+.np-when .seg button { min-height: 44px; font-size: 0.92rem; }
+.np-when input[type=date] { height: 44px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+.np-prep { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+.np-list { display: flex; flex-direction: column; gap: 10px; }
+.np-item { display: flex; align-items: flex-start; gap: 14px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; }
+.np-item.hidden-n { background: var(--frost); }
+.np-item.hidden-n .np-text { color: var(--slate); text-decoration: line-through; text-decoration-color: rgba(100, 121, 143, 0.5); }
+.np-item .np-text { flex: 1; min-width: 0; }
+.np-item .np-text b { display: block; font-family: var(--disp); font-weight: 400; font-size: 1.12rem; line-height: 1.35; color: var(--ink); }
+.np-item .np-text span { font-size: 0.82rem; color: #5A6E82; }
+.np-item .np-acts { display: flex; gap: 6px; flex: none; }
+.np-group { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #5A6E82; margin: 6px 0 -2px; }
+.np-empty { color: var(--slate); margin: 0; }
+.notice-hint { display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap; color: #FFE7B8; }
+.notice-hint button { border: 1px solid rgba(255, 255, 255, 0.35); background: none; color: #fff; border-radius: 8px; padding: 0.3rem 0.6rem; cursor: pointer; font-weight: 700; }
 /* Accounts */
 .badge { display: inline-grid; place-items: center; min-width: 1.25rem; height: 1.25rem; padding: 0 0.3rem; border-radius: 999px; background: #C2453D; color: #fff; font-size: 0.72rem; font-weight: 700; line-height: 1; }
 .topbtn .badge { margin-left: -0.15rem; }
@@ -608,6 +671,9 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
     </div>
     <button type="button" class="formchip" id="formChip" title="Your form (change it in Setup)"></button>
     <nav class="week" id="week" aria-label="Choose a day"></nav>
+    <button type="button" class="topbtn" id="noticesBtn" hidden>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l14-6v14L3 13z"></path><path d="M7 12.5V17a2 2 0 0 0 4 0v-3"></path><path d="M20 9v6"></path></svg>Notices<span class="badge" id="noticesBadge" hidden></span>
+    </button>
     <button type="button" class="topbtn" id="setupBtn">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"></path></svg>Setup<span class="badge" id="setupBadge" hidden data-tip="People waiting for you to approve them"></span>
     </button>
@@ -768,6 +834,7 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
       <button type="button" class="bb-btn" id="vSound">Sound off</button>
     </div>
     <span class="grow"></span>
+    <span class="notice-hint" id="noticeHint" hidden><span id="noticeHintText"></span><button type="button" id="noticeStripBtn"></button></span>
     <span class="projstatus off" id="projStatus"><span class="led"></span><span id="projText">Not on the projector</span></span>
     <button type="button" class="bb-btn" id="projSwap" hidden>Show this instead</button>
     <span class="vsep"></span>
@@ -776,6 +843,8 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
     <button type="button" class="bb-btn bb-icon" id="saveCopy" aria-label="Save a copy" title="Save a copy"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg></button>
   </footer>
 </div>
+
+<div class="np-back" id="noticePanel" hidden><div class="np" role="dialog" aria-modal="true" aria-label="Notices" id="noticeDialog"></div></div>
 
 <!-- ===================== SETUP ===================== -->
 <div id="setupScreen" class="screen" hidden>
@@ -1129,7 +1198,8 @@ function defaultState() {
     headings: { all: {}, day: {} },      // your own headings: { all: { key: text }, day: { FRI: { key: text } } } (just-today ones live in overrides)
     other: per(''), otherTitle: per(''), // the middle "Other info" box
     oneoff: {},                          // { date: { notes, info, lunch, other, prepInfo } }: "just this <weekday>" announcements
-    split: {},                           // { box: true } splits a box into weekly + just-this-week (default: one list)                // show "Miss A Woodhouse" (true) or "Miss Woodhouse" (false)
+    split: {},
+    noticeStrip: false,                  // whole-slide Freestyle: show school notices in a strip along the bottom                           // { box: true } splits a box into weekly + just-this-week (default: one list)                // show "Miss A Woodhouse" (true) or "Miss Woodhouse" (false)
     prefNames: {}                        // { form: { name on the spreadsheet: preferred name } }
   };
 }
@@ -1565,6 +1635,37 @@ function setSlideHTML(host, html) {      // replaces the slide but keeps anythin
   host.querySelectorAll(':scope > .slide').forEach(s => s.remove());
   host.insertAdjacentHTML('afterbegin', html);
 }
+/* ---------- School notices ----------
+   Signed-in staff get notices from the school database. A copy is kept on this laptop (NOTICE_KEY) so the
+   projector window, which never goes online itself, can show them, and so they still show if the Wi-Fi drops. */
+const NOTICE_KEY = 'morningSlide.v2.notices';
+function loadNoticeCache() { try { return JSON.parse(localStorage.getItem(NOTICE_KEY)) || null; } catch (e) { return null; } }
+let noticeCache = loadNoticeCache();
+const SECTION_NAMES = { LS: 'Lower School', MS: 'Middle School', US: 'Upper School', PP: 'Pre-Prep' };
+const formYear = f => { const m = /^(\d+)/.exec(String(f || '')); return m ? Number(m[1]) : null; };
+function formSection(cache, form) { const f = ((cache && cache.forms) || []).find(x => x.form === form); return f ? f.section : null; }
+function noticeReaches(n, form, cache) {
+  const a = n.audience || {};
+  if (a.all) return true;
+  if (!form) return false;
+  const y = formYear(form), s = formSection(cache, form);
+  return (a.forms || []).includes(form) || (y != null && (a.years || []).includes(y)) || (!!s && (a.sections || []).includes(s));
+}
+// where: 'morning' = that day's slides; 'eve' = the prep slide the evening before that day
+function noticesFor(st, date, where, withHidden) {
+  const c = noticeCache;
+  if (!c || !c.uid) return [];
+  const iso = toISO(date), hides = new Set(c.hides || []);
+  return (c.notices || []).filter(n => n.start_date <= iso && n.end_date >= iso && (where !== 'eve' || n.prep_eve) &&
+      noticeReaches(n, st.form, c) && (withHidden || !hides.has(n.id)))
+    .sort((a, b) => (a.created_at < b.created_at ? -1 : 1));
+}
+function noticesHTML(list, cls) {
+  if (!list.length) return '';
+  return '<div class="notices' + (list.length > 3 ? ' many' : '') + (cls ? ' ' + cls : '') + '">' +
+    list.map(n => '<div class="notice" data-notice="' + esc(n.id) + '">' + esc(n.body) + ' <span class="by">– ' + esc(n.author_initials || '') + '</span></div>').join('') + '</div>';
+}
+
 function renderSlide(host, st, date, editor) {
   const day = resolveDay(st, date);
   const t = themeFor(st, day.wd);
@@ -1576,6 +1677,7 @@ function renderSlide(host, st, date, editor) {
         '<div class="circle" style="width:900px;height:900px;left:-300px;bottom:-480px"></div>' +
         '<div class="circle" style="width:700px;height:700px;right:-260px;top:-360px"></div>' +
         '<div class="grid"><div class="banner">' + dateHTML(date) + '</div>' + freeHTML('whole', day.free.whole, editor, 'free-whole') + '</div>' +
+        (st.noticeStrip ? noticesHTML(noticesFor(st, date, 'morning'), 'notice-strip') : '') +
       '</div>');
     fitSlide(host.querySelector('.slide'), 'none');
     return host.querySelector('.slide');
@@ -1597,7 +1699,7 @@ function renderSlide(host, st, date, editor) {
           (day.ttView === 'first' ? firstLessonHTML(day.firstLesson, hd(st, date, 'first')) : '') +
         '</div>' +
         '<div class="left' + (wide ? '' : ' region-main') + '">' +
-          '<div class="card notes">' + hdEl(st, date, 'notes') + splitHTML(st, date, 'notes', 'notes', day.notes, '32,20', editor) + '</div>' +
+          '<div class="card notes">' + hdEl(st, date, 'notes') + splitHTML(st, date, 'notes', 'notes', day.notes, '32,20', editor) + noticesHTML(noticesFor(st, date, 'morning')) + '</div>' +
         '</div>' +
         (day.showTT ? '<div class="card tt region-main">' + hdEl(st, date, 'tt') + timetableHTML(st, day.wd) + '</div>' : '') +
         (day.ttView === 'text' ? '<div class="card other region-main"><div class="heading" data-field="otherTitle">' + esc(day.otherTitle.trim() || 'Other info') + '</div>' + splitHTML(st, date, 'other', 'otherText', day.otherText, '30,18', editor) + '</div>' : '') +
@@ -1751,6 +1853,7 @@ function renderPrep(host, st, date, editor) {
   }
   const info = resolveDay(st, date).prepInfo;
   const pf = prepFreeOf(st, date);
+  const notes2 = morning ? noticesFor(st, date, 'morning') : noticesFor(st, nextSchoolDay(date), 'eve');
   host.style.background = t.bg;
   if (pf.mode === 'whole') {
     // Everything below the banner is freestyle; the timer moves into the banner so it's never lost
@@ -1767,6 +1870,7 @@ function renderPrep(host, st, date, editor) {
           '</div>' +
           freeHTML('whole', pf.item, editor, 'free-whole').replace('data-slot="whole"', 'data-slot="prep"').replace(/data-field="free:whole:/g, 'data-field="free:prep:') +
         '</div>' +
+        (st.noticeStrip ? noticesHTML(notes2, 'notice-strip') : '') +
       '</div>');
     const s = host.querySelector('.slide');
     fitSlide(s, 'none'); paintTimer(s, st);
@@ -1788,10 +1892,10 @@ function renderPrep(host, st, date, editor) {
             : (editor ? '' : '<div class="prep-none">No preps set for ' + DAY_NAMES[wd] + ' yet</div>')) +
           (editor && rows.length < 4 ? '<button type="button" class="prep-add" data-add-prep>+ Add a prep</button>' : '') +
         '</div>' +
-        (pf.mode === 'bottom' ? freeHTML('prep', pf.item, editor, 'free-pbot') :
+        (pf.mode === 'bottom' ? freeHTML('prep', pf.item, editor, 'free-pbot') + (st.noticeStrip ? noticesHTML(notes2, 'notice-strip') : '') :
         '<div class="prep-low">' +
           '<div class="card prep-box">' + hdEl(st, date, 'prepInfo') + splitHTML(st, date, 'prepInfo', 'prepInfo', info, '30,18', editor, 'No extra instructions') + '</div>' +
-          '<div class="card prep-box">' + hdEl(st, date, secondTitle) + splitHTML(st, date, secondTitle, secondTitle, second, '30,18', editor) + '</div>' +
+          '<div class="card prep-box">' + hdEl(st, date, secondTitle) + splitHTML(st, date, secondTitle, secondTitle, second, '30,18', editor) + noticesHTML(notes2) + '</div>' +
         '</div>') +
         '<div class="right">' +
           (clockOnly ? '<div class="pt clock-only">' + (editor ? timerBell(st) : '') + hdEl(st, date, 'timeNow', null, 'pt-label') + '<div class="pt-time pt-bigclock"></div>' +
@@ -2028,6 +2132,7 @@ if (location.hash === '#slide') {
   onVideoStatus = () => { if (window.opener && !window.opener.closed) { try { window.opener.postMessage({ type: 'ms-video-status', status: videoStatus }, '*'); } catch (e) {} } };
   window.addEventListener('storage', e => {
     if (e.key === STORE_KEY) { state = loadState(); draw(); }
+    if (e.key === NOTICE_KEY) { noticeCache = loadNoticeCache(); draw(); }
     if (e.key === TIMER_KEY) { timer = loadTimer(); paint(); }
   });
   // The projector keeps time too, so the timer moves on even if the laptop tab is in the background
@@ -3845,9 +3950,30 @@ function renderAll(opts = {}) {
     if (editMode === 'prep') refreshTimerUi();
   }
   if (!els.stage.hidden) { renderView(els.stage, state, proj.mode, fromISO(proj.date)); scaleInto(els.stage); }
+  updateNoticeHint();
   updatePresenting();
   sendToSlide();
 }
+// Freestyle covering the box where notices go: say so, and offer a strip along the bottom
+function updateNoticeHint() {
+  const hint = $('noticeHint'); if (!hint) return;
+  let list = [], covered = false;
+  if (editMode === 'prep') {
+    const wd = wdOf(viewDate), morning = isMorningPrep(state, wd), mode = prepFreeOf(state, viewDate).mode;
+    covered = mode === 'whole' || mode === 'bottom';
+    list = morning ? noticesFor(state, viewDate, 'morning') : noticesFor(state, nextSchoolDay(viewDate), 'eve');
+  } else {
+    covered = !!resolveDay(state, viewDate).whole;
+    list = noticesFor(state, viewDate, 'morning');
+  }
+  hint.hidden = !covered || !list.length;
+  if (hint.hidden) return;
+  $('noticeHintText').textContent = state.noticeStrip
+    ? list.length + (list.length === 1 ? ' notice is' : ' notices are') + ' in a strip along the bottom'
+    : list.length + (list.length === 1 ? ' notice isn’t' : ' notices aren’t') + ' showing because of Freestyle';
+  $('noticeStripBtn').textContent = state.noticeStrip ? 'Hide the strip' : 'Show them in a strip';
+}
+$('noticeStripBtn').addEventListener('click', () => { state.noticeStrip = !state.noticeStrip; changed(); });
 function changed(opts = {}) {
   save();
   if (!opts.keepPreview) pendingFull = true;
@@ -4039,7 +4165,7 @@ async function client() {
 }
 
 async function refreshMe(event) {
-  if (!session) { me = null; admin.loaded = false; paint(); return; }
+  if (!session) { me = null; admin.loaded = false; clearNotices(); paint(); return; }
   if (!me || me.id !== session.user.id) { me = null; meError = ''; }   // still loading: show "Loading…", not an error
   const { data, error } = await sb.from('ms_staff').select('*').eq('id', session.user.id).maybeSingle();
   const was = me;
@@ -4051,6 +4177,7 @@ async function refreshMe(event) {
     if (view !== 'recovery') openSetup('account');
   }
   if (me && me.role === 'admin' && me.status === 'approved') await loadAdmin(); else admin.loaded = false;
+  if (me && me.status === 'approved') fetchNotices(); else clearNotices();
   if (!was || !me || was.id !== me.id || was.status !== me.status || was.role !== me.role || view === 'recovery') { if (!/^(recovery|link)/.test(view)) view = 'signin'; }
   paint();
 }
@@ -4081,6 +4208,8 @@ function paintBadges() {
   const n = isAdmin() ? waiting() : 0;
   for (const id of ['setupBadge', 'adminNavBadge']) { const b = $(id); if (b) { b.hidden = !n; b.textContent = n; } }
   $('adminNav').hidden = !isAdmin();
+  $('noticesBtn').hidden = !isStaff();
+  paintNoticeBadge();
   $('acctNavSub').textContent = session && !me ? 'Signed in as ' + session.user.email : me ? (me.status === 'approved' ? 'Signed in as ' + me.name : 'Waiting for approval') : 'Sign in with your school email';
   if (!isAdmin() && setupSec === 'admin' && !$('setupScreen').hidden) showSection('account');
 }
@@ -4328,6 +4457,315 @@ for (const id of ['acctBody', 'adminBody']) {
   $(id).addEventListener('click', onClick);
   $(id).addEventListener('change', onChange);
 }
+
+/* =====================================================================
+   NOTICES: posting, and the list for your form
+   ===================================================================== */
+const isStaff = () => !!(me && me.status === 'approved');
+const todayISO = () => toISO(new Date());
+let npTab = 'new', npOpen = false, npBusy = false;
+let draft = null;            // the notice being written or edited
+
+function saveNoticeCache(c) {
+  noticeCache = c;
+  try { if (c) localStorage.setItem(NOTICE_KEY, JSON.stringify(c)); else localStorage.removeItem(NOTICE_KEY); } catch (e) {}
+  renderAll(); paintNoticeBadge(); if (npOpen) paintPanel();
+}
+function clearNotices() { if (noticeCache) saveNoticeCache(null); }
+async function fetchNotices() {
+  if (!sb || !isStaff()) return;
+  const since = toISO(addDays(new Date(), -1));
+  const [ns, hs, fs] = await Promise.all([
+    sb.from('ms_notices').select('*').gte('end_date', since).order('start_date'),
+    sb.from('ms_notice_hides').select('notice_id'),
+    sb.rpc('ms_forms'),
+  ]);
+  if (ns.error) {   // e.g. 04-notices.sql not run yet: keep whatever we had
+    noticeError = ns.error.message || 'Couldn’t load notices';
+    if (npOpen) paintPanel();
+    return;
+  }
+  noticeError = '';
+  const old = noticeCache && noticeCache.uid === me.id ? noticeCache : {};
+  saveNoticeCache({
+    uid: me.id, at: Date.now(),
+    forms: Array.isArray(fs.data) && fs.data.length ? fs.data.filter(f => f && f.form).map(f => ({ form: String(f.form), section: f.section || '' })) : (old.forms || []),
+    notices: ns.data || [],
+    hides: (hs.data || []).map(x => x.notice_id),
+    seen: old.seen || [],
+  });
+}
+let noticeError = '';
+setInterval(() => { if (isStaff() && document.visibilityState === 'visible') fetchNotices().catch(() => {}); }, 180000);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && isStaff() && noticeCache && Date.now() - noticeCache.at > 60000) fetchNotices().catch(() => {}); });
+
+/* ---------- forms, sections and years from Timetable Maker ---------- */
+function schoolTree() {
+  const forms = ((noticeCache && noticeCache.forms) || []).slice().sort((a, b) => a.form.localeCompare(b.form, 'en', { numeric: true }));
+  const order = ['PP', 'LS', 'MS', 'US'];
+  const secs = [...new Set(forms.map(f => f.section || ''))].sort((a, b) => (order.indexOf(a) + 1 || 99) - (order.indexOf(b) + 1 || 99) || a.localeCompare(b));
+  return secs.map(s => {
+    const fs = forms.filter(f => (f.section || '') === s);
+    const years = [...new Set(fs.map(f => formYear(f.form)))].sort((a, b) => (a == null) - (b == null) || a - b);
+    return { code: s, name: SECTION_NAMES[s] || s || 'Other forms', forms: fs.map(f => f.form),
+      years: years.map(y => ({ y, label: y == null ? 'Other' : 'Year ' + y, forms: fs.filter(f => formYear(f.form) === y).map(f => f.form) })) };
+  });
+}
+const allForms = tree => [].concat(...tree.map(s => s.forms));
+// smallest description of the picked forms: whole school, sections, years, then single forms
+function audienceOf(picked, tree) {
+  const has = f => picked.has(f), all = allForms(tree);
+  if (all.length && all.every(has)) return { all: true };
+  const a = { sections: [], years: [], forms: [] };
+  tree.forEach(s => {
+    if (s.code && s.forms.length && s.forms.every(has)) { a.sections.push(s.code); return; }
+    s.years.forEach(y => {
+      if (y.y != null && y.forms.every(has)) a.years.push(y.y);
+      else y.forms.filter(has).forEach(f => a.forms.push(f));
+    });
+  });
+  return a;
+}
+function pickedFrom(aud, tree) {
+  const out = new Set();
+  tree.forEach(s => s.forms.forEach(f => { if (noticeReaches({ audience: aud }, f, noticeCache)) out.add(f); }));
+  return out;
+}
+function describeAudience(a) {
+  if (!a || a.all) return 'Whole school';
+  const parts = [].concat((a.sections || []).map(s => SECTION_NAMES[s] || s), (a.years || []).map(y => 'Year ' + y), a.forms || []);
+  return parts.length > 1 ? parts.slice(0, -1).join(', ') + ' and ' + parts[parts.length - 1] : (parts[0] || 'Nobody');
+}
+const longDate = iso => { const d = fromISO(iso); return DAY_NAMES[dayCode(d)] + ' ' + d.getDate() + ' ' + MONTHS[d.getMonth()]; };
+const shortD = iso => shortDate(fromISO(iso));
+function datesText(n) {
+  const t = todayISO(), tm = toISO(nextSchoolDay(new Date()));
+  const one = iso => iso === t ? 'Today' : iso === tm ? 'Tomorrow' : shortD(iso);
+  return n.start_date === n.end_date ? one(n.start_date) : shortD(n.start_date) + ' to ' + shortD(n.end_date);
+}
+
+/* ---------- the panel ---------- */
+const ICON_X = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>';
+const CHEV = '<svg width="14" height="14" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 4l4 4 4-4"></path></svg>';
+function newDraft() {
+  const tm = toISO(nextSchoolDay(new Date()));
+  return { id: null, body: '', picked: new Set(), yearsOpen: false, formsOpen: false, when: 'tom', day: tm, from: tm, to: tm, prep: true };
+}
+function myFormNotices() {
+  const c = noticeCache || {}, t = todayISO();
+  return (c.notices || []).filter(n => n.end_date >= t && noticeReaches(n, state.form, c));
+}
+function unseenCount() {
+  const seen = new Set((noticeCache && noticeCache.seen) || []);
+  return myFormNotices().filter(n => !seen.has(n.id) && n.author !== (me && me.id)).length;
+}
+function paintNoticeBadge() {
+  const b = $('noticesBadge'); if (!b) return;
+  const n = isStaff() ? unseenCount() : 0;
+  b.hidden = !n; b.textContent = n;
+}
+function markSeen() {
+  if (!noticeCache) return;
+  const ids = myFormNotices().map(n => n.id);
+  const seen = new Set(noticeCache.seen || []);
+  if (ids.every(i => seen.has(i))) return;
+  noticeCache.seen = [...new Set([...ids, ...(noticeCache.seen || []).filter(i => (noticeCache.notices || []).some(n => n.id === i))])];
+  try { localStorage.setItem(NOTICE_KEY, JSON.stringify(noticeCache)); } catch (e) {}
+  paintNoticeBadge();
+}
+function openNotices(tab) {
+  if (!isStaff()) { openSetup('account'); return; }
+  npOpen = true; npTab = tab || (unseenCount() ? 'form' : 'new');
+  if (!draft) draft = newDraft();
+  $('noticePanel').hidden = false;
+  paintPanel();
+  fetchNotices().catch(() => {});
+  setTimeout(() => { const t = $('npText'); if (npTab === 'new' && t) t.focus(); else { const x = $('noticeDialog').querySelector('[role=tab][aria-selected=true]'); if (x) x.focus(); } }, 0);
+}
+function closeNotices() {
+  npOpen = false; $('noticePanel').hidden = true;
+  const b = $('noticesBtn'); if (b && !b.hidden) b.focus();
+}
+
+function chipSt(fs, picked) { const n = fs.filter(f => picked.has(f)).length; return n === fs.length && n ? 'on' : n ? 'part' : 'off'; }
+function newTabHTML(tree) {
+  const d = draft, picked = d.picked, all = allForms(tree);
+  if (!all.length) return '<div class="np-body"><p class="np-empty">Morning Slide couldn’t find the list of forms from Timetable Maker yet. Try again in a moment.</p></div>';
+  const n = all.filter(f => picked.has(f)).length;
+  const chip = (st, label, data, cls, note) => '<button type="button" class="np-chip ' + (cls || '') + '" data-st="' + st + '" aria-pressed="' + (st === 'on') + '" ' + data + '>' + esc(label) + (st === 'part' && note ? ' <small>' + note + '</small>' : '') + '</button>';
+  let who = '<div class="np-chips">' + chip(chipSt(all, picked), 'Whole school', 'data-pick="all"', 'big') + '<span class="np-sep" aria-hidden="true"></span>' +
+    tree.map((s, i) => chip(chipSt(s.forms, picked), s.name, 'data-pick="s:' + i + '"', 'big', s.forms.filter(f => picked.has(f)).length + ' of ' + s.forms.length)).join('') + '</div>' +
+    '<button type="button" class="np-more" data-np="years" aria-expanded="' + d.yearsOpen + '">' + CHEV + (d.yearsOpen ? 'Hide year groups' : 'Show year groups') + '</button>';
+  if (d.yearsOpen) {
+    who += '<div class="np-years"><div class="np-chips">' +
+      tree.map((s, i) => s.years.map((y, j) => chip(chipSt(y.forms, picked), y.label, 'data-pick="y:' + i + ':' + j + '"', 'sm' + (j === 0 && i > 0 ? ' gapl' : ''), y.forms.filter(f => picked.has(f)).length + '/' + y.forms.length)).join('')).join('') + '</div>' +
+      '<button type="button" class="np-more" data-np="forms" aria-expanded="' + d.formsOpen + '">' + CHEV + (d.formsOpen ? 'Hide forms' : 'Show forms') + '</button>' +
+      (d.formsOpen ? '<div class="np-forms">' + tree.map(s => s.years.map(y => '<div><span class="yl">' + esc(y.label) + '</span>' + y.forms.map(f => chip(picked.has(f) ? 'on' : 'off', f, 'data-pick="f:' + esc(f) + '"', 'sm')).join('') + '</div>').join('')).join('') + '</div>' : '') +
+      '</div>';
+  }
+  const t = todayISO(), tm = toISO(nextSchoolDay(new Date()));
+  const W = [['today', 'Today'], ['tom', 'Tomorrow'], ['day', 'Specific day'], ['run', 'Multiple days']];
+  const when = '<div class="np-when"><div class="seg" role="group" aria-label="When">' + W.map(([k, l]) => '<button type="button" data-when="' + k + '" aria-pressed="' + (d.when === k) + '">' + l + '</button>').join('') + '</div>' +
+    (d.when === 'today' ? '<b>' + longDate(t) + '</b>' : d.when === 'tom' ? '<b>' + longDate(tm) + '</b>' :
+     d.when === 'day' ? '<label>Date <input type="date" id="npDay" min="' + t + '" value="' + d.day + '"></label>' :
+     '<label>From <input type="date" id="npFrom" min="' + t + '" value="' + d.from + '"></label><label>to <input type="date" id="npTo" min="' + d.from + '" value="' + d.to + '"></label>') + '</div>' +
+    (d.when === 'today' ? '' : '<div class="np-prep"><button type="button" class="switch" role="switch" id="npPrep" aria-checked="' + d.prep + '" aria-labelledby="npPrepL"></button><span id="npPrepL">Also show it on the prep slide the evening before</span></div>');
+  return '<div class="np-body">' +
+    '<section><h3><label for="npText">Your notice</label></h3><div class="np-write"><textarea id="npText" rows="3" maxlength="140" placeholder="e.g. Choir rehearsal moved to the Music School at 1:15">' + esc(d.body) + '</textarea><span class="np-by">– ' + esc(me.initials) + '</span></div>' +
+      '<div class="np-under"><span>This is how it looks on the slide, below each form’s own notes. Please don’t use pupils’ names.</span><span id="npCount">' + d.body.length + ' / 140</span></div></section>' +
+    '<section><h3>Who’s it for?</h3>' + who + '</section>' +
+    '<section><h3>When?</h3>' + when + '</section>' +
+  '</div>' +
+  '<div class="np-foot"><p id="npSummary">' + esc(summaryText(tree)) + '</p>' +
+    (d.id ? '<button type="button" class="btn" data-np="cancelEdit">Cancel</button>' : '') +
+    '<button type="button" class="btn primary" data-np="post"' + (npBusy ? ' disabled' : '') + '>' + (d.id ? 'Save changes' : 'Post notice') + '</button></div>';
+}
+function draftDates() {
+  const d = draft, t = todayISO(), tm = toISO(nextSchoolDay(new Date()));
+  if (d.when === 'today') return [t, t];
+  if (d.when === 'tom') return [tm, tm];
+  if (d.when === 'day') return [d.day, d.day];
+  return [d.from, d.to];
+}
+function summaryText(tree) {
+  const picked = draft.picked, n = allForms(tree).filter(f => picked.has(f)).length;
+  if (!n) return 'Choose who it’s for.';
+  const [a, b] = draftDates(), t = todayISO(), tm = toISO(nextSchoolDay(new Date()));
+  const when = a !== b ? 'from ' + shortD(a) + ' to ' + shortD(b) : a === t ? 'today' : a === tm ? 'tomorrow' : 'on ' + longDate(a);
+  return 'Goes to ' + describeAudience(audienceOf(picked, tree)).replace(/^Whole school$/, 'the whole school') + ' (' + n + ' form' + (n === 1 ? '' : 's') + ') ' + when +
+    (draft.prep && draft.when !== 'today' ? ', and on prep slides the evening before.' : '.');
+}
+function itemHTML(n, acts, sub) {
+  return '<div class="np-item' + (acts.hidden ? ' hidden-n' : '') + '"><div class="np-text"><b>' + esc(n.body) + '</b><span>' + sub + '</span></div><div class="np-acts">' + acts.html + '</div></div>';
+}
+function formTabHTML() {
+  const c = noticeCache || {}, hides = new Set(c.hides || []), t = todayISO();
+  const list = myFormNotices().sort((a, b) => a.start_date.localeCompare(b.start_date) || (a.created_at < b.created_at ? -1 : 1));
+  const head = state.form ? '' : '<p class="np-empty">Choose your form in Setup to see the notices meant for it. Until then you’ll only see whole-school notices.</p>';
+  if (!list.length) return '<div class="np-body">' + head + '<p class="np-empty">No notices for ' + esc(state.form || 'your form') + ' at the moment.</p></div>';
+  const now = list.filter(n => n.start_date <= t), later = list.filter(n => n.start_date > t);
+  const row = n => itemHTML(n, { hidden: hides.has(n.id), html: '<button type="button" class="btn small" data-hide="' + esc(n.id) + '">' + (hides.has(n.id) ? 'Show on my slide' : 'Hide on my slide') + '</button>' },
+    '– ' + esc(n.author_name || n.author_initials) + ' · ' + esc(datesText(n)) + (hides.has(n.id) ? ' · hidden on your slide' : ''));
+  return '<div class="np-body">' + head + '<div class="np-list">' +
+    (now.length ? '<div class="np-group">On the slide today</div>' + now.map(row).join('') : '') +
+    (later.length ? '<div class="np-group">Coming up</div>' + later.map(row).join('') : '') + '</div>' +
+    '<p class="np-empty" style="font-size:0.85rem">Hiding a notice only takes it off your own slides, on any laptop you sign in on. Everyone else still sees it.</p></div>';
+}
+function mineTabHTML() {
+  const list = ((noticeCache || {}).notices || []).filter(n => n.author === me.id && n.end_date >= todayISO());
+  if (!list.length) return '<div class="np-body"><p class="np-empty">You haven’t posted any notices that are still to come.</p></div>';
+  return '<div class="np-body"><div class="np-list">' + list.map(n => itemHTML(n, { html: '<button type="button" class="btn small" data-edit="' + esc(n.id) + '">Edit</button><button type="button" class="btn small" data-del="' + esc(n.id) + '">Delete</button>' },
+    esc(describeAudience(n.audience)) + ' · ' + esc(datesText(n)) + (n.prep_eve ? ' · also at evening prep' : ''))).join('') + '</div></div>';
+}
+function allTabHTML() {
+  const list = ((noticeCache || {}).notices || []).filter(n => n.end_date >= todayISO());
+  if (!list.length) return '<div class="np-body"><p class="np-empty">There are no notices still to come.</p></div>';
+  return '<div class="np-body"><div class="np-list">' + list.map(n => itemHTML(n, { html: '<button type="button" class="btn small danger" data-del="' + esc(n.id) + '">Delete</button>' },
+    '– ' + esc(n.author_name || n.author_initials) + ' · ' + esc(describeAudience(n.audience)) + ' · ' + esc(datesText(n)))).join('') + '</div>' +
+    '<p class="np-empty" style="font-size:0.85rem">As an admin you can delete anyone’s notice. It disappears from every slide within a few minutes.</p></div>';
+}
+function paintPanel() {
+  if (!npOpen) return;
+  if (!isStaff()) { closeNotices(); return; }
+  const tree = schoolTree(), mineN = ((noticeCache || {}).notices || []).filter(n => n.author === me.id && n.end_date >= todayISO()).length;
+  const tabs = [['new', draft && draft.id ? 'Edit notice' : 'New notice'], ['form', 'For ' + (state.form || 'my form') + (myFormNotices().length ? ' (' + myFormNotices().length + ')' : '')], ['mine', 'My notices' + (mineN ? ' (' + mineN + ')' : '')]].concat(isAdmin() ? [['all', 'All notices']] : []);
+  if (npTab === 'all' && !isAdmin()) npTab = 'new';
+  const keep = document.activeElement && document.activeElement.id;
+  const sel = keep === 'npText' ? [$('npText').selectionStart, $('npText').selectionEnd] : null;
+  $('noticeDialog').innerHTML = '<div class="np-head" role="tablist">' + tabs.map(([k, l]) => '<button type="button" role="tab" data-tab="' + k + '" aria-selected="' + (npTab === k) + '">' + esc(l) + '</button>').join('') +
+    '<button type="button" class="np-x" data-np="close" aria-label="Close">' + ICON_X + '</button></div>' +
+    (noticeError ? '<div class="acct-msg err" style="margin:16px 28px 0">Notices aren’t working yet: ' + esc(noticeError) + '</div>' : '') +
+    (npTab === 'new' ? newTabHTML(tree) : npTab === 'form' ? formTabHTML() : npTab === 'mine' ? mineTabHTML() : allTabHTML());
+  if (npTab === 'form') markSeen();
+  if (keep) { const el = $(keep); if (el) { el.focus(); if (sel) el.setSelectionRange(sel[0], sel[1]); } }
+}
+
+async function postDraft() {
+  const tree = schoolTree(), d = draft, body = d.body.trim();
+  if (!body) { toast('Write your notice first.'); $('npText').focus(); return; }
+  if (!allForms(tree).some(f => d.picked.has(f))) { toast('Choose who it’s for.'); return; }
+  const [a, b] = draftDates();
+  if (!a || !b || b < a) { toast('Check the dates: the last day can’t be before the first.'); return; }
+  if ((fromISO(b) - fromISO(a)) / 864e5 > 31) { toast('A notice can run for a month at most.'); return; }
+  const row = { body, start_date: a, end_date: b, audience: audienceOf(d.picked, tree), prep_eve: d.when === 'today' ? false : d.prep };
+  npBusy = true; paintPanel();
+  const r = d.id ? await sb.from('ms_notices').update(row).eq('id', d.id) : await sb.from('ms_notices').insert(row);
+  npBusy = false;
+  if (r.error) { toast('Couldn’t save the notice: ' + r.error.message); paintPanel(); return; }
+  toast(d.id ? 'Notice updated' : 'Notice posted. It’ll reach other laptops within a few minutes.');
+  draft = newDraft(); npTab = 'mine';
+  await fetchNotices();
+  paintPanel();
+}
+
+$('noticesBtn').addEventListener('click', () => openNotices());
+$('noticePanel').addEventListener('click', async e => {
+  if (e.target === $('noticePanel')) { closeNotices(); return; }
+  const b = e.target.closest('button'); if (!b) return;
+  const tree = schoolTree(), d = draft, ds = b.dataset;
+  if (ds.tab) { npTab = ds.tab; paintPanel(); const t = $('noticeDialog').querySelector('[data-tab="' + ds.tab + '"]'); if (t) t.focus(); return; }
+  if (ds.np === 'close') return closeNotices();
+  if (ds.np === 'years') { d.yearsOpen = !d.yearsOpen; if (!d.yearsOpen) d.formsOpen = false; return paintPanel(); }
+  if (ds.np === 'forms') { d.formsOpen = !d.formsOpen; return paintPanel(); }
+  if (ds.np === 'post') return postDraft();
+  if (ds.np === 'cancelEdit') { draft = newDraft(); npTab = 'mine'; return paintPanel(); }
+  if (ds.pick) {
+    let fs = [];
+    const [k, i, j] = ds.pick.split(':');
+    if (k === 'all') fs = allForms(tree);
+    else if (k === 's') fs = tree[i].forms;
+    else if (k === 'y') fs = tree[i].years[j].forms;
+    else if (k === 'f') fs = [ds.pick.slice(2)];
+    const on = chipSt(fs, d.picked) !== 'on';
+    fs.forEach(f => on ? d.picked.add(f) : d.picked.delete(f));
+    return paintPanel();
+  }
+  if (ds.when) { d.when = ds.when; return paintPanel(); }
+  if (b.id === 'npPrep') { d.prep = !d.prep; return paintPanel(); }
+  if (ds.hide) {
+    const id = ds.hide, hidden = (noticeCache.hides || []).includes(id);
+    const r = hidden ? await sb.from('ms_notice_hides').delete().eq('notice_id', id) : await sb.from('ms_notice_hides').insert({ notice_id: id });
+    if (r.error) { toast('Couldn’t change that: ' + r.error.message); return; }
+    noticeCache.hides = hidden ? noticeCache.hides.filter(x => x !== id) : (noticeCache.hides || []).concat(id);
+    saveNoticeCache(noticeCache);
+    toast(hidden ? 'It’s back on your slide' : 'Hidden from your slide');
+    return;
+  }
+  if (ds.edit) {
+    const n = noticeCache.notices.find(x => x.id === ds.edit); if (!n) return;
+    const t = todayISO(), tm = toISO(nextSchoolDay(new Date()));
+    const when = n.start_date !== n.end_date ? 'run' : n.start_date === t ? 'today' : n.start_date === tm ? 'tom' : 'day';
+    draft = { id: n.id, body: n.body, picked: pickedFrom(n.audience, tree), yearsOpen: !n.audience.all && !!((n.audience.years || []).length || (n.audience.forms || []).length),
+      formsOpen: !!(n.audience.forms || []).length, when, day: n.start_date, from: n.start_date, to: n.end_date, prep: n.prep_eve };
+    npTab = 'new'; return paintPanel();
+  }
+  if (ds.del) {
+    const n = noticeCache.notices.find(x => x.id === ds.del); if (!n) return;
+    if (!confirm('Delete this notice?\n\n“' + n.body + '”')) return;
+    const r = await sb.from('ms_notices').delete().eq('id', n.id);
+    if (r.error) { toast('Couldn’t delete it: ' + r.error.message); return; }
+    if (draft && draft.id === n.id) draft = newDraft();
+    toast('Notice deleted'); await fetchNotices(); paintPanel();
+  }
+});
+$('noticePanel').addEventListener('input', e => {
+  const d = draft, tree = schoolTree();
+  if (e.target.id === 'npText') { d.body = e.target.value; $('npCount').textContent = d.body.length + ' / 140'; }
+  if (e.target.id === 'npDay') d.day = e.target.value;
+  if (e.target.id === 'npFrom') { d.from = e.target.value; if (d.to < d.from) { d.to = d.from; $('npTo').value = d.to; } $('npTo').min = d.from; }
+  if (e.target.id === 'npTo') d.to = e.target.value;
+  const s = $('npSummary'); if (s) s.textContent = summaryText(tree);
+});
+document.addEventListener('keydown', e => { if (npOpen && e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeNotices(); } }, true);
+$('noticePanel').addEventListener('keydown', e => {
+  if (e.key === 'Tab') {   // keep focus inside the panel
+    const f = [...$('noticeDialog').querySelectorAll('button:not([disabled]), textarea, input')]; if (!f.length) return;
+    if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+    else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+  }
+});
+// clicking a notice on the preview opens the list for your form
+els.preview.addEventListener('click', e => { if (e.target.closest('.notice')) { e.preventDefault(); openNotices('form'); } });
 
 /* ---------- start ---------- */
 async function start(show) {
