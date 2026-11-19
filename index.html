@@ -1785,7 +1785,9 @@ function fitSlide(slide, panel) {
   slide.querySelectorAll('[data-fit]').forEach(el => {
     const [max, min] = el.dataset.fit.split(',').map(Number);
     const oneLine = el.classList.contains('info-value') || el.classList.contains('prep-subj');   // one line, shrinks to fit its width
-    const over = () => el.scrollWidth > el.clientWidth + 1 || (!oneLine && el.scrollHeight > el.clientHeight + 1);
+    // a box that is only as tall as its text (matchday lines) can be a pixel or two out from rounding: allow for that
+    const slack = el.classList.contains('mday') ? 6 : 1;
+    const over = () => el.scrollWidth > el.clientWidth + 1 || (!oneLine && el.scrollHeight > el.clientHeight + slack);
     let size = max;
     el.style.fontSize = size + 'px';
     while (size > min && over(size)) { size -= 1; el.style.fontSize = size + 'px'; }
@@ -3281,7 +3283,7 @@ function showBars() {
   const f = ed.field, rich = isRich(f), wd = DAY_NAMES[wdOf(viewDate)];
   let scope = !!SCOPED[f], note = '';
   if (f === 'at830' && ed.forceToday && ed.scope !== 'today') { scope = false; note = 'Set by the house meeting schedule: your change is just for ' + dayMonth(viewDate); }
-  if (f.startsWith('house:')) note = 'Just for ' + shortDate(viewDate);
+  if (f.startsWith('house:')) note = 'From the house meeting schedule · a change here is just for ' + shortDate(viewDate);
   else if (f.startsWith('prep:')) note = 'Same every ' + wd;
   else if (f.startsWith('once:')) note = 'Just this ' + wd + ' · gone next week';
   else if (f.startsWith('free:')) note = slotNote(f.split(':')[1]);
@@ -4867,13 +4869,16 @@ function paintPanel() {
   const tabs = [['new', draft && draft.id ? 'Edit notice' : 'New notice'], ['form', 'For ' + (state.form || 'my form') + (myFormNotices().length ? ' (' + myFormNotices().length + ')' : '')], ['mine', 'My notices' + (mineN ? ' (' + mineN + ')' : '')]].concat(isAdmin() ? [['all', 'All notices']] : []);
   if (npTab === 'all' && !isAdmin()) npTab = 'new';
   const keep = document.activeElement && document.activeElement.id;
+  const oldBody = $('noticeDialog').querySelector('.np-body'), scrollY = oldBody ? oldBody.scrollTop : 0, sameTab = $('noticeDialog').dataset.tab === npTab;
+  $('noticeDialog').dataset.tab = npTab;
   const sel = keep === 'npText' ? [$('npText').selectionStart, $('npText').selectionEnd] : null;
   $('noticeDialog').innerHTML = '<div class="np-head" role="tablist">' + tabs.map(([k, l]) => '<button type="button" role="tab" data-tab="' + k + '" aria-selected="' + (npTab === k) + '">' + esc(l) + '</button>').join('') +
     '<button type="button" class="np-x" data-np="close" aria-label="Close">' + ICON_X + '</button></div>' +
     (noticeError ? '<div class="acct-msg err" style="margin:16px 28px 0">Notices aren’t working yet: ' + esc(noticeError) + '</div>' : '') +
     (npTab === 'new' ? newTabHTML(tree) : npTab === 'form' ? formTabHTML() : npTab === 'mine' ? mineTabHTML() : allTabHTML());
   if (npTab === 'form') markSeen();
-  if (keep) { const el = $(keep); if (el) { el.focus(); if (sel) el.setSelectionRange(sel[0], sel[1]); } }
+  if (keep) { const el = $(keep); if (el) { el.focus({ preventScroll: true }); if (sel) el.setSelectionRange(sel[0], sel[1]); } }
+  const newBody = $('noticeDialog').querySelector('.np-body'); if (newBody && sameTab) newBody.scrollTop = scrollY;
 }
 
 async function postDraft() {
