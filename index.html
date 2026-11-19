@@ -567,6 +567,67 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
 .tip { position: fixed; z-index: 300; max-width: 290px; padding: 0.45rem 0.7rem; border-radius: 8px; background: var(--ink); color: #fff; font-size: 0.82rem; line-height: 1.4; pointer-events: none; box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.45); }
 .toast { position: fixed; left: 50%; bottom: 5rem; transform: translate(-50%, 1rem); background: var(--ink); color: #fff; padding: 0.6rem 1.05rem; border-radius: 8px; font-size: 0.9rem; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 100; max-width: calc(100% - 2rem); box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.5); }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
+/* Sign in (top bar) */
+.topbtn.signin { background: var(--steel); border-color: var(--steel); color: #fff; }
+.topbtn.signin:hover { background: #335677; }
+.topbtn.signedin { padding: 0.3rem 0.7rem 0.3rem 0.35rem; }
+.topbtn .av { width: 1.75rem; height: 1.75rem; border-radius: 50%; background: var(--steel); color: #fff; display: grid; place-items: center; font-size: 0.72rem; letter-spacing: 0.02em; }
+.topbtn .av.wait { background: #C48A12; }
+.bb-new { display: inline-flex; align-items: center; gap: 0.4rem; border: 1px solid rgba(255, 255, 255, 0.28); background: rgba(255, 255, 255, 0.06); color: #fff; border-radius: 8px; padding: 0.35rem 0.7rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.bb-new:hover { background: rgba(255, 255, 255, 0.14); }
+/* What's new */
+.wn-back { position: fixed; inset: 0; z-index: 150; background: rgba(28, 48, 72, 0.42); display: grid; place-items: center; padding: 1rem; overflow: auto; }
+.wn { position: relative; width: min(940px, 100%); max-height: calc(100vh - 2rem); overflow: auto; box-sizing: border-box; background: #fff; color: var(--ink); border-radius: 18px; box-shadow: 0 30px 70px -24px rgba(28, 48, 72, 0.6); padding: 24px 36px 20px; display: flex; flex-direction: column; gap: 14px; line-height: 1.4; }
+.wn .wn-x { position: absolute; top: 14px; right: 14px; width: 44px; height: 44px; border: 0; background: none; border-radius: 10px; color: #5A6E82; cursor: pointer; display: grid; place-items: center; }
+.wn .wn-x:hover { background: var(--mist); }
+.wn .wn-tag { align-self: flex-start; padding: 3px 12px; border-radius: 999px; background: #FFE9A8; color: #6B4E00; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.02em; }
+.wn h2.wn-title { margin: 0; font-family: var(--disp); font-size: 1.8rem; line-height: 1.2; color: var(--ink); }
+.wn .wn-sub { margin: 0; font-size: 1rem; color: #4E6377; }
+.wn header { display: flex; flex-direction: column; gap: 6px; padding-right: 40px; }
+.wn-hero { display: flex; align-items: center; gap: 28px; padding: 16px 22px; border-radius: 18px; background: #E8F0F8; border: 1.5px solid #C6D7EA; }
+.wn-hero .txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.wn-hero .head { display: flex; align-items: center; gap: 10px; }
+.wn-hero .num { flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--steel); color: #fff; display: grid; place-items: center; font-weight: 700; }
+.wn-hero h3 { margin: 0; font-family: var(--disp); font-size: 1.38rem; }
+.wn-hero p { margin: 0; font-size: 0.97rem; }
+.wn-hero p.soft { font-size: 0.88rem; color: #4E6377; }
+.wn-bar { flex: none; display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 12px; background: #fff; box-shadow: 0 8px 22px -14px rgba(28, 48, 72, 0.5); }
+.wn-bar span { height: 36px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--line); display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 0.88rem; color: #4E6377; }
+.wn-bar span.hi { background: var(--steel); border-color: var(--steel); color: #fff; box-shadow: 0 0 0 4px #FFD25A; padding: 0 14px; }
+.wn-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.wn-card { display: flex; flex-direction: column; gap: 8px; padding: 16px 18px; border-radius: 16px; border: 1.5px solid var(--soft-line); background: #fff; }
+.wn-card .ic { flex: none; width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; }
+.wn-card h4 { margin: 0; font-family: var(--disp); font-size: 1.12rem; }
+.wn-card p { margin: 0; font-size: 0.9rem; flex-grow: 1; }
+.wn-card .where { font-size: 0.82rem; color: #4E6377; }
+.wn-card .where b { color: var(--ink); }
+.wn-soon { flex-direction: row; align-items: center; gap: 16px; padding: 14px 18px; border-style: dashed; border-color: #C6D7EA; }
+.wn-soon .t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.wn-soon .t > div { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.wn-soon .pill { padding: 2px 10px; border-radius: 999px; background: var(--mist); color: var(--steel); font-size: 0.74rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+.wn footer { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.wn footer p { margin: 0; flex: 1 1 320px; font-size: 0.88rem; color: #4E6377; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.wn footer .chip { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border-radius: 8px; background: var(--ink); color: #fff; font-weight: 700; font-size: 0.82rem; }
+.wn footer .btn { min-height: 46px; padding: 0 22px; }
+/* top bar on laptop-width screens: just initials and the Notices icon once signed in */
+@media (max-width: 1500px) { .topbtn.signedin .tb-label, #noticesBtn .tb-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } #noticesBtn { padding-inline: 0.65rem; } }
+/* What's new on shorter screens (school laptops are about 640px tall) */
+@media (max-height: 760px) {
+  .wn-back { padding: 0.5rem; }
+  .wn { padding: 14px 28px 12px; gap: 8px; max-height: calc(100vh - 1rem); }
+  .wn header { gap: 3px; } .wn .wn-tag { font-size: 0.74rem; padding: 2px 10px; }
+  .wn-hero .txt { gap: 4px; }
+  .wn h2.wn-title { font-size: 1.45rem; }
+  .wn .wn-sub { font-size: 0.92rem; }
+  .wn-hero { padding: 11px 18px; gap: 20px; }
+  .wn-hero h3 { font-size: 1.15rem; } .wn-hero .num { width: 26px; height: 26px; }
+  .wn-hero p { font-size: 0.88rem; } .wn-hero p.soft { font-size: 0.8rem; }
+  .wn-card { padding: 11px 14px; gap: 5px; } .wn-card .ic { width: 32px; height: 32px; border-radius: 10px; } .wn-card .ic svg { width: 18px; height: 18px; }
+  .wn-card h4 { font-size: 0.98rem; } .wn-card p { font-size: 0.82rem; } .wn-card .where { font-size: 0.76rem; }
+  .wn-soon { padding: 9px 14px; }
+  .wn footer .btn { min-height: 42px; }
+}
+@media (max-width: 760px) { .wn-cards { grid-template-columns: 1fr; } .wn-hero { flex-direction: column; align-items: stretch; } .wn-bar { display: none; } }
 /* Notices panel */
 .np-back { position: fixed; inset: 0; z-index: 140; background: rgba(28, 48, 72, 0.38); display: grid; place-items: start center; padding: 64px 1rem 1rem; overflow: auto; }
 .np { width: min(780px, 100%); background: #fff; border-radius: 16px; box-shadow: 0 24px 60px -20px rgba(28, 48, 72, 0.55); display: flex; flex-direction: column; max-height: calc(100vh - 84px); }
@@ -676,8 +737,9 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
     </div>
     <button type="button" class="formchip" id="formChip" title="Your form (change it in Setup)"></button>
     <nav class="week" id="week" aria-label="Choose a day"></nav>
-    <button type="button" class="topbtn" id="noticesBtn" hidden>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l14-6v14L3 13z"></path><path d="M7 12.5V17a2 2 0 0 0 4 0v-3"></path><path d="M20 9v6"></path></svg>Notices<span class="badge" id="noticesBadge" hidden></span>
+    <button type="button" class="topbtn signin" id="acctBtn" title="Sign in with your school email"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg><span id="acctBtnText">Sign in</span></button>
+    <button type="button" class="topbtn" id="noticesBtn" title="Notices" hidden>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l14-6v14L3 13z"></path><path d="M7 12.5V17a2 2 0 0 0 4 0v-3"></path><path d="M20 9v6"></path></svg><span class="tb-label">Notices</span><span class="badge" id="noticesBadge" hidden></span>
     </button>
     <button type="button" class="topbtn" id="setupBtn">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"></path></svg>Setup<span class="badge" id="setupBadge" hidden data-tip="People waiting for you to approve them"></span>
@@ -839,6 +901,7 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
       <button type="button" class="bb-btn" id="vSound">Sound off</button>
     </div>
     <span class="grow"></span>
+    <button type="button" class="bb-new" id="whatsNewBtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4z"></path><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"></path></svg>What’s new?</button>
     <span class="notice-hint" id="noticeHint" hidden><span id="noticeHintText"></span><button type="button" id="noticeStripBtn"></button></span>
     <span class="projstatus off" id="projStatus"><span class="led"></span><span id="projText">Not on the projector</span></span>
     <button type="button" class="bb-btn" id="projSwap" hidden>Show this instead</button>
@@ -848,6 +911,42 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
     <button type="button" class="bb-btn bb-icon" id="saveCopy" aria-label="Save a copy" title="Save a copy"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg></button>
   </footer>
 </div>
+
+<div class="wn-back" id="whatsNew" hidden><div class="wn" role="dialog" aria-modal="true" aria-labelledby="wnTitle">
+  <button type="button" class="wn-x" data-wn="close" aria-label="Close"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+  <header>
+    <span class="wn-tag">New in Morning Slide v3</span>
+    <h2 class="wn-title" id="wnTitle">Your slide now joins up with the rest of school</h2>
+    <p class="wn-sub">Everything you had is still here, just as you left it. Here’s what’s new.</p>
+  </header>
+  <section class="wn-hero">
+    <div class="txt">
+      <div class="head"><span class="num">1</span><h3>Start by signing in</h3></div>
+      <p>Press <b>Sign in</b> at the top right and use your school email. It takes a minute: you’ll get one email to confirm it’s you. Signing in never changes anything already on your laptop.</p>
+      <p class="soft">Not ready to sign in? That’s fine: just carry on using Morning Slide as normal.</p>
+    </div>
+    <div class="wn-bar" aria-hidden="true"><span>Today</span><span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l14-6v14L3 13z"></path><path d="M7 12.5V17a2 2 0 0 0 4 0v-3"></path><path d="M20 9v6"></path></svg>Notices</span><span class="hi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>Sign in</span><span>Setup</span></div>
+  </section>
+  <section class="wn-cards">
+    <article class="wn-card"><span class="ic" style="background:#FCEBD7;color:#9A5212"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l14-6v14L3 13z"></path><path d="M7 12.5V17a2 2 0 0 0 4 0v-3"></path><path d="M20 9v6"></path></svg></span>
+      <h4>School notices</h4><p>Any teacher can post a notice to the whole school, a section, a year or single forms. It shows on your slide under What’s happening.</p>
+      <span class="where"><b>Where:</b> the Notices button, once you’re signed in</span></article>
+    <article class="wn-card"><span class="ic" style="background:#DDEFE3;color:#2D6B45"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5L12 4l9 6.5"></path><path d="M5 9.5V20h14V9.5"></path><path d="M10 20v-5h4v5"></path></svg></span>
+      <h4>House meetings update themselves</h4><p>Rooms and congers come straight from the school’s schedule. You can still change a room on your own slide.</p>
+      <span class="where"><b>Where:</b> automatic, signed in or not</span></article>
+    <article class="wn-card"><span class="ic" style="background:#E3E8F7;color:#3B4F8F"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></span>
+      <h4>Matchday lunch queues</h4><p>On Wednesdays and Saturdays, your year group’s teams, doors and lunch times fill in Lunchtime Arrangements for you.</p>
+      <span class="where"><b>Where:</b> automatic, Years 5 to 8</span></article>
+  </section>
+  <article class="wn-card wn-soon"><span class="ic" style="background:#F1E4F6;color:#7A3D8F"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg></span>
+    <div class="t"><div><h4>Music lessons update themselves</h4><span class="pill">Coming soon</span></div>
+      <p>The music department uploads the lessons once, and each form’s lessons appear on its slide by themselves. No more uploading the spreadsheet yourself.</p></div></article>
+  <footer>
+    <p>See this again any time with <span class="chip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 14l-1.8-4.6L5.5 9l4.7-1.4z"></path><path d="M19 14l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"></path></svg>What’s new?</span> at the bottom of the screen.</p>
+    <button type="button" class="btn" data-wn="later">Maybe later</button>
+    <button type="button" class="btn primary" data-wn="create" id="wnCreate">Create account</button>
+  </footer>
+</div></div>
 
 <div class="np-back" id="noticePanel" hidden><div class="np" role="dialog" aria-modal="true" aria-label="Notices" id="noticeDialog"></div></div>
 
@@ -1028,12 +1127,12 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
           </div>
         </div>
         <div class="card2" id="v1Card">
-          <h3>The original Morning Slide</h3>
-          <p class="hint" style="margin:0">The first time you opened v2, it copied your settings from the original Morning Slide. Since then the two save separately: changes here don’t affect the original, and changes there don’t appear here.</p>
-          <div class="row"><button type="button" class="btn" id="copyV1">Copy my settings from the original again</button><a class="linkbtn" id="v1Link" href="https://morning-slide.netlify.app/">Go back to the original</a></div>
+          <h3>Earlier versions</h3>
+          <p class="hint" style="margin:0">The first time you opened v3, it copied your settings from v2 (or from the original Morning Slide if you hadn’t used v2). Since then they save separately: changes here don’t affect v2, and changes there don’t appear here.</p>
+          <div class="row"><button type="button" class="btn" id="copyV1">Copy my settings from v2 again</button><a class="linkbtn" id="v1Link" href="https://morning-slide.netlify.app/v2/">Go back to v2</a></div>
         </div>
         <div class="card2 danger">
-          <div style="flex:1"><h3 style="margin-bottom:4px">Start again</h3><p class="hint" style="margin:0">Clears everything in v2 on this browser: timetable, notes, preps, design and music lessons. The original Morning Slide isn’t affected. Save a copy first if you might want it back.</p></div>
+          <div style="flex:1"><h3 style="margin-bottom:4px">Start again</h3><p class="hint" style="margin:0">Clears everything in v3 on this browser: timetable, notes, preps, design and music lessons. v2 and the original Morning Slide aren’t affected. Save a copy first if you might want it back.</p></div>
           <button type="button" class="btn danger" id="resetAll">Reset everything</button>
         </div>
       </section>
@@ -1094,9 +1193,10 @@ const DAYS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 const ALL_DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 const DAY_NAMES = { MON: 'Monday', TUE: 'Tuesday', WED: 'Wednesday', THU: 'Thursday', FRI: 'Friday', SAT: 'Saturday', SUN: 'Sunday' };
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const STORE_KEY = 'morningSlide.v2.state';
-const V1_KEY = 'morningSlide.state.v1';      // the original Morning Slide: copied once the first time v2 opens, never changed
-let copiedFromV1 = false;
+const STORE_KEY = 'morningSlide.v3.state';
+const V2_KEY = 'morningSlide.v2.state';      // v2: copied once the first time v3 opens, never changed
+const V1_KEY = 'morningSlide.state.v1';      // the original Morning Slide: copied instead if there's no v2
+let copiedFrom = '';                         // 'v2' | 'v1' when this is the first time v3 has opened here
 const PANEL_DEFAULT = { MON: 'none', TUE: 'none', WED: 'lunch', THU: 'house', FRI: 'none', SAT: 'lunch' };
 /* Headings you can rename (pencil in the bottom bar). Just today beats every <weekday>, which beats every day. */
 const HEADINGS = {
@@ -1160,7 +1260,7 @@ const BUILTIN_SCHEDULE = [
 /* The school's schedule and matchday lunch queues also live online (no names in either), so everyone,
    signed in or not, gets updates without a new version of the page. A copy is kept on this laptop. */
 const SUPA = { url: 'https://jbvemxhfndjkofcbubmn.supabase.co', key: 'sb_publishable_oPEAFTgMAq94UaWYsLgD-Q_LR5u-cNP' };
-const SHARED_KEY = 'morningSlide.v2.shared';
+const SHARED_KEY = 'morningSlide.v3.shared';
 function loadShared() { try { return JSON.parse(localStorage.getItem(SHARED_KEY)) || null; } catch (e) { return null; } }
 let shared = loadShared();
 function schoolSchedule() {
@@ -1288,7 +1388,8 @@ function loadState() {
   const base = defaultState();
   try {
     let raw = localStorage.getItem(STORE_KEY);
-    if (raw == null) { raw = localStorage.getItem(V1_KEY); copiedFromV1 = !!raw; }
+    if (raw == null) { raw = localStorage.getItem(V2_KEY); if (raw) copiedFrom = 'v2'; }
+    if (raw == null) { raw = localStorage.getItem(V1_KEY); if (raw) copiedFrom = 'v1'; }
     const saved = JSON.parse(raw);
     if (saved && saved.v === 1) {
       for (const k of Object.keys(base)) {
@@ -1303,7 +1404,7 @@ function loadState() {
     if (saved && Array.isArray(saved.schedule)) base.schedule = saved.schedule;   // older versions kept a full copy
   } catch (e) { /* fresh start */ }
   migrateSchedule(base);
-  if (copiedFromV1) { try { localStorage.setItem(STORE_KEY, JSON.stringify(base)); } catch (e) {} }
+  if (copiedFrom) { try { localStorage.setItem(STORE_KEY, JSON.stringify(base)); } catch (e) {} }
   return base;
 }
 let state = loadState();
@@ -1695,10 +1796,22 @@ function setSlideHTML(host, html) {      // replaces the slide but keeps anythin
   host.querySelectorAll(':scope > .slide').forEach(s => s.remove());
   host.insertAdjacentHTML('afterbegin', html);
 }
+/* ---------- What's new (opens once on the first visit to v3, then from the bottom bar) ---------- */
+const WN_KEY = 'morningSlide.v3.whatsNewSeen';
+let openAccount = view => openSetup('account');      // the account code replaces this once it has loaded
+function openWhatsNew() {
+  $('whatsNew').hidden = false;
+  const signedIn = !!(noticeCache && noticeCache.uid);
+  $('wnCreate').hidden = signedIn;
+  setTimeout(() => (signedIn ? $('whatsNew').querySelector('[data-wn=later]') : $('wnCreate')).focus(), 0);
+  try { localStorage.setItem(WN_KEY, '1'); } catch (e) {}
+}
+function closeWhatsNew() { $('whatsNew').hidden = true; $('whatsNewBtn').focus(); }
+
 /* ---------- School notices ----------
    Signed-in staff get notices from the school database. A copy is kept on this laptop (NOTICE_KEY) so the
    projector window, which never goes online itself, can show them, and so they still show if the Wi-Fi drops. */
-const NOTICE_KEY = 'morningSlide.v2.notices';
+const NOTICE_KEY = 'morningSlide.v3.notices';
 function loadNoticeCache() { try { return JSON.parse(localStorage.getItem(NOTICE_KEY)) || null; } catch (e) { return null; } }
 let noticeCache = loadNoticeCache();
 const SECTION_NAMES = { LS: 'Lower School', MS: 'Middle School', US: 'Upper School', PP: 'Pre-Prep' };
@@ -1839,7 +1952,7 @@ function fitSlide(slide, panel) {
 /* =====================================================================
    PREP SLIDE
    ===================================================================== */
-const TIMER_KEY = 'morningSlide.v2.prepTimer';
+const TIMER_KEY = 'morningSlide.v3.prepTimer';
 function loadTimer() { try { return JSON.parse(localStorage.getItem(TIMER_KEY)) || null; } catch (e) { return null; } }
 function storeTimer(t) { try { if (t) localStorage.setItem(TIMER_KEY, JSON.stringify(t)); else localStorage.removeItem(TIMER_KEY); } catch (e) {} }
 let timer = loadTimer();
@@ -3956,18 +4069,19 @@ $('schedPasteCancel').addEventListener('click', () => { $('schedPasteBox').hidde
 
 /* ---------- Backup & reset ---------- */
 const BACKUP_KEY = 'morningSlide.lastBackup';
-const V1_URL = /\/v2\/?(index\.html)?$/.test(location.pathname) ? '../' : 'https://morning-slide.netlify.app/';
+const V1_URL = /\/v3\/?(index\.html)?$/.test(location.pathname) ? '../v2/' : 'https://morning-slide.netlify.app/v2/';
 document.querySelectorAll('#v1Link, .v1link').forEach(a => { a.href = V1_URL; });
 $('copyV1').addEventListener('click', () => {
-  let raw = null; try { raw = localStorage.getItem(V1_KEY); } catch (e) {}
-  if (!raw) { toast('There are no settings from the original Morning Slide in this browser.'); return; }
-  if (!confirm('Replace everything in v2 with your settings from the original Morning Slide? Anything you’ve only set up in v2 will be lost.')) return;
+  let raw = null, from = 'v2'; try { raw = localStorage.getItem(V2_KEY); if (!raw) { raw = localStorage.getItem(V1_KEY); from = 'the original Morning Slide'; } } catch (e) {}
+  if (!raw) { toast('There are no settings from an earlier version in this browser.'); return; }
+  if (!confirm('Replace everything in v3 with your settings from ' + from + '? Anything you’ve only set up in v3 will be lost.')) return;
   try { localStorage.setItem(STORE_KEY, raw); } catch (e) {}
-  state = loadState(); afterLoad(); refreshSetupAll(); toast('Settings copied from the original Morning Slide.');
+  state = loadState(); afterLoad(); refreshSetupAll(); toast('Settings copied from ' + from + '.');
 });
 function refreshBackup() {
-  let hasV1 = false; try { hasV1 = !!localStorage.getItem(V1_KEY); } catch (e) {}
-  $('copyV1').hidden = !hasV1;
+  let hasV2 = false, hasV1 = false; try { hasV2 = !!localStorage.getItem(V2_KEY); hasV1 = !!localStorage.getItem(V1_KEY); } catch (e) {}
+  $('copyV1').hidden = !hasV2 && !hasV1;
+  $('copyV1').textContent = hasV2 ? 'Copy my settings from v2 again' : 'Copy my settings from the original again';
   let last = null; try { last = localStorage.getItem(BACKUP_KEY); } catch (e) {}
   $('lastBackup').textContent = 'Last saved a copy: ' + (last ? shortDate(new Date(last)) : 'never');
 }
@@ -3997,7 +4111,7 @@ $('importInput').addEventListener('change', async () => {
   } catch (e) { toast('That file isn’t a Morning Slide copy.'); }
 });
 $('resetAll').addEventListener('click', () => {
-  if (!confirm('Reset everything in v2? This clears your timetable, notes, preps, design and music lessons here. The original Morning Slide isn’t affected.')) return;
+  if (!confirm('Reset everything in v3? This clears your timetable, notes, preps, design and music lessons here. v2 and the original Morning Slide aren’t affected.')) return;
   state = defaultState();
   try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {} afterLoad(); toast('Everything has been reset.');
 });
@@ -4070,6 +4184,23 @@ function updateNoticeHint() {
   $('noticeStripBtn').textContent = state.noticeStrip ? 'Hide the strip' : 'Show them in a strip';
 }
 $('noticeStripBtn').addEventListener('click', () => { state.noticeStrip = !state.noticeStrip; changed(); });
+$('whatsNewBtn').addEventListener('click', openWhatsNew);
+$('whatsNew').addEventListener('click', e => {
+  if (e.target === $('whatsNew')) return closeWhatsNew();
+  const b = e.target.closest('[data-wn]'); if (!b) return;
+  if (b.dataset.wn === 'create') { $('whatsNew').hidden = true; openAccount('signup'); return; }
+  closeWhatsNew();
+});
+$('whatsNew').addEventListener('keydown', e => {
+  if (e.key === 'Escape') { e.stopPropagation(); closeWhatsNew(); }
+  if (e.key === 'Tab') {
+    const f = [...$('whatsNew').querySelectorAll('button:not([hidden])')];
+    if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+    else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+  }
+});
+$('acctBtn').addEventListener('click', () => openAccount());
+{ let seen = false; try { seen = !!localStorage.getItem(WN_KEY); } catch (e) {} if (!seen) setTimeout(openWhatsNew, 600); }
 function changed(opts = {}) {
   save();
   if (!opts.keepPreview) pendingFull = true;
@@ -4202,7 +4333,7 @@ function afterLoad() {
 }
 if (document.fonts) document.fonts.ready.then(() => renderAll());
 afterLoad();
-if (copiedFromV1) toast('Welcome to Morning Slide v2! Your settings from the original have been copied over.');
+if (copiedFrom) toast('Welcome to Morning Slide v3! Your settings from ' + (copiedFrom === 'v2' ? 'v2' : 'the original Morning Slide') + ' have been copied over.');
 /* =====================================================================
    STAFF ACCOUNTS (Supabase). Only in the editor, never in the projector window.
    Signed out, nothing here runs until someone opens Setup → Account.
@@ -4306,6 +4437,16 @@ function paintBadges() {
   for (const id of ['setupBadge', 'adminNavBadge']) { const b = $(id); if (b) { b.hidden = !n; b.textContent = n; } }
   $('adminNav').hidden = !isAdmin();
   $('noticesBtn').hidden = !isStaff();
+  const ab = $('acctBtn');
+  if (session && me) {
+    ab.className = 'topbtn signedin';
+    ab.innerHTML = '<span class="av' + (me.status === 'approved' ? '' : ' wait') + '">' + esc(me.initials) + '</span><span class="tb-label">' + esc(me.status === 'approved' ? me.name : 'Waiting for approval') + '</span>';
+    ab.title = 'Signed in as ' + me.email + '. Click for your account.';
+  } else {
+    ab.className = 'topbtn signin';
+    ab.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg><span>Sign in</span>';
+    ab.title = 'Sign in with your school email';
+  }
   paintNoticeBadge();
   $('acctNavSub').textContent = session && !me ? 'Signed in as ' + session.user.email : me ? (me.status === 'approved' ? 'Signed in as ' + me.name : 'Waiting for approval') : 'Sign in with your school email';
   if (!isAdmin() && setupSec === 'admin' && !$('setupScreen').hidden) showSection('account');
@@ -4975,6 +5116,12 @@ $('noticePanel').addEventListener('keydown', e => {
 });
 // clicking a notice on the preview opens the list for your form
 els.preview.addEventListener('click', e => { if (e.target.closest('.notice')) { e.preventDefault(); openNotices('form'); } });
+
+openAccount = v => {
+  if (v && !me) { view = v; msg = null; }
+  openSetup('account');
+  setTimeout(() => { const f = $(view === 'signup' ? 'acName' : 'acEmail'); if (f && !me) f.focus(); }, 60);
+};
 
 /* ---------- start ---------- */
 async function start(show) {
