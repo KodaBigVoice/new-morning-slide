@@ -155,7 +155,7 @@
 .slide .houses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .slide .house-tile { display: flex; flex-direction: column; gap: 6px; border-radius: 16px; padding: 8px 8px 10px; }
 .slide .house-name { border-radius: 8px; padding: 6px 0; text-align: center; font-size: 27px; font-weight: 700; }
-.slide .house-loc { text-align: center; font-size: 27px; font-weight: 500; line-height: 1.2; min-height: 1.2em; overflow-wrap: anywhere; }
+.slide .house-loc { flex: 1; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 27px; font-weight: 500; line-height: 1.2; min-height: 1.2em; overflow-wrap: anywhere; }
 
 /* Prep slide: preps, prep info and tomorrow (or today) on the left; timer and music on the right */
 .slide.prep .grid { grid-template-columns: 1162px 630px; }
