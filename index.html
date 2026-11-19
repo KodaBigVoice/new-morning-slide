@@ -204,6 +204,7 @@
 /* Freestyle */
 .slide .free { position: relative; min-height: 0; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .slide .free-main { grid-column: 2; grid-row: 3; }
+.slide .left .free-notes { flex: 1; min-height: 0; }
 .slide .right .free-side { flex: 1 1 0; min-height: 300px; }
 .slide.whole .banner { grid-column: 1 / 4; }
 .slide .free-whole { grid-column: 1 / 4; grid-row: 2 / 4; }
@@ -601,6 +602,11 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
 .wn-card p { margin: 0; font-size: 0.9rem; flex-grow: 1; }
 .wn-card .where { font-size: 0.82rem; color: #4E6377; }
 .wn-card .where b { color: var(--ink); }
+.wn-soonrow { display: flex; align-items: center; gap: 16px; }
+.wn-soonrow .head { flex: none; display: flex; align-items: center; gap: 10px; }
+.wn-soonrow .num { flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--steel); color: #fff; display: grid; place-items: center; font-weight: 700; }
+.wn-soonrow h3 { margin: 0; font-family: var(--disp); font-size: 1.38rem; white-space: nowrap; }
+.wn-soonrow .wn-soon { flex: 1; min-width: 0; }
 .wn-soon { flex-direction: row; align-items: center; gap: 16px; padding: 14px 18px; border-style: dashed; border-color: #C6D7EA; }
 .wn-soon .t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
 .wn-soon .t > div { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -610,6 +616,7 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
 .wn footer .chip { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border-radius: 8px; background: var(--ink); color: #fff; font-weight: 700; font-size: 0.82rem; }
 .wn footer .btn { min-height: 46px; padding: 0 22px; }
 /* top bar on laptop-width screens: just initials and the Notices icon once signed in */
+@media (max-width: 1500px) { .topbar .topbtn { padding-inline: 0.65rem; gap: 0.4rem; } #acctBtn.signin svg, #setupBtn svg, #presentBtn svg { display: none; } .topbar .present-btn { padding-inline: 0.9rem; } }
 @media (max-width: 1500px) { .topbtn.signedin .tb-label, #noticesBtn .tb-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } #noticesBtn { padding-inline: 0.65rem; } }
 /* What's new on shorter screens (school laptops are about 640px tall) */
 @media (max-height: 760px) {
@@ -617,7 +624,8 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
   .wn { padding: 14px 28px 12px; gap: 8px; max-height: calc(100vh - 1rem); }
   .wn header { gap: 3px; } .wn .wn-tag { font-size: 0.74rem; padding: 2px 10px; }
   .wn-hero .txt { gap: 4px; }
-  .wn h2.wn-title { font-size: 1.45rem; }
+  .wn h2.wn-title { font-size: 1.3rem; }
+  .wn-cards { gap: 10px; } .wn-card h4 { line-height: 1.2; }
   .wn .wn-sub { font-size: 0.92rem; }
   .wn-hero { padding: 11px 18px; gap: 20px; }
   .wn-hero h3 { font-size: 1.15rem; } .wn-hero .num { width: 26px; height: 26px; }
@@ -625,9 +633,10 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
   .wn-card { padding: 11px 14px; gap: 5px; } .wn-card .ic { width: 32px; height: 32px; border-radius: 10px; } .wn-card .ic svg { width: 18px; height: 18px; }
   .wn-card h4 { font-size: 0.98rem; } .wn-card p { font-size: 0.82rem; } .wn-card .where { font-size: 0.76rem; }
   .wn-soon { padding: 9px 14px; }
+  .wn-soonrow h3 { font-size: 1.15rem; } .wn-soonrow .num { width: 26px; height: 26px; }
   .wn footer .btn { min-height: 42px; }
 }
-@media (max-width: 760px) { .wn-cards { grid-template-columns: 1fr; } .wn-hero { flex-direction: column; align-items: stretch; } .wn-bar { display: none; } }
+@media (max-width: 760px) { .wn-soonrow { flex-direction: column; align-items: stretch; } .wn-cards { grid-template-columns: 1fr; } .wn-hero { flex-direction: column; align-items: stretch; } .wn-bar { display: none; } }
 /* Notices panel */
 .np-back { position: fixed; inset: 0; z-index: 140; background: rgba(28, 48, 72, 0.38); display: grid; place-items: start center; padding: 64px 1rem 1rem; overflow: auto; }
 .np { width: min(780px, 100%); background: #fff; border-radius: 16px; box-shadow: 0 24px 60px -20px rgba(28, 48, 72, 0.55); display: flex; flex-direction: column; max-height: calc(100vh - 84px); }
@@ -737,7 +746,7 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
     </div>
     <button type="button" class="formchip" id="formChip" title="Your form (change it in Setup)"></button>
     <nav class="week" id="week" aria-label="Choose a day"></nav>
-    <button type="button" class="topbtn signin" id="acctBtn" title="Sign in with your school email"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg><span id="acctBtnText">Sign in</span></button>
+    <button type="button" class="topbtn signin" id="acctBtn" title="Sign in, or create an account, with your school email"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg><span id="acctBtnText">Sign in</span></button>
     <button type="button" class="topbtn" id="noticesBtn" title="Notices" hidden>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l14-6v14L3 13z"></path><path d="M7 12.5V17a2 2 0 0 0 4 0v-3"></path><path d="M20 9v6"></path></svg><span class="tb-label">Notices</span><span class="badge" id="noticesBadge" hidden></span>
     </button>
@@ -831,6 +840,15 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
           <div class="seg" id="mainScope"><button type="button" data-scope="week"></button><button type="button" data-scope="today">Change for today</button></div>
         </div>
 
+        <div class="box areabox main" data-region="notes" style="margin-bottom:10px">
+          <h3 class="areahead"><span class="ttl">What’s happening</span><span class="src" id="notesSrc"></span></h3>
+          <select class="text" id="notesSel" aria-label="What the What’s happening box shows">
+            <option value="notes">Notes (as usual)</option>
+            <optgroup label="Freestyle: fills the whole box"><option value="free-image">Image or GIF</option><option value="free-video">YouTube video</option><option value="free-message">Message</option></optgroup>
+          </select>
+          <div class="seg" id="notesScope"><button type="button" data-scope="week"></button><button type="button" data-scope="today">Change for today</button></div>
+        </div>
+
         <div class="box areabox side-p" data-region="side" style="margin-bottom:10px">
           <h3 class="areahead"><span class="ttl"><span class="mm" data-mm="side" aria-hidden="true"></span>Side panel</span><span class="src" id="sideSrc"></span></h3>
           <select class="text" id="panelSel" aria-label="What the side panel shows">
@@ -921,16 +939,16 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
   </header>
   <section class="wn-hero">
     <div class="txt">
-      <div class="head"><span class="num">1</span><h3>Start by signing in</h3></div>
-      <p>Press <b>Sign in</b> at the top right and use your school email. It takes a minute: you’ll get one email to confirm it’s you. Signing in never changes anything already on your laptop.</p>
-      <p class="soft">Not ready to sign in? That’s fine: just carry on using Morning Slide as normal.</p>
+      <div class="head"><span class="num">1</span><h3>Start by creating an account</h3></div>
+      <p>Press <b>Create account</b> at the top right and use your school email. It takes a minute: you’ll get one email to confirm it’s you. Creating an account never changes anything already on your laptop.</p>
+      <p class="soft">Not ready to create an account? That’s fine: just carry on using Morning Slide as normal.</p>
     </div>
-    <div class="wn-bar" aria-hidden="true"><span>Today</span><span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l14-6v14L3 13z"></path><path d="M7 12.5V17a2 2 0 0 0 4 0v-3"></path><path d="M20 9v6"></path></svg>Notices</span><span class="hi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>Sign in</span><span>Setup</span></div>
+    <div class="wn-bar" aria-hidden="true"><span>Today</span><span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l14-6v14L3 13z"></path><path d="M7 12.5V17a2 2 0 0 0 4 0v-3"></path><path d="M20 9v6"></path></svg>Notices</span><span class="hi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>Create account</span><span>Setup</span></div>
   </section>
   <section class="wn-cards">
     <article class="wn-card"><span class="ic" style="background:#FCEBD7;color:#9A5212"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l14-6v14L3 13z"></path><path d="M7 12.5V17a2 2 0 0 0 4 0v-3"></path><path d="M20 9v6"></path></svg></span>
       <h4>School notices</h4><p>Any teacher can post a notice to the whole school, a section, a year or single forms. It shows on your slide under What’s happening.</p>
-      <span class="where"><b>Where:</b> the Notices button, once you’re signed in</span></article>
+      <span class="where"><b>Where:</b> the Notices button, once you’ve created an account</span></article>
     <article class="wn-card"><span class="ic" style="background:#DDEFE3;color:#2D6B45"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5L12 4l9 6.5"></path><path d="M5 9.5V20h14V9.5"></path><path d="M10 20v-5h4v5"></path></svg></span>
       <h4>House meetings update themselves</h4><p>Rooms and congers come straight from the school’s schedule. You can still change a room on your own slide.</p>
       <span class="where"><b>Where:</b> automatic, signed in or not</span></article>
@@ -938,9 +956,12 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
       <h4>Matchday lunch queues</h4><p>On Wednesdays and Saturdays, your year group’s teams, doors and lunch times fill in Lunchtime Arrangements for you.</p>
       <span class="where"><b>Where:</b> automatic, Years 5 to 8</span></article>
   </section>
+  <section class="wn-soonrow">
+  <div class="head"><span class="num">2</span><h3>Coming soon</h3></div>
   <article class="wn-card wn-soon"><span class="ic" style="background:#F1E4F6;color:#7A3D8F"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg></span>
-    <div class="t"><div><h4>Music lessons update themselves</h4><span class="pill">Coming soon</span></div>
-      <p>The music department uploads the lessons once, and each form’s lessons appear on its slide by themselves. No more uploading the spreadsheet yourself.</p></div></article>
+    <div class="t"><div><h4>Music lessons update themselves</h4></div>
+      <p>Music lessons are uploaded once by an admin, and each form’s lessons appear on its slide by themselves. No more uploading the spreadsheet yourself.</p></div></article>
+  </section>
   <footer>
     <p>See this again any time with <span class="chip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 14l-1.8-4.6L5.5 9l4.7-1.4z"></path><path d="M19 14l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"></path></svg>What’s new?</span> at the bottom of the screen.</p>
     <button type="button" class="btn" data-wn="later">Maybe later</button>
@@ -1285,6 +1306,7 @@ function defaultState() {
     ttImage: per(null),
     ttShow: per(true),                   // older on/off switch (still read if ttView isn't set)
     ttView: per(null),                   // 'full' | 'first' | 'off', per weekday
+    notesView: per('notes'),             // What's happening box: 'notes', or 'free' (a picture, video or message filling the box)
     firstRow: per(null),                 // which timetable row is the first lesson (null = worked out automatically)
     task: per(''),
     at830: per(''),
@@ -1518,7 +1540,9 @@ function resolveDay(st, date) {
     prepInfo: ovr.prepInfo != null ? ovr.prepInfo : ((st.prepInfo || {})[wd] || ''),
     tomorrow: ovr.tomorrow != null ? ovr.tomorrow : ((st.tomorrowWeekly || {})[wd] || ''),
     whole: ovr.whole != null ? !!ovr.whole : !!(st.freeWhole || {})[wd],
+    nview: ovr.nview || (st.notesView || {})[wd] || 'notes',
     free: {
+      notes: freeItem(st, ovr, wd, 'notes', ovr.nview != null),
       main: freeItem(st, ovr, wd, 'main', ovr.ttView != null),
       side: freeItem(st, ovr, wd, 'side', ovr.panel != null),
       whole: freeItem(st, ovr, wd, 'whole', ovr.whole != null)
@@ -1872,12 +1896,14 @@ function renderSlide(host, st, date, editor) {
           (day.ttView === 'first' ? firstLessonHTML(day.firstLesson, hd(st, date, 'first')) : '') +
         '</div>' +
         '<div class="left' + (wide ? '' : ' region-main') + '">' +
-          '<div class="card notes">' + hdEl(st, date, 'notes') + splitHTML(st, date, 'notes', 'notes', day.notes, '32,20', editor) + noticesHTML(noticesFor(st, date, 'morning')) + '</div>' +
+          (day.nview === 'free' ? freeHTML('notes', day.free.notes, editor, 'free-notes') :
+          '<div class="card notes">' + hdEl(st, date, 'notes') + splitHTML(st, date, 'notes', 'notes', day.notes, '32,20', editor) + noticesHTML(noticesFor(st, date, 'morning')) + '</div>') +
         '</div>' +
         (day.showTT ? '<div class="card tt region-main">' + hdEl(st, date, 'tt') + timetableHTML(st, day.wd) + '</div>' : '') +
         (day.ttView === 'text' ? '<div class="card other region-main"><div class="heading" data-field="otherTitle">' + esc(day.otherTitle.trim() || 'Other info') + '</div>' + splitHTML(st, date, 'other', 'otherText', day.otherText, '30,18', editor) + '</div>' : '') +
         (freeMain ? freeHTML('main', day.free.main, editor, 'free-main region-main') : '') +
       '</div>' +
+      (day.nview === 'free' && st.noticeStrip ? noticesHTML(noticesFor(st, date, 'morning'), 'notice-strip') : '') +
     '</div>');
   fitSlide(host.querySelector('.slide'), day.panel);
   return host.querySelector('.slide');
@@ -2386,7 +2412,7 @@ function setOvr(key, val) {
   if (val == null) delete o[key]; else o[key] = val;
   if (Object.keys(o).length) state.overrides[iso] = o; else delete state.overrides[iso];
 }
-const OVR_NAMES = { tomorrow: 'Tomorrow Morning', prepInfo: 'prep info', headings: 'headings', otherTitle: 'other info heading', otherText: 'other info', whole: 'whole slide', free: 'freestyle', pfree: 'prep freestyle', task: 'morning task', at830: '8:30 box', notes: 'What’s happening', panel: 'side panel', panelText: 'side panel text', infoTitle: 'panel heading', house: 'house rooms', ttView: 'main area' };
+const OVR_NAMES = { nview: 'What’s happening box', tomorrow: 'Tomorrow Morning', prepInfo: 'prep info', headings: 'headings', otherTitle: 'other info heading', otherText: 'other info', whole: 'whole slide', free: 'freestyle', pfree: 'prep freestyle', task: 'morning task', at830: '8:30 box', notes: 'What’s happening', panel: 'side panel', panelText: 'side panel text', infoTitle: 'panel heading', house: 'house rooms', ttView: 'main area' };
 function plainFirst(s) {
   const line = String(s || '').replace(/^\s*[-*•]\s+/gm, '').replace(/\*\*|__|\*/g, '').split('\n').map(x => x.trim()).find(Boolean) || '';
   return line.length > 38 ? line.slice(0, 36).trim() + '…' : line;
@@ -2529,6 +2555,10 @@ function refreshMorningSide() {
     $('firstSelect').value = pick != null && rows[pick] ? String(pick) : '';
   }
 
+  $('notesSel').value = day.nview === 'free' ? 'free-' + day.free.notes.kind : 'notes';
+  const notesOvr = day.ovr.nview != null;
+  $('notesSrc').textContent = notesOvr ? 'Changed for ' + dayMonth(viewDate) : DAY_NAMES[wd] + '’s usual';
+  scopeSeg('notesScope', notesOvr || scopePending.notes, wd);
   $('panelSel').value = day.panel === 'free' ? 'free-' + day.free.side.kind : day.panel;
   const own = ((state.infoTitle || {})[wd] || '').trim();
   $('panelSel').querySelector('option[value="info"]').textContent = own ? 'Custom panel (' + own + ')' : 'Custom panel';
@@ -2598,6 +2628,15 @@ $('panelSel').addEventListener('change', () => {
   if (isFree) { setFreeProp('side', { kind: raw.slice(5) }); selectZone('side'); }
   changed(); refreshUi();
 });
+$('notesSel').addEventListener('change', () => {
+  const raw = $('notesSel').value, isFree = raw.startsWith('free-'), v = isFree ? 'free' : 'notes', wd = wdOf(viewDate);
+  const weekly = (state.notesView || {})[wd] || 'notes';
+  const today = ovr().nview != null || scopePending.notes || (isFree && weekly !== 'free');   // a picture starts as a one-off
+  if (today) setOvr('nview', v === weekly ? null : v);
+  else { state.notesView = state.notesView || {}; state.notesView[wd] = v; setOvr('nview', null); }
+  if (isFree) { setFreeProp('notes', { kind: raw.slice(5) }); selectZone('notes'); }
+  changed(); refreshUi();
+});
 function scopeClick(segId, key, ovrKey, slot) {
   $(segId).addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
@@ -2609,6 +2648,7 @@ function scopeClick(segId, key, ovrKey, slot) {
         // Make today's choice the usual one for this weekday
         const wd = wdOf(viewDate), v = o[ovrKey];
         if (ovrKey === 'ttView') { state.ttView[wd] = v; state.ttShow[wd] = v !== 'off'; }
+        else if (ovrKey === 'nview') { state.notesView = state.notesView || {}; state.notesView[wd] = v; }
         else state.panelDefault[wd] = v;
         promoteFree(slot);
         setOvr(ovrKey, null); changed();
@@ -2620,6 +2660,7 @@ function scopeClick(segId, key, ovrKey, slot) {
 }
 scopeClick('mainScope', 'main', 'ttView', 'main');
 scopeClick('sideScope', 'side', 'panel', 'side');
+scopeClick('notesScope', 'notes', 'nview', 'notes');
 
 /* ---------- Headings (pencil in the bottom bar) ---------- */
 let hdMode = null;                      // null, or where changes go: 'all' | 'day' | 'today'
@@ -2686,7 +2727,7 @@ $('hdResetChoices').addEventListener('click', e => {
 /* ---------- Freestyle ---------- */
 function slotToday(slot) {
   const o = ovr();
-  return slot === 'main' ? o.ttView != null : slot === 'side' ? o.panel != null : slot === 'whole' ? o.whole != null : o.pfree != null;
+  return slot === 'main' ? o.ttView != null : slot === 'side' ? o.panel != null : slot === 'notes' ? o.nview != null : slot === 'whole' ? o.whole != null : o.pfree != null;
 }
 function setFreeProp(slot, props) {
   const wd = wdOf(viewDate);
@@ -2908,6 +2949,7 @@ function imageTarget() {
   if (editMode === 'prep') { const pf = prepFreeOf(state, viewDate); return pf.mode !== 'off' && pf.item.kind === 'image' ? 'prep' : null; }
   const d = resolveDay(state, viewDate);
   if (d.whole) return d.free.whole.kind === 'image' ? 'whole' : null;
+  if (d.nview === 'free' && d.free.notes.kind === 'image') return 'notes';
   if (d.ttView === 'free' && d.free.main.kind === 'image') return 'main';
   if (d.panel === 'free' && d.free.side.kind === 'image') return 'side';
   return null;
@@ -2949,7 +2991,7 @@ function projVideo() {
   const d = fromISO(proj.date);
   if (proj.mode === 'prep') { const pf = prepFreeOf(state, d); return pf.mode !== 'off' && pf.item.kind === 'video' && pf.item.yt ? pf.item : null; }
   const day = resolveDay(state, d);
-  const slots = day.whole ? ['whole'] : [].concat(day.ttView === 'free' ? ['main'] : [], day.panel === 'free' ? ['side'] : []);
+  const slots = day.whole ? ['whole'] : [].concat(day.nview === 'free' ? ['notes'] : [], day.ttView === 'free' ? ['main'] : [], day.panel === 'free' ? ['side'] : []);
   const s = slots.find(k => day.free[k].kind === 'video' && day.free[k].yt);
   return s ? day.free[s] : null;
 }
@@ -4173,7 +4215,8 @@ function updateNoticeHint() {
     covered = mode === 'whole' || mode === 'bottom';
     list = morning ? noticesFor(state, viewDate, 'morning') : noticesFor(state, nextSchoolDay(viewDate), 'eve');
   } else {
-    covered = !!resolveDay(state, viewDate).whole;
+    const dd = resolveDay(state, viewDate);
+    covered = !!dd.whole || dd.nview === 'free';
     list = noticesFor(state, viewDate, 'morning');
   }
   hint.hidden = !covered || !list.length;
@@ -4199,7 +4242,11 @@ $('whatsNew').addEventListener('keydown', e => {
     else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
   }
 });
-$('acctBtn').addEventListener('click', () => openAccount());
+// Until someone has signed in on this laptop, the button says Create account (most people won't have one yet)
+const everSignedIn = () => { try { return !!(localStorage.getItem('morningSlide.everSignedIn') || localStorage.getItem('sb-jbvemxhfndjkofcbubmn-auth-token')); } catch (e) { return false; } };
+function acctLabel() { const t = $('acctBtnText'); if (t) t.textContent = everSignedIn() ? 'Sign in' : 'Create account'; }
+acctLabel();
+$('acctBtn').addEventListener('click', () => openAccount(noticeCache && noticeCache.uid ? undefined : everSignedIn() ? 'signin' : 'signup'));
 { let seen = false; try { seen = !!localStorage.getItem(WN_KEY); } catch (e) {} if (!seen) setTimeout(openWhatsNew, 600); }
 function changed(opts = {}) {
   save();
@@ -4439,13 +4486,15 @@ function paintBadges() {
   $('noticesBtn').hidden = !isStaff();
   const ab = $('acctBtn');
   if (session && me) {
+    try { localStorage.setItem('morningSlide.everSignedIn', '1'); } catch (e) {}
     ab.className = 'topbtn signedin';
     ab.innerHTML = '<span class="av' + (me.status === 'approved' ? '' : ' wait') + '">' + esc(me.initials) + '</span><span class="tb-label">' + esc(me.status === 'approved' ? me.name : 'Waiting for approval') + '</span>';
     ab.title = 'Signed in as ' + me.email + '. Click for your account.';
   } else {
     ab.className = 'topbtn signin';
-    ab.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg><span>Sign in</span>';
-    ab.title = 'Sign in with your school email';
+    ab.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg><span id="acctBtnText">Sign in</span>';
+    ab.title = 'Sign in, or create an account, with your school email';
+    acctLabel();
   }
   paintNoticeBadge();
   $('acctNavSub').textContent = session && !me ? 'Signed in as ' + session.user.email : me ? (me.status === 'approved' ? 'Signed in as ' + me.name : 'Waiting for approval') : 'Sign in with your school email';
