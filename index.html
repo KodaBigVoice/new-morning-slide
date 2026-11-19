@@ -155,7 +155,7 @@
 .slide .houses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .slide .house-tile { display: flex; flex-direction: column; gap: 6px; border-radius: 16px; padding: 8px 8px 10px; }
 .slide .house-name { border-radius: 8px; padding: 6px 0; text-align: center; font-size: 27px; font-weight: 700; }
-.slide .house-loc { flex: 1; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 27px; font-weight: 500; line-height: 1.2; min-height: 1.2em; overflow-wrap: anywhere; }
+.slide .house-loc { flex: 1; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 27px; font-weight: 500; line-height: 1.2; min-height: 1.2em; white-space: nowrap; overflow: hidden; }
 
 /* Prep slide: preps, prep info and tomorrow (or today) on the left; timer and music on the right */
 .slide.prep .grid { grid-template-columns: 1162px 630px; }
@@ -1668,7 +1668,7 @@ function panelHTML(st, day, editor) {
   if (day.panel === 'house') {
     return '<div class="card panel house region-side">' + hdEl(st, day.date, 'house') + '<div class="houses">' +
       HOUSES.map(h => '<div class="house-tile" style="background:' + h.tint + '"><div class="house-name" style="background:' + h.bg + ';color:' + h.fg + '">' + h.name + '</div>' +
-        '<div class="house-loc" data-field="house:' + h.name + '">' + esc(day.houses[h.name] || '') + '</div></div>').join('') + '</div></div>';
+        '<div class="house-loc" data-fit="27,19" data-field="house:' + h.name + '">' + esc(day.houses[h.name] || '') + '</div></div>').join('') + '</div></div>';
   }
   const mday = day.panel === 'lunch' ? matchdayText(st, day.date) : '';
   return '<div class="card panel bullets region-side">' + (day.panel === 'info' ? '<div class="heading" data-field="panelTitle">' + esc(day.panelTitle) + '</div>' : hdEl(st, day.date, 'lunch')) +
@@ -1784,7 +1784,7 @@ function fitSlide(slide, panel) {
   }
   slide.querySelectorAll('[data-fit]').forEach(el => {
     const [max, min] = el.dataset.fit.split(',').map(Number);
-    const oneLine = el.classList.contains('info-value') || el.classList.contains('prep-subj');   // one line, shrinks to fit its width
+    const oneLine = el.classList.contains('info-value') || el.classList.contains('prep-subj') || el.classList.contains('house-loc');   // one line, shrinks to fit its width
     // a box that is only as tall as its text (matchday lines) can be a pixel or two out from rounding: allow for that
     const slack = el.classList.contains('mday') ? 6 : 1;
     const over = () => el.scrollWidth > el.clientWidth + 1 || (!oneLine && el.scrollHeight > el.clientHeight + slack);
@@ -1792,6 +1792,12 @@ function fitSlide(slide, panel) {
     el.style.fontSize = size + 'px';
     while (size > min && over(size)) { size -= 1; el.style.fontSize = size + 'px'; }
     // Task / 8:30 that still won't fit on one line: let it wrap onto two lines instead of cutting it off
+    // A room name that still won't fit on one line: two lines, as big as will fit
+    if (el.classList.contains('house-loc') && over()) {
+      el.style.whiteSpace = 'normal'; el.style.overflowWrap = 'anywhere';
+      size = 25; el.style.fontSize = size + 'px';
+      while (size > 16 && el.scrollHeight > el.clientHeight + 1) { size -= 1; el.style.fontSize = size + 'px'; }
+    }
     if (el.classList.contains('info-value') && over()) {
       el.style.whiteSpace = 'normal'; el.style.overflowWrap = 'anywhere';
       size = Math.min(max, 34); el.style.fontSize = size + 'px';
