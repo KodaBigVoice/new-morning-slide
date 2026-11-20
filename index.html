@@ -196,7 +196,7 @@
 .slide .notice { border: 3px solid color-mix(in srgb, var(--dot) 34%, transparent); border-radius: 22px; padding: 10px 20px 12px; font-size: 27px; line-height: 1.28; color: var(--ink); text-wrap: pretty; }
 .slide .notices.many .notice { font-size: 23px; padding: 8px 18px 10px; }
 .slide .notice .by { color: var(--label); font-size: 0.82em; white-space: nowrap; }
-.slide .prep-box .notice { font-size: 24px; }
+.slide .prep-box .notice, .slide .panel .notice, .slide .other .notice { font-size: 24px; }
 .slide .notice-strip { position: absolute; left: 48px; right: 48px; bottom: 26px; z-index: 4; display: flex; flex-direction: row; flex-wrap: wrap; align-items: flex-start; gap: 14px; max-height: 40%; }
 .slide .notice-strip .notice { flex: 1 1 380px; font-size: 30px; background: #fff; box-shadow: 0 10px 28px -14px rgba(23, 50, 79, 0.35); }
 .slide.editor-preview .notice { cursor: pointer; }
@@ -349,6 +349,8 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
 .areahead .src { font-family: var(--ui); font-weight: 400; font-size: 0.75rem; opacity: 0.92; }
 .top .areahead { background: var(--top); } .main .areahead { background: var(--main); } .side-p .areahead { background: var(--side); }
 .areabox.off { opacity: 0.55; }
+.nb-seg button { font-size: 0.82rem; padding-inline: 0.3rem; }
+.nb-seg button.unavail { opacity: 0.5; text-decoration: line-through; text-decoration-color: rgba(28, 48, 72, 0.35); }
 .labelrow { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; font-size: 0.9rem; }
 .map { display: grid; grid-template-columns: 2.25fr 1.6fr 2.15fr; grid-template-rows: 20px 20px minmax(0, 1fr); gap: 4px; height: 128px; padding: 8px; border-radius: 10px; background: #F4F7FA; }
 .map i { display: block; border-radius: 4px; background: #E1E7EE; transition: filter 0.15s; }
@@ -824,6 +826,13 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
         <div id="areaBoxes">
         <div class="box" style="margin-bottom:10px">
           <div class="labelrow"><span style="display:flex;align-items:center;gap:0.45rem"><b id="taskLbl">Show morning task</b><button type="button" class="info-i" data-tip="The 8:30 box always shows. A first lesson box joins it when the central column shows “First lesson only”." aria-label="About the morning task box">i</button></span><button type="button" class="switch" id="taskSwitch" role="switch" aria-checked="true" aria-labelledby="taskLbl"></button></div>
+        </div>
+        <div class="box" id="noticeBoxRow" hidden style="margin-bottom:10px">
+          <b id="nbLbl">Announcements go in</b>
+          <div class="seg nb-seg" id="noticeBoxSeg" role="group" aria-labelledby="nbLbl">
+            <button type="button" data-nb="notes">What’s happening</button><button type="button" data-nb="main">Central column</button><button type="button" data-nb="side">Side panel</button>
+          </div>
+          <p class="subtle" id="nbNote" hidden></p>
         </div>
         <div class="box areabox top" data-region="notes" style="margin-bottom:10px">
           <h3 class="areahead"><span class="ttl"><span class="mm" data-mm="notes" aria-hidden="true"></span>What’s happening</span><span class="src" id="notesSrc"></span></h3>
@@ -1339,7 +1348,8 @@ function defaultState() {
     other: per(''), otherTitle: per(''), // the middle "Other info" box
     oneoff: {},                          // { date: { notes, info, lunch, other, prepInfo } }: "just this <weekday>" announcements
     split: {},
-    noticeStrip: false,                  // whole-slide Freestyle: show school notices in a strip along the bottom                           // { box: true } splits a box into weekly + just-this-week (default: one list)                // show "Miss A Woodhouse" (true) or "Miss Woodhouse" (false)
+    noticeStrip: false,
+    noticeBox: 'notes',                  // where announcements go on the morning slide: 'notes' | 'main' | 'side' (falls back to What's happening)                  // whole-slide Freestyle: show school notices in a strip along the bottom                           // { box: true } splits a box into weekly + just-this-week (default: one list)                // show "Miss A Woodhouse" (true) or "Miss Woodhouse" (false)
     prefNames: {}                        // { form: { name on the spreadsheet: preferred name } }
   };
 }
@@ -1798,7 +1808,8 @@ function panelHTML(st, day, editor) {
   const mday = day.panel === 'lunch' ? matchdayText(st, day.date) : '';
   return '<div class="card panel bullets region-side">' + (day.panel === 'info' ? '<div class="heading" data-field="panelTitle">' + esc(day.panelTitle) + '</div>' : hdEl(st, day.date, 'lunch')) +
     (mday ? '<div class="rich mday" data-fit="28,15"' + (editor ? ' data-tip="From Matchday Queues, for your year group. Your own notes go underneath."' : '') + '>' + richHTML(mday) + '</div>' : '') +
-    splitHTML(st, day.date, day.panel, 'panelText', day.panelText, '30,18', editor) + '</div>';
+    splitHTML(st, day.date, day.panel, 'panelText', day.panelText, '30,18', editor) +
+    (noticeTarget(st, day) === 'side' ? noticesHTML(noticesFor(st, day.date, 'morning')) : '') + '</div>';
 }
 
 /* Timer buttons shown in the timer box on the laptop's preview (never on the projector) */
@@ -1857,6 +1868,25 @@ function noticesFor(st, date, where, withHidden) {
       noticeReaches(n, st.form, c) && (withHidden || !hides.has(n.id)))
     .sort((a, b) => (a.created_at < b.created_at ? -1 : 1));
 }
+// The teacher's chosen box if it has room today, otherwise What's happening, otherwise nowhere (Freestyle covers it)
+const NB_NAMES = { notes: 'What’s happening', main: 'the central column', side: 'the side panel' };
+function noticeBoxOk(day, box) {
+  if (day.whole) return false;
+  if (box === 'main') return day.ttView === 'text';
+  if (box === 'side') return day.panel === 'lunch' || day.panel === 'info';
+  return day.nview !== 'free';
+}
+function noticeBoxWhyNot(day, box) {
+  if (day.whole) return 'Freestyle covers the whole slide today';
+  if (box === 'main') return 'The central column is showing ' + (day.ttView === 'full' ? 'the timetable' : day.ttView === 'free' ? 'Freestyle' : day.ttView === 'first' ? 'nothing (first lesson only)' : 'nothing') + ' today. Announcements fit when it shows the Other info box.';
+  if (box === 'side') return 'The side panel is showing ' + ({ house: 'house meetings', free: 'Freestyle', none: 'nothing' }[day.panel] || 'something else') + ' today. Announcements fit with Lunchtime Arrangements or a Custom panel.';
+  return 'What’s happening is showing Freestyle today';
+}
+function noticeTarget(st, day) {
+  const want = st.noticeBox || 'notes';
+  if (noticeBoxOk(day, want)) return want;
+  return noticeBoxOk(day, 'notes') ? 'notes' : null;
+}
 function noticesHTML(list, cls) {
   if (!list.length) return '';
   return '<div class="notices' + (list.length > 3 ? ' many' : '') + (cls ? ' ' + cls : '') + '">' +
@@ -1880,6 +1910,7 @@ function renderSlide(host, st, date, editor) {
     return host.querySelector('.slide');
   }
   const freeMain = day.ttView === 'free', wide = day.showTT || freeMain || day.ttView === 'text';
+  const nt = noticeTarget(st, day), nAt = box => (nt === box ? noticesHTML(noticesFor(st, date, 'morning')) : '');
   setSlideHTML(host,
     '<div class="slide' + (wide ? '' : ' no-tt') + (st.teacherInitial === false ? ' short-teachers' : '') + (day.ttView === 'first' ? ' first' : '') + (st.design === 'modern' ? ' modern' : '') + (day.panel === 'none' ? ' no-panel' : '') + '" style="' + themeVars(t) + '">' +
       '<div class="circle" style="width:900px;height:900px;left:-300px;bottom:-480px"></div>' +
@@ -1897,13 +1928,13 @@ function renderSlide(host, st, date, editor) {
         '</div>' +
         '<div class="left' + (wide ? '' : ' region-main') + '">' +
           (day.nview === 'free' ? freeHTML('notes', day.free.notes, editor, 'free-notes region-notes') :
-          '<div class="card notes region-notes">' + hdEl(st, date, 'notes') + splitHTML(st, date, 'notes', 'notes', day.notes, '32,20', editor) + noticesHTML(noticesFor(st, date, 'morning')) + '</div>') +
+          '<div class="card notes region-notes">' + hdEl(st, date, 'notes') + splitHTML(st, date, 'notes', 'notes', day.notes, '32,20', editor) + nAt('notes') + '</div>') +
         '</div>' +
         (day.showTT ? '<div class="card tt region-main">' + hdEl(st, date, 'tt') + timetableHTML(st, day.wd) + '</div>' : '') +
-        (day.ttView === 'text' ? '<div class="card other region-main"><div class="heading" data-field="otherTitle">' + esc(day.otherTitle.trim() || 'Other info') + '</div>' + splitHTML(st, date, 'other', 'otherText', day.otherText, '30,18', editor) + '</div>' : '') +
+        (day.ttView === 'text' ? '<div class="card other region-main"><div class="heading" data-field="otherTitle">' + esc(day.otherTitle.trim() || 'Other info') + '</div>' + splitHTML(st, date, 'other', 'otherText', day.otherText, '30,18', editor) + nAt('main') + '</div>' : '') +
         (freeMain ? freeHTML('main', day.free.main, editor, 'free-main region-main') : '') +
       '</div>' +
-      (day.nview === 'free' && st.noticeStrip ? noticesHTML(noticesFor(st, date, 'morning'), 'notice-strip') : '') +
+      (nt === null && st.noticeStrip ? noticesHTML(noticesFor(st, date, 'morning'), 'notice-strip') : '') +
     '</div>');
   fitSlide(host.querySelector('.slide'), day.panel);
   return host.querySelector('.slide');
@@ -2555,6 +2586,18 @@ function refreshMorningSide() {
     $('firstSelect').value = pick != null && rows[pick] ? String(pick) : '';
   }
 
+  // Where announcements go (only once signed in, as that's when there are any)
+  $('noticeBoxRow').hidden = !(noticeCache && noticeCache.uid);
+  const nbWant = state.noticeBox || 'notes', nbAt = noticeTarget(state, day);
+  $('noticeBoxSeg').querySelectorAll('[data-nb]').forEach(b => {
+    const ok = noticeBoxOk(day, b.dataset.nb);
+    b.setAttribute('aria-pressed', String(b.dataset.nb === nbWant));
+    b.classList.toggle('unavail', !ok);
+    if (ok) b.removeAttribute('data-tip'); else b.dataset.tip = noticeBoxWhyNot(day, b.dataset.nb);
+  });
+  $('nbNote').hidden = nbAt === nbWant;
+  $('nbNote').textContent = nbAt === null ? 'Freestyle covers the boxes today, so announcements can go in a strip instead (see the bottom bar).'
+    : 'Today they’re in ' + NB_NAMES[nbAt] + ': ' + noticeBoxWhyNot(day, nbWant).replace(/ Announcements fit.*$/, '').replace(/^./, c => c.toLowerCase());
   $('notesSel').value = day.nview === 'free' ? 'free-' + day.free.notes.kind : 'notes';
   const notesOvr = day.ovr.nview != null;
   $('notesSrc').textContent = notesOvr ? 'Changed for ' + dayMonth(viewDate) : DAY_NAMES[wd] + '’s usual';
@@ -2602,6 +2645,19 @@ document.querySelectorAll('.areabox').forEach(box => {
   });
 });
 
+$('noticeBoxSeg').addEventListener('click', e => {
+  const b = e.target.closest('[data-nb]'); if (!b) return;
+  state.noticeBox = b.dataset.nb; changed(); refreshUi();
+  const day = resolveDay(state, viewDate);
+  if (!noticeBoxOk(day, b.dataset.nb)) toast('Saved. ' + noticeBoxWhyNot(day, b.dataset.nb).replace(/ Announcements fit.*$/, '') + ' For now they’re in ' + (noticeTarget(state, day) ? NB_NAMES[noticeTarget(state, day)] : 'a strip, if you turn it on') + '.');
+});
+// hovering a choice outlines that box on the preview
+$('noticeBoxSeg').addEventListener('mouseover', e => {
+  const b = e.target.closest('[data-nb]'); els.preview.querySelectorAll('.region-lit').forEach(el => el.classList.remove('region-lit')); if (!b) return;
+  const el = els.preview.querySelector(b.dataset.nb === 'notes' ? '.region-notes' : b.dataset.nb === 'main' ? '.card.region-main, .free.region-main' : '.region-side');
+  if (el) el.classList.add('region-lit');
+});
+$('noticeBoxSeg').addEventListener('mouseleave', () => els.preview.querySelectorAll('.region-lit').forEach(el => el.classList.remove('region-lit')));
 $('taskSwitch').addEventListener('click', () => { state.showTask = state.showTask === false; changed(); refreshUi(); });
 $('ttViewSel').addEventListener('change', () => {
   const raw = $('ttViewSel').value, isFree = raw.startsWith('free-'), v = isFree ? 'free' : raw, wd = wdOf(viewDate);
@@ -4215,8 +4271,7 @@ function updateNoticeHint() {
     covered = mode === 'whole' || mode === 'bottom';
     list = morning ? noticesFor(state, viewDate, 'morning') : noticesFor(state, nextSchoolDay(viewDate), 'eve');
   } else {
-    const dd = resolveDay(state, viewDate);
-    covered = !!dd.whole || dd.nview === 'free';
+    covered = noticeTarget(state, resolveDay(state, viewDate)) === null;
     list = noticesFor(state, viewDate, 'morning');
   }
   hint.hidden = !covered || !list.length;
@@ -4857,7 +4912,7 @@ let draft = null;            // the notice being written or edited
 function saveNoticeCache(c) {
   noticeCache = c;
   try { if (c) localStorage.setItem(NOTICE_KEY, JSON.stringify(c)); else localStorage.removeItem(NOTICE_KEY); } catch (e) {}
-  renderAll(); paintNoticeBadge(); if (npOpen) paintPanel();
+  renderAll(); refreshUi(); paintNoticeBadge(); if (npOpen) paintPanel();
 }
 function clearNotices() { if (noticeCache) saveNoticeCache(null); }
 async function fetchNotices() {
