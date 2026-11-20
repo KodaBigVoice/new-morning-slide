@@ -2,7 +2,7 @@
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
-<meta name="ms-updated" content="2026-11-20T00:30:03Z">
+<meta name="ms-updated" content="2026-11-20T00:30:26Z">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
 <title>Morning Slide</title>
@@ -578,7 +578,6 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
 .topbtn .av { width: 1.75rem; height: 1.75rem; border-radius: 50%; background: var(--steel); color: #fff; display: grid; place-items: center; font-size: 0.72rem; letter-spacing: 0.02em; }
 .topbtn .av.wait { background: #C48A12; }
 .bb-updated { color: #9FB2C7; font-size: 0.78rem; white-space: nowrap; }
-@media (max-width: 1350px) { .bb-updated { display: none; } }
 .bb-new { display: inline-flex; align-items: center; gap: 0.4rem; border: 1px solid rgba(255, 255, 255, 0.28); background: rgba(255, 255, 255, 0.06); color: #fff; border-radius: 8px; padding: 0.35rem 0.7rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
 .bb-new:hover { background: rgba(255, 255, 255, 0.14); }
 /* What's new */
@@ -4289,7 +4288,7 @@ $('noticeStripBtn').addEventListener('click', () => { state.noticeStrip = !state
 $('whatsNewBtn').addEventListener('click', openWhatsNew);
 // "Updated …": stamped automatically into the page each time a new version is committed
 { const m = document.querySelector('meta[name="ms-updated"]'), d = m && new Date(m.content);
-  if (d && !isNaN(d)) $('bbUpdated').textContent = 'Updated ' + d.getDate() + ' ' + MONTHS[d.getMonth()] + ', ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+  if (d && !isNaN(d)) $('bbUpdated').textContent = 'Updated ' + d.getDate() + ' ' + MONTHS[d.getMonth()].slice(0, 3) + ', ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
 $('whatsNew').addEventListener('click', e => {
   if (e.target === $('whatsNew')) return closeWhatsNew();
   const b = e.target.closest('[data-wn]'); if (!b) return;
