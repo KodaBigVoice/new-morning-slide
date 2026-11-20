@@ -616,8 +616,8 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
 .wn footer .chip { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border-radius: 8px; background: var(--ink); color: #fff; font-weight: 700; font-size: 0.82rem; }
 .wn footer .btn { min-height: 46px; padding: 0 22px; }
 /* top bar on laptop-width screens: just initials and the Notices icon once signed in */
-@media (max-width: 1500px) { .topbar .topbtn { padding-inline: 0.65rem; gap: 0.4rem; } #acctBtn.signin svg, #setupBtn svg, #presentBtn svg { display: none; } .topbar .present-btn { padding-inline: 0.9rem; } }
-@media (max-width: 1500px) { .topbtn.signedin .tb-label, #noticesBtn .tb-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } #noticesBtn { padding-inline: 0.65rem; } }
+.topbar .topbtn, .topbar .present-btn { height: 42px; padding-top: 0; padding-bottom: 0; }
+@media (max-width: 1500px) { .topbar .topbtn { padding-inline: 0.7rem; gap: 0.4rem; } #acctBtn.signin svg { display: none; } .topbar .present-btn { padding-inline: 0.95rem; } }
 /* What's new on shorter screens (school laptops are about 640px tall) */
 @media (max-height: 760px) {
   .wn-back { padding: 0.5rem; }
@@ -741,14 +741,14 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
   <header class="topbar">
     <h1 class="sr-only">Morning Slide</h1>
     <div class="modeswitch" id="modeSwitch" role="group" aria-label="Which slide you are editing">
-      <button type="button" data-m="morning" aria-pressed="true">Morning Slide</button>
-      <button type="button" data-m="prep" aria-pressed="false">Prep Slide</button>
+      <button type="button" data-m="morning" aria-pressed="true">Morning</button>
+      <button type="button" data-m="prep" aria-pressed="false">Prep</button>
     </div>
     <button type="button" class="formchip" id="formChip" title="Your form (change it in Setup)"></button>
     <nav class="week" id="week" aria-label="Choose a day"></nav>
-    <button type="button" class="topbtn signin" id="acctBtn" title="Sign in, or create an account, with your school email"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg><span id="acctBtnText">Sign in</span></button>
-    <button type="button" class="topbtn" id="noticesBtn" title="Notices" hidden>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l14-6v14L3 13z"></path><path d="M7 12.5V17a2 2 0 0 0 4 0v-3"></path><path d="M20 9v6"></path></svg><span class="tb-label">Notices</span><span class="badge" id="noticesBadge" hidden></span>
+    <button type="button" class="topbtn signin" id="acctBtn" title="Sign in, or create an account, with your school email"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg><span id="acctBtnText">Create account</span></button>
+    <button type="button" class="topbtn" id="noticesBtn" hidden>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l14-6v14L3 13z"></path><path d="M7 12.5V17a2 2 0 0 0 4 0v-3"></path><path d="M20 9v6"></path></svg>Announcements<span class="badge" id="noticesBadge" hidden></span>
     </button>
     <button type="button" class="topbtn" id="setupBtn">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"></path></svg>Setup<span class="badge" id="setupBadge" hidden data-tip="People waiting for you to approve them"></span>
@@ -822,14 +822,22 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
           </div>
         </div>
         <div id="areaBoxes">
-        <div class="box areabox top" data-region="top" style="margin-bottom:10px">
-          <h3 class="areahead"><span class="ttl"><span class="mm" data-mm="top" aria-hidden="true"></span>Top boxes</span></h3>
-          <div class="labelrow"><span style="display:flex;align-items:center;gap:0.45rem"><span id="taskLbl">Morning task box</span><button type="button" class="info-i" data-tip="The 8:30 box always shows. A first lesson box joins it when the main area shows “First lesson only”." aria-label="About the top boxes">i</button></span><button type="button" class="switch" id="taskSwitch" role="switch" aria-checked="true" aria-labelledby="taskLbl"></button></div>
+        <div class="box" style="margin-bottom:10px">
+          <div class="labelrow"><span style="display:flex;align-items:center;gap:0.45rem"><b id="taskLbl">Show morning task</b><button type="button" class="info-i" data-tip="The 8:30 box always shows. A first lesson box joins it when the central column shows “First lesson only”." aria-label="About the morning task box">i</button></span><button type="button" class="switch" id="taskSwitch" role="switch" aria-checked="true" aria-labelledby="taskLbl"></button></div>
+        </div>
+        <div class="box areabox top" data-region="notes" style="margin-bottom:10px">
+          <h3 class="areahead"><span class="ttl"><span class="mm" data-mm="notes" aria-hidden="true"></span>What’s happening</span><span class="src" id="notesSrc"></span></h3>
+          <select class="text" id="notesSel" aria-label="What the What’s happening box shows">
+            <option value="notes">Notes (as usual)</option>
+            <optgroup label="Freestyle: fills the whole box"><option value="free-image">Image or GIF</option><option value="free-video">YouTube video</option><option value="free-message">Message</option></optgroup>
+          </select>
+          <div class="seg" id="notesScope"><button type="button" data-scope="week"></button><button type="button" data-scope="today">Change for today</button></div>
         </div>
 
+
         <div class="box areabox main" data-region="main" style="margin-bottom:10px">
-          <h3 class="areahead"><span class="ttl"><span class="mm" data-mm="main" aria-hidden="true"></span>Main area</span><span class="src" id="mainSrc"></span></h3>
-          <select class="text" id="ttViewSel" aria-label="What the main area shows">
+          <h3 class="areahead"><span class="ttl"><span class="mm" data-mm="main" aria-hidden="true"></span>Central column</span><span class="src" id="mainSrc"></span></h3>
+          <select class="text" id="ttViewSel" aria-label="What the central column shows">
             <option value="full">Full timetable</option>
             <option value="first">First lesson only</option>
             <option value="text">Other info box</option>
@@ -840,14 +848,6 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
           <div class="seg" id="mainScope"><button type="button" data-scope="week"></button><button type="button" data-scope="today">Change for today</button></div>
         </div>
 
-        <div class="box areabox main" data-region="notes" style="margin-bottom:10px">
-          <h3 class="areahead"><span class="ttl">What’s happening</span><span class="src" id="notesSrc"></span></h3>
-          <select class="text" id="notesSel" aria-label="What the What’s happening box shows">
-            <option value="notes">Notes (as usual)</option>
-            <optgroup label="Freestyle: fills the whole box"><option value="free-image">Image or GIF</option><option value="free-video">YouTube video</option><option value="free-message">Message</option></optgroup>
-          </select>
-          <div class="seg" id="notesScope"><button type="button" data-scope="week"></button><button type="button" data-scope="today">Change for today</button></div>
-        </div>
 
         <div class="box areabox side-p" data-region="side" style="margin-bottom:10px">
           <h3 class="areahead"><span class="ttl"><span class="mm" data-mm="side" aria-hidden="true"></span>Side panel</span><span class="src" id="sideSrc"></span></h3>
@@ -943,12 +943,12 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
       <p>Press <b>Create account</b> at the top right and use your school email. It takes a minute: you’ll get one email to confirm it’s you. Creating an account never changes anything already on your laptop.</p>
       <p class="soft">Not ready to create an account? That’s fine: just carry on using Morning Slide as normal.</p>
     </div>
-    <div class="wn-bar" aria-hidden="true"><span>Today</span><span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l14-6v14L3 13z"></path><path d="M7 12.5V17a2 2 0 0 0 4 0v-3"></path><path d="M20 9v6"></path></svg>Notices</span><span class="hi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>Create account</span><span>Setup</span></div>
+    <div class="wn-bar" aria-hidden="true"><span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l14-6v14L3 13z"></path><path d="M7 12.5V17a2 2 0 0 0 4 0v-3"></path><path d="M20 9v6"></path></svg>Announcements</span><span class="hi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>Create account</span><span>Setup</span></div>
   </section>
   <section class="wn-cards">
     <article class="wn-card"><span class="ic" style="background:#FCEBD7;color:#9A5212"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l14-6v14L3 13z"></path><path d="M7 12.5V17a2 2 0 0 0 4 0v-3"></path><path d="M20 9v6"></path></svg></span>
-      <h4>School notices</h4><p>Any teacher can post a notice to the whole school, a section, a year or single forms. It shows on your slide under What’s happening.</p>
-      <span class="where"><b>Where:</b> the Notices button, once you’ve created an account</span></article>
+      <h4>School announcements</h4><p>Any teacher can post an announcement to the whole school, a section, a year or single forms. It shows on your slide under What’s happening.</p>
+      <span class="where"><b>Where:</b> the Announcements button, once you’ve created an account</span></article>
     <article class="wn-card"><span class="ic" style="background:#DDEFE3;color:#2D6B45"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5L12 4l9 6.5"></path><path d="M5 9.5V20h14V9.5"></path><path d="M10 20v-5h4v5"></path></svg></span>
       <h4>House meetings update themselves</h4><p>Rooms and congers come straight from the school’s schedule. You can still change a room on your own slide.</p>
       <span class="where"><b>Where:</b> automatic, signed in or not</span></article>
@@ -969,7 +969,7 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
   </footer>
 </div></div>
 
-<div class="np-back" id="noticePanel" hidden><div class="np" role="dialog" aria-modal="true" aria-label="Notices" id="noticeDialog"></div></div>
+<div class="np-back" id="noticePanel" hidden><div class="np" role="dialog" aria-modal="true" aria-label="Announcements" id="noticeDialog"></div></div>
 
 <!-- ===================== SETUP ===================== -->
 <div id="setupScreen" class="screen" hidden>
@@ -1161,7 +1161,7 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
       <!-- Account -->
       <section class="setsec" data-sec="account" hidden>
         <h2>Account</h2>
-        <p class="lead">Staff accounts will let Morning Slide share things across the school, like notices and music lessons. You don’t need one: without signing in, everything works just as it does now. Signing in never changes anything already on this laptop.</p>
+        <p class="lead">Staff accounts will let Morning Slide share things across the school, like announcements and music lessons. You don’t need one: without signing in, everything works just as it does now. Signing in never changes anything already on this laptop.</p>
         <div id="acctBody"><div class="card2"><p class="empty-note">Loading…</p></div></div>
       </section>
 
@@ -1896,8 +1896,8 @@ function renderSlide(host, st, date, editor) {
           (day.ttView === 'first' ? firstLessonHTML(day.firstLesson, hd(st, date, 'first')) : '') +
         '</div>' +
         '<div class="left' + (wide ? '' : ' region-main') + '">' +
-          (day.nview === 'free' ? freeHTML('notes', day.free.notes, editor, 'free-notes') :
-          '<div class="card notes">' + hdEl(st, date, 'notes') + splitHTML(st, date, 'notes', 'notes', day.notes, '32,20', editor) + noticesHTML(noticesFor(st, date, 'morning')) + '</div>') +
+          (day.nview === 'free' ? freeHTML('notes', day.free.notes, editor, 'free-notes region-notes') :
+          '<div class="card notes region-notes">' + hdEl(st, date, 'notes') + splitHTML(st, date, 'notes', 'notes', day.notes, '32,20', editor) + noticesHTML(noticesFor(st, date, 'morning')) + '</div>') +
         '</div>' +
         (day.showTT ? '<div class="card tt region-main">' + hdEl(st, date, 'tt') + timetableHTML(st, day.wd) + '</div>' : '') +
         (day.ttView === 'text' ? '<div class="card other region-main"><div class="heading" data-field="otherTitle">' + esc(day.otherTitle.trim() || 'Other info') + '</div>' + splitHTML(st, date, 'other', 'otherText', day.otherText, '30,18', editor) + '</div>' : '') +
@@ -2412,7 +2412,7 @@ function setOvr(key, val) {
   if (val == null) delete o[key]; else o[key] = val;
   if (Object.keys(o).length) state.overrides[iso] = o; else delete state.overrides[iso];
 }
-const OVR_NAMES = { nview: 'What’s happening box', tomorrow: 'Tomorrow Morning', prepInfo: 'prep info', headings: 'headings', otherTitle: 'other info heading', otherText: 'other info', whole: 'whole slide', free: 'freestyle', pfree: 'prep freestyle', task: 'morning task', at830: '8:30 box', notes: 'What’s happening', panel: 'side panel', panelText: 'side panel text', infoTitle: 'panel heading', house: 'house rooms', ttView: 'main area' };
+const OVR_NAMES = { nview: 'What’s happening box', tomorrow: 'Tomorrow Morning', prepInfo: 'prep info', headings: 'headings', otherTitle: 'other info heading', otherText: 'other info', whole: 'whole slide', free: 'freestyle', pfree: 'prep freestyle', task: 'morning task', at830: '8:30 box', notes: 'What’s happening', panel: 'side panel', panelText: 'side panel text', infoTitle: 'panel heading', house: 'house rooms', ttView: 'central column' };
 function plainFirst(s) {
   const line = String(s || '').replace(/^\s*[-*•]\s+/gm, '').replace(/\*\*|__|\*/g, '').split('\n').map(x => x.trim()).find(Boolean) || '';
   return line.length > 38 ? line.slice(0, 36).trim() + '…' : line;
@@ -2578,8 +2578,8 @@ function refreshMorningSide() {
 function paintMap(day) {
   // A small map of the slide in each area's heading, with that area lit
   const cell = (col, row, region) => '<i' + (region ? ' data-r="' + region + '"' : '') + ' style="grid-column:' + col + ';grid-row:' + row + '"></i>';
-  let cells = cell('1 / 3', '1') + cell('1 / 3', '2', 'top');
-  cells += day.showTT || day.ttView === 'free' || day.ttView === 'text' ? cell('1', '3') + cell('2', '3', 'main') : cell('1 / 3', '3', 'main');
+  let cells = cell('1 / 3', '1') + cell('1 / 3', '2');
+  cells += day.showTT || day.ttView === 'free' || day.ttView === 'text' ? cell('1', '3', 'notes') + cell('2', '3', 'main') : cell('1 / 3', '3', 'notes');
   cells += day.panel === 'none' ? cell('3', '1 / 4', 'side') : cell('3', '1 / 3') + cell('3', '3', 'side');
   document.querySelectorAll('.mm[data-mm]').forEach(mm => {
     mm.innerHTML = cells;
@@ -4222,8 +4222,8 @@ function updateNoticeHint() {
   hint.hidden = !covered || !list.length;
   if (hint.hidden) return;
   $('noticeHintText').textContent = state.noticeStrip
-    ? list.length + (list.length === 1 ? ' notice is' : ' notices are') + ' in a strip along the bottom'
-    : list.length + (list.length === 1 ? ' notice isn’t' : ' notices aren’t') + ' showing because of Freestyle';
+    ? list.length + (list.length === 1 ? ' announcement is' : ' announcements are') + ' in a strip along the bottom'
+    : list.length + (list.length === 1 ? ' announcement isn’t' : ' announcements aren’t') + ' showing because of Freestyle';
   $('noticeStripBtn').textContent = state.noticeStrip ? 'Hide the strip' : 'Show them in a strip';
 }
 $('noticeStripBtn').addEventListener('click', () => { state.noticeStrip = !state.noticeStrip; changed(); });
@@ -4244,9 +4244,9 @@ $('whatsNew').addEventListener('keydown', e => {
 });
 // Until someone has signed in on this laptop, the button says Create account (most people won't have one yet)
 const everSignedIn = () => { try { return !!(localStorage.getItem('morningSlide.everSignedIn') || localStorage.getItem('sb-jbvemxhfndjkofcbubmn-auth-token')); } catch (e) { return false; } };
-function acctLabel() { const t = $('acctBtnText'); if (t) t.textContent = everSignedIn() ? 'Sign in' : 'Create account'; }
+function acctLabel() { const t = $('acctBtnText'); if (t) t.textContent = 'Create account'; }
 acctLabel();
-$('acctBtn').addEventListener('click', () => openAccount(noticeCache && noticeCache.uid ? undefined : everSignedIn() ? 'signin' : 'signup'));
+$('acctBtn').addEventListener('click', () => openAccount('signup'));
 { let seen = false; try { seen = !!localStorage.getItem(WN_KEY); } catch (e) {} if (!seen) setTimeout(openWhatsNew, 600); }
 function changed(opts = {}) {
   save();
@@ -4485,12 +4485,8 @@ function paintBadges() {
   $('adminNav').hidden = !isAdmin();
   $('noticesBtn').hidden = !isStaff();
   const ab = $('acctBtn');
-  if (session && me) {
-    try { localStorage.setItem('morningSlide.everSignedIn', '1'); } catch (e) {}
-    ab.className = 'topbtn signedin';
-    ab.innerHTML = '<span class="av' + (me.status === 'approved' ? '' : ' wait') + '">' + esc(me.initials) + '</span><span class="tb-label">' + esc(me.status === 'approved' ? me.name : 'Waiting for approval') + '</span>';
-    ab.title = 'Signed in as ' + me.email + '. Click for your account.';
-  } else {
+  ab.hidden = !!(session && me);          // signed in: your account is in Setup → Account
+  if (!(session && me)) {
     ab.className = 'topbtn signin';
     ab.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg><span id="acctBtnText">Sign in</span>';
     ab.title = 'Sign in, or create an account, with your school email';
@@ -4873,7 +4869,7 @@ async function fetchNotices() {
     sb.rpc('ms_forms'),
   ]);
   if (ns.error) {   // e.g. 04-notices.sql not run yet: keep whatever we had
-    noticeError = ns.error.message || 'Couldn’t load notices';
+    noticeError = ns.error.message || 'Couldn’t load announcements';
     if (npOpen) paintPanel();
     return;
   }
@@ -5003,14 +4999,14 @@ function newTabHTML(tree) {
      '<label>From <input type="date" id="npFrom" min="' + t + '" value="' + d.from + '"></label><label>to <input type="date" id="npTo" min="' + d.from + '" value="' + d.to + '"></label>') + '</div>' +
     (d.when === 'today' ? '' : '<div class="np-prep"><button type="button" class="switch" role="switch" id="npPrep" aria-checked="' + d.prep + '" aria-labelledby="npPrepL"></button><span id="npPrepL">Also show it on the prep slide the evening before</span></div>');
   return '<div class="np-body">' +
-    '<section><h3><label for="npText">Your notice</label></h3><div class="np-write"><textarea id="npText" rows="3" maxlength="140" placeholder="e.g. Choir rehearsal moved to the Music School at 1:15">' + esc(d.body) + '</textarea><span class="np-by">– ' + esc(me.initials) + '</span></div>' +
+    '<section><h3><label for="npText">Your announcement</label></h3><div class="np-write"><textarea id="npText" rows="3" maxlength="140" placeholder="e.g. Choir rehearsal moved to the Music School at 1:15">' + esc(d.body) + '</textarea><span class="np-by">– ' + esc(me.initials) + '</span></div>' +
       '<div class="np-under"><span>This is how it looks on the slide, below each form’s own notes. Please don’t use pupils’ names.</span><span id="npCount">' + d.body.length + ' / 140</span></div></section>' +
     '<section><h3>Who’s it for?</h3>' + who + '</section>' +
     '<section><h3>When?</h3>' + when + '</section>' +
   '</div>' +
   '<div class="np-foot"><p id="npSummary">' + esc(summaryText(tree)) + '</p>' +
     (d.id ? '<button type="button" class="btn" data-np="cancelEdit">Cancel</button>' : '') +
-    '<button type="button" class="btn primary" data-np="post"' + (npBusy ? ' disabled' : '') + '>' + (d.id ? 'Save changes' : 'Post notice') + '</button></div>';
+    '<button type="button" class="btn primary" data-np="post"' + (npBusy ? ' disabled' : '') + '>' + (d.id ? 'Save changes' : 'Post announcement') + '</button></div>';
 }
 function draftDates() {
   const d = draft, t = todayISO(), tm = toISO(nextSchoolDay(new Date()));
@@ -5035,34 +5031,34 @@ function itemHTML(n, acts, sub) {
 function formTabHTML() {
   const c = noticeCache || {}, hides = new Set(c.hides || []), t = todayISO();
   const list = myFormNotices().sort((a, b) => a.start_date.localeCompare(b.start_date) || (a.created_at < b.created_at ? -1 : 1));
-  const head = state.form ? '' : '<p class="np-empty">Choose your form in Setup to see the notices meant for it. Until then you’ll only see whole-school notices.</p>';
-  if (!list.length) return '<div class="np-body">' + head + '<p class="np-empty">No notices for ' + esc(state.form || 'your form') + ' at the moment.</p></div>';
+  const head = state.form ? '' : '<p class="np-empty">Choose your form in Setup to see the announcements meant for it. Until then you’ll only see whole-school ones.</p>';
+  if (!list.length) return '<div class="np-body">' + head + '<p class="np-empty">No announcements for ' + esc(state.form || 'your form') + ' at the moment.</p></div>';
   const now = list.filter(n => n.start_date <= t), later = list.filter(n => n.start_date > t);
   const row = n => itemHTML(n, { hidden: hides.has(n.id), html: (hides.has(n.id) ? '' : seeBtn(n)) + '<button type="button" class="btn small" data-hide="' + esc(n.id) + '">' + (hides.has(n.id) ? 'Show on my slide' : 'Hide on my slide') + '</button>' },
     '– ' + esc(n.author_name || n.author_initials) + ' · ' + esc(datesText(n)) + (hides.has(n.id) ? ' · hidden on your slide' : ''));
   return '<div class="np-body">' + head + '<div class="np-list">' +
     (now.length ? '<div class="np-group">On the slide today</div>' + now.map(row).join('') : '') +
     (later.length ? '<div class="np-group">Coming up</div>' + later.map(row).join('') : '') + '</div>' +
-    '<p class="np-empty" style="font-size:0.85rem">Hiding a notice only takes it off your own slides, on any laptop you sign in on. Everyone else still sees it.</p></div>';
+    '<p class="np-empty" style="font-size:0.85rem">Hiding an announcement only takes it off your own slides, on any laptop you sign in on. Everyone else still sees it.</p></div>';
 }
 function mineTabHTML() {
   const list = ((noticeCache || {}).notices || []).filter(n => n.author === me.id && n.end_date >= todayISO());
-  if (!list.length) return '<div class="np-body"><p class="np-empty">You haven’t posted any notices that are still to come.</p></div>';
+  if (!list.length) return '<div class="np-body"><p class="np-empty">You haven’t posted any announcements that are still to come.</p></div>';
   return '<div class="np-body"><div class="np-list">' + list.map(n => itemHTML(n, { html: seeBtn(n) + '<button type="button" class="btn small" data-edit="' + esc(n.id) + '">Edit</button><button type="button" class="btn small" data-del="' + esc(n.id) + '">Delete</button>' },
     esc(describeAudience(n.audience)) + ' · ' + esc(datesText(n)) + (n.prep_eve ? ' · also at evening prep' : ''))).join('') + '</div></div>';
 }
 function allTabHTML() {
   const list = ((noticeCache || {}).notices || []).filter(n => n.end_date >= todayISO());
-  if (!list.length) return '<div class="np-body"><p class="np-empty">There are no notices still to come.</p></div>';
+  if (!list.length) return '<div class="np-body"><p class="np-empty">There are no announcements still to come.</p></div>';
   return '<div class="np-body"><div class="np-list">' + list.map(n => itemHTML(n, { html: '<button type="button" class="btn small danger" data-del="' + esc(n.id) + '">Delete</button>' },
     '– ' + esc(n.author_name || n.author_initials) + ' · ' + esc(describeAudience(n.audience)) + ' · ' + esc(datesText(n)))).join('') + '</div>' +
-    '<p class="np-empty" style="font-size:0.85rem">As an admin you can delete anyone’s notice. It disappears from every slide within a few minutes.</p></div>';
+    '<p class="np-empty" style="font-size:0.85rem">As an admin you can delete anyone’s announcement. It disappears from every slide within a few minutes.</p></div>';
 }
 function paintPanel() {
   if (!npOpen) return;
   if (!isStaff()) { closeNotices(); return; }
   const tree = schoolTree(), mineN = ((noticeCache || {}).notices || []).filter(n => n.author === me.id && n.end_date >= todayISO()).length;
-  const tabs = [['new', draft && draft.id ? 'Edit notice' : 'New notice'], ['form', 'For ' + (state.form || 'my form') + (myFormNotices().length ? ' (' + myFormNotices().length + ')' : '')], ['mine', 'My notices' + (mineN ? ' (' + mineN + ')' : '')]].concat(isAdmin() ? [['all', 'All notices']] : []);
+  const tabs = [['new', draft && draft.id ? 'Edit announcement' : 'New announcement'], ['form', 'For ' + (state.form || 'my form') + (myFormNotices().length ? ' (' + myFormNotices().length + ')' : '')], ['mine', 'My announcements' + (mineN ? ' (' + mineN + ')' : '')]].concat(isAdmin() ? [['all', 'All announcements']] : []);
   if (npTab === 'all' && !isAdmin()) npTab = 'new';
   const keep = document.activeElement && document.activeElement.id;
   const oldBody = $('noticeDialog').querySelector('.np-body'), scrollY = oldBody ? oldBody.scrollTop : 0, sameTab = $('noticeDialog').dataset.tab === npTab;
@@ -5070,7 +5066,7 @@ function paintPanel() {
   const sel = keep === 'npText' ? [$('npText').selectionStart, $('npText').selectionEnd] : null;
   $('noticeDialog').innerHTML = '<div class="np-head" role="tablist">' + tabs.map(([k, l]) => '<button type="button" role="tab" data-tab="' + k + '" aria-selected="' + (npTab === k) + '">' + esc(l) + '</button>').join('') +
     '<button type="button" class="np-x" data-np="close" aria-label="Close">' + ICON_X + '</button></div>' +
-    (noticeError ? '<div class="acct-msg err" style="margin:16px 28px 0">Notices aren’t working yet: ' + esc(noticeError) + '</div>' : '') +
+    (noticeError ? '<div class="acct-msg err" style="margin:16px 28px 0">Announcements aren’t working yet: ' + esc(noticeError) + '</div>' : '') +
     (npTab === 'new' ? newTabHTML(tree) : npTab === 'form' ? formTabHTML() : npTab === 'mine' ? mineTabHTML() : allTabHTML());
   if (npTab === 'form') markSeen();
   if (keep) { const el = $(keep); if (el) { el.focus({ preventScroll: true }); if (sel) el.setSelectionRange(sel[0], sel[1]); } }
@@ -5079,18 +5075,18 @@ function paintPanel() {
 
 async function postDraft() {
   const tree = schoolTree(), d = draft, body = d.body.trim();
-  if (!body) { toast('Write your notice first.'); $('npText').focus(); return; }
+  if (!body) { toast('Write your announcement first.'); $('npText').focus(); return; }
   if (!allForms(tree).some(f => d.picked.has(f))) { toast('Choose who it’s for.'); return; }
   const [a, b] = draftDates();
   if (!a || !b || b < a) { toast('Check the dates: the last day can’t be before the first.'); return; }
-  if ((fromISO(b) - fromISO(a)) / 864e5 > 31) { toast('A notice can run for a month at most.'); return; }
+  if ((fromISO(b) - fromISO(a)) / 864e5 > 31) { toast('An announcement can run for a month at most.'); return; }
   const row = { body, start_date: a, end_date: b, audience: audienceOf(d.picked, tree), prep_eve: d.when === 'today' ? false : d.prep };
   npBusy = true; paintPanel();
   const r = d.id ? await sb.from('ms_notices').update(row).eq('id', d.id) : await sb.from('ms_notices').insert(row);
   npBusy = false;
-  if (r.error) { toast('Couldn’t save the notice: ' + r.error.message); paintPanel(); return; }
+  if (r.error) { toast('Couldn’t save the announcement: ' + r.error.message); paintPanel(); return; }
   const v = toISO(viewDate), off = editMode === 'morning' && (v < a || v > b);
-  toast((d.id ? 'Notice updated.' : 'Notice posted.') + (off ? ' It’s on ' + DAY_NAMES[dayCode(fromISO(a))] + '’s slide, and you’re looking at ' + DAY_NAMES[dayCode(viewDate)] + '’s: use “See it on the slide” to go there.' : ' It’ll reach other laptops within a few minutes.'));
+  toast((d.id ? 'Announcement updated.' : 'Announcement posted.') + (off ? ' It’s on ' + DAY_NAMES[dayCode(fromISO(a))] + '’s slide, and you’re looking at ' + DAY_NAMES[dayCode(viewDate)] + '’s: use “See it on the slide” to go there.' : ' It’ll reach other laptops within a few minutes.'));
   draft = newDraft(); npTab = 'mine';
   await fetchNotices();
   paintPanel();
@@ -5140,11 +5136,11 @@ $('noticePanel').addEventListener('click', async e => {
   }
   if (ds.del) {
     const n = noticeCache.notices.find(x => x.id === ds.del); if (!n) return;
-    if (!confirm('Delete this notice?\n\n“' + n.body + '”')) return;
+    if (!confirm('Delete this announcement?\n\n“' + n.body + '”')) return;
     const r = await sb.from('ms_notices').delete().eq('id', n.id);
     if (r.error) { toast('Couldn’t delete it: ' + r.error.message); return; }
     if (draft && draft.id === n.id) draft = newDraft();
-    toast('Notice deleted'); await fetchNotices(); paintPanel();
+    toast('Announcement deleted'); await fetchNotices(); paintPanel();
   }
 });
 $('noticePanel').addEventListener('input', e => {
