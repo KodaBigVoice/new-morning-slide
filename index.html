@@ -2,7 +2,7 @@
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
-<meta name="ms-updated" content="2026-11-20T00:30:26Z">
+<meta name="ms-updated" content="2026-11-20T00:34:49Z">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
 <title>Morning Slide</title>
@@ -578,6 +578,7 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
 .topbtn .av { width: 1.75rem; height: 1.75rem; border-radius: 50%; background: var(--steel); color: #fff; display: grid; place-items: center; font-size: 0.72rem; letter-spacing: 0.02em; }
 .topbtn .av.wait { background: #C48A12; }
 .bb-updated { color: #9FB2C7; font-size: 0.78rem; white-space: nowrap; }
+.bottombar:has(#timerGroup:not([hidden])) .bb-updated, .bottombar:has(#videoGroup:not([hidden])) .bb-updated { display: none; }
 .bb-new { display: inline-flex; align-items: center; gap: 0.4rem; border: 1px solid rgba(255, 255, 255, 0.28); background: rgba(255, 255, 255, 0.06); color: #fff; border-radius: 8px; padding: 0.35rem 0.7rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
 .bb-new:hover { background: rgba(255, 255, 255, 0.14); }
 /* What's new */
@@ -914,6 +915,7 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
     <button type="button" class="bb-btn bb-icon hd-btn" id="hdEdit" title="Change the headings" aria-label="Change the headings"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg><span class="hd-on">Change headings</span></button>
     <button type="button" class="bb-btn bb-icon" id="hdReset" title="Put headings back to default" aria-label="Put headings back to default" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 4v5h5"></path></svg></button>
     <span class="vsep"></span>
+    <span class="bb-updated" id="bbUpdated" title="When this version of Morning Slide was published. Press Ctrl+F5 to check for a newer one."></span>
     <div class="row" id="timerGroup" hidden style="gap:0.6rem;flex-wrap:nowrap">
       <input class="timebox" id="timeBox" readonly aria-label="Timer: click to type a time" title="Click to type a time" autocomplete="off" spellcheck="false">
       <div class="tlabel"><span id="tLabel"></span><div class="tbars" id="tBars"></div></div>
@@ -930,7 +932,6 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
       <button type="button" class="bb-btn" id="vSound">Sound off</button>
     </div>
     <span class="grow"></span>
-    <span class="bb-updated" id="bbUpdated" title="When this version of Morning Slide was published. Press Ctrl+F5 to check for a newer one."></span>
     <button type="button" class="bb-new" id="whatsNewBtn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4z"></path><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"></path></svg>What’s new?</button>
     <span class="notice-hint" id="noticeHint" hidden><span id="noticeHintText"></span><button type="button" id="noticeStripBtn"></button></span>
     <span class="projstatus off" id="projStatus"><span class="led"></span><span id="projText">Not on the projector</span></span>
