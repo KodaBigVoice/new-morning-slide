@@ -1,0 +1,9 @@
+#!/bin/sh
+# Stamps the commit time into each Morning Slide page being committed, so the bottom bar can show "Updated …".
+now=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+for f in $(git diff --cached --name-only --diff-filter=AM | grep 'index.html$'); do
+  if grep -q 'name="ms-updated"' "$f"; then
+    sed -i "s|<meta name=\"ms-updated\" content=\"[^\"]*\">|<meta name=\"ms-updated\" content=\"$now\">|" "$f"
+    git add "$f"
+  fi
+done
