@@ -18,3 +18,7 @@ Everything you enter is saved in your own browser only. Nothing is uploaded.
 - Morning prep days (Settings): the prep slide shows today's notes and music lessons instead of tomorrow's.
 - The projector shows its own slide: you can edit tomorrow's morning slide while prep is on screen. At 9:00 and 17:30 it offers to move on to the next slide.
 
+
+## "Updated …" on the bottom bar
+`.githooks/pre-commit` stamps the commit time into `<meta name="ms-updated">` in each committed `index.html`.
+After cloning, run `git config core.hooksPath .githooks` once so it runs.
