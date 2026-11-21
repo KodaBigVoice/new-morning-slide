@@ -2,7 +2,7 @@
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
-<meta name="ms-updated" content="2026-11-21T23:09:40Z">
+<meta name="ms-updated" content="2026-11-21T23:16:16Z">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
 <title>Morning Slide</title>
@@ -1269,7 +1269,7 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
   </ul>
   <p class="hint" id="dpMore">Signed in, your slide is saved online with your account, so it’s on any laptop you sign in on. Pictures and videos you add stay on the laptop you added them on.</p>
   <p class="hint" id="dpWhen" hidden></p>
-  <div class="row" style="justify-content:flex-end"><button type="button" class="btn" id="dpLater">Not now</button><button type="button" class="btn primary" id="dpAgree">I agree</button></div>
+  <div class="row" style="justify-content:flex-end"><button type="button" class="btn" id="dpLater">Not now – stay offline</button><button type="button" class="btn primary" id="dpAgree">I agree</button></div>
 </div></div>
 <div class="modal-back" id="syncModal" hidden><div class="modal sync" role="dialog" aria-modal="true" aria-labelledby="syncTitle">
   <h3 id="syncTitle">Which slide do you want to keep?</h3>
@@ -4792,7 +4792,7 @@ function paintAccount() {
       (isStaff() ? slideCardHTML() : '') +
       '<div class="card2"><h3>Your details</h3><form class="acct-form" data-form="details"><div class="pair">' +
       field('acName', 'Title and surname <small>as on iSAMS</small>', 'text', ' value="' + esc(me.name) + '" maxlength="60" required') +
-      field('acInit', 'Initials', 'text', ' value="' + esc(me.initials) + '" maxlength="5" required style="text-transform:uppercase"') +
+      field('acInit', 'School initials', 'text', ' value="' + esc(me.initials) + '" maxlength="5" required style="text-transform:uppercase"') +
       '</div><div class="row"><button class="btn small strong">Save</button></div></form></div>' +
       '<div class="card2"><h3>Change password</h3><form class="acct-form" data-form="password">' +
       field('acPwOld', 'Current password', 'password', ' autocomplete="current-password" required') +
@@ -4813,7 +4813,7 @@ function paintAccount() {
       (up
         ? '<form class="acct-form" data-form="signup"><div class="pair">' +
           field('acName', 'Title and surname <small>as on iSAMS, e.g. Mr Joshi</small>', 'text', ' autocomplete="off" maxlength="60" required') +
-          field('acInit', 'Initials', 'text', ' autocomplete="off" maxlength="5" required style="text-transform:uppercase" placeholder="TSJ"') + '</div>' +
+          field('acInit', 'School initials', 'text', ' autocomplete="off" maxlength="5" required style="text-transform:uppercase" placeholder="TSJ"') + '</div>' +
           field('acEmail', 'School email', 'email', ' autocomplete="email" required placeholder="name' + DOMAIN + '"') +
           field('acPw', 'Password <small>at least 8 characters</small>', 'password', ' autocomplete="new-password" minlength="8" required') +
           '<div class="row"><button class="btn primary">Create account</button></div>' +
@@ -4828,6 +4828,12 @@ function paintAccount() {
   body.innerHTML = html;
 }
 
+let editId = null;      // the person whose name and school initials an admin is correcting
+function editRow(x, extra) {
+  return '<tr class="editing"><td><input class="text" id="edName" value="' + esc(x.name) + '" maxlength="60" aria-label="Title and surname" style="width:100%;min-width:140px"></td>' +
+    '<td><input class="text" id="edInit" value="' + esc(x.initials) + '" maxlength="5" aria-label="School initials" style="width:80px;text-transform:uppercase"></td><td class="muted">' + esc(x.email) + '</td>' + extra +
+    '<td class="acts"><button type="button" class="btn small strong" data-save-staff="' + x.id + '">Save</button><button type="button" class="btn small" data-cancel-edit>Cancel</button></td></tr>';
+}
 function paintAdmin() {
   const body = $('adminBody');
   if (!isAdmin()) { body.innerHTML = '<div class="card2"><p class="empty-note">Only admins can see this.</p></div>'; return; }
@@ -4835,19 +4841,20 @@ function paintAdmin() {
   const when = t => { const d = new Date(t); return d.getDate() + ' ' + MONTHS[d.getMonth()]; };
   const reqs = admin.requests;
   let html = '<div class="card2"><h3>Access requests' + (waiting() ? ' <span class="badge">' + waiting() + '</span>' : '') + '</h3>' +
-    (reqs.length ? '<table class="people"><thead><tr><th>Name</th><th>Initials</th><th>Email</th><th>Asked</th><th></th></tr></thead><tbody>' +
-      reqs.map(r => '<tr><td><b>' + esc(r.name) + '</b>' + (r.confirmed === false ? ' <span class="pill warn" data-tip="They haven’t clicked the link in their confirmation email yet">Email not confirmed</span>' : '') +
+    (reqs.length ? '<table class="people"><thead><tr><th>Name</th><th>School initials</th><th>Email</th><th>Asked</th><th></th></tr></thead><tbody>' +
+      reqs.map(r => editId === r.id ? editRow(r, '<td class="muted">' + when(r.created_at) + '</td>') : '<tr><td><b>' + esc(r.name) + '</b>' + (r.confirmed === false ? ' <span class="pill warn" data-tip="They haven’t clicked the link in their confirmation email yet">Email not confirmed</span>' : '') +
         '</td><td>' + esc(r.initials) + '</td><td class="muted">' + esc(r.email) + '</td><td class="muted">' + when(r.created_at) +
-        '</td><td class="acts"><button type="button" class="btn small strong" data-approve="' + r.id + '">Approve</button><button type="button" class="btn small" data-decline="' + r.id + '">Decline</button></td></tr>').join('') +
+        '</td><td class="acts"><button type="button" class="btn small" data-edit-staff="' + r.id + '">Edit</button><button type="button" class="btn small strong" data-approve="' + r.id + '">Approve</button><button type="button" class="btn small" data-decline="' + r.id + '">Decline</button></td></tr>').join('') +
       '</tbody></table><p class="hint" style="margin:0">Approving someone also adds their email to the approved list below and their name to Timetable Maker’s staff list.</p>'
       : '<p class="empty-note">Nobody is waiting. New staff whose email isn’t on the approved list will appear here once they’ve confirmed their email.</p>') + '</div>';
 
-  html += '<div class="card2"><h3>Staff with accounts</h3><table class="people"><thead><tr><th>Name</th><th>Initials</th><th>Email</th><th>Role</th><th></th></tr></thead><tbody>' +
+  html += '<div class="card2"><h3>Staff with accounts</h3><table class="people"><thead><tr><th>Name</th><th>School initials</th><th>Email</th><th>Role</th><th></th></tr></thead><tbody>' +
     admin.staff.map(s => {
       const self = s.id === me.id;
+      if (editId === s.id) return editRow(s, '<td class="muted">' + (s.role === 'admin' ? 'Admin' : 'Teacher') + '</td>');
       return '<tr><td><b>' + esc(s.name) + '</b>' + (self ? ' <span class="muted">(you)</span>' : '') + '</td><td>' + esc(s.initials) + '</td><td class="muted">' + esc(s.email) +
         '</td><td><select data-role="' + s.id + '"' + (self ? ' disabled data-tip="You can’t remove your own admin role"' : '') + '><option value="teacher"' + (s.role === 'teacher' ? ' selected' : '') + '>Teacher</option><option value="admin"' + (s.role === 'admin' ? ' selected' : '') + '>Admin</option></select></td>' +
-        '<td class="acts">' + (self ? '' : '<button type="button" class="btn small" data-remove="' + s.id + '">Remove</button>') + '</td></tr>';
+        '<td class="acts"><button type="button" class="btn small" data-edit-staff="' + s.id + '">Edit</button>' + (self ? '' : '<button type="button" class="btn small" data-remove="' + s.id + '">Remove</button>') + '</td></tr>';
     }).join('') + '</tbody></table><p class="hint" style="margin:0">Admins can approve staff and see this page. Removing someone deletes their account; they can sign up again and you’d need to approve them.</p></div>';
 
   const has = new Set(admin.staff.map(s => s.email).concat(admin.requests.map(r => r.email)));
@@ -4901,7 +4908,7 @@ async function onSubmit(e) {
       const email = val('acEmail').toLowerCase(), name = val('acName').replace(/\s+/g, ' '), initials = val('acInit').toUpperCase().replace(/[^A-Z]/g, '');
       if (!email.endsWith(DOMAIN)) throw new Error('Only ' + DOMAIN + ' addresses can sign up.');
       if (!/^(mr|mrs|miss|ms|mx|dr|prof|rev)\.?\s+\S/i.test(name)) throw new Error('Please put your title first, as on iSAMS, e.g. Mr Joshi or Mrs Smith.');
-      if (!initials) throw new Error('Please add your initials.');
+      if (!initials) throw new Error('Please add your school initials.');
       const { data, error } = await sb.auth.signUp({ email, password: $('acPw').value, options: { data: { name, initials }, emailRedirectTo: here() } });
       if (error) throw error;
       if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) throw new Error('already registered');
@@ -5084,6 +5091,11 @@ async function adminAct(fn, okText) {
   paint();
 }
 
+document.addEventListener('keydown', e => {
+  if (!e.target.closest || !e.target.closest('tr.editing')) return;
+  if (e.key === 'Enter') { e.preventDefault(); const b = document.querySelector('tr.editing [data-save-staff]'); if (b) b.click(); }
+  if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); editId = null; paint(); }
+}, true);
 function onClick(e) {
   const t = e.target.closest('button'); if (!t) return;
   const d = t.dataset;
@@ -5093,6 +5105,15 @@ function onClick(e) {
   if (d.act === 'retry') { offline = false; start(true); return; }
   if (d.act === 'signout') { sb.auth.signOut().then(() => { toast('Signed out. Everything on this laptop is still here.'); view = 'signin'; }); return; }
   const find = id => admin.requests.concat(admin.staff).find(x => x.id === id) || {};
+  if (d.editStaff) { editId = d.editStaff; paint(); setTimeout(() => { const i = $('edName'); if (i) i.focus(); }, 20); return; }
+  if ('cancelEdit' in d) { editId = null; paint(); return; }
+  if (d.saveStaff) {
+    const name = val('edName').replace(/\s+/g, ' '), initials = val('edInit').toUpperCase().replace(/[^A-Z]/g, '');
+    if (!/^(mr|mrs|miss|ms|mx|dr|prof|rev)\.?\s+\S/i.test(name)) { toast('Put their title first, as on iSAMS, e.g. Mr Joshi.'); return; }
+    if (!initials) { toast('Add their school initials.'); return; }
+    const id = d.saveStaff; editId = null;
+    return adminAct(() => sb.rpc('ms_admin_update', { uid: id, new_name: name, new_initials: initials }), 'Saved').then(() => { if (me && id === me.id) refreshMe(); });
+  }
   if (d.approve) return adminAct(() => sb.rpc('ms_approve', { uid: d.approve }), find(d.approve).name + ' approved');
   if (d.decline) { if (!confirm('Decline ' + find(d.decline).name + '? Their account request will be deleted.')) return; return adminAct(() => sb.rpc('ms_decline', { uid: d.decline }), 'Declined'); }
   if (d.remove) { if (!confirm('Remove ' + find(d.remove).name + '’s account? They won’t be able to sign in.')) return; return adminAct(() => sb.rpc('ms_decline', { uid: d.remove }), 'Removed'); }
@@ -5442,7 +5463,7 @@ async function staffReady() {
 let dpLater = false;
 function openDP(readOnly) {
   const needs = !!(me && !me.agreed_at);
-  $('dpLater').textContent = needs ? 'Not now' : 'Close';
+  $('dpLater').textContent = needs ? 'Not now – stay offline' : 'Close';
   $('dpAgree').hidden = !needs;
   $('dpMore').hidden = !session;
   $('dpWhen').hidden = !(me && me.agreed_at);
