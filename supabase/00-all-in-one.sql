@@ -148,10 +148,10 @@ grant execute on function public.ms_approve(uuid), public.ms_decline(uuid), publ
 grant execute on function public.ms_is_staff(), public.ms_is_admin(), public.ms_forms() to authenticated;
 
 -- ---------------------------------------------------------------------
--- The first admin: put your own school email here before running. More admins can be made later from Setup → Admin.
+-- The first admin. On a brand-new project, after running this file, open Table Editor → ms_allowed
+-- and add a row with your school email and role "admin", then create your account on the site.
+-- More admins can be made later from Setup → Admin.
 -- ---------------------------------------------------------------------
-insert into public.ms_allowed (email, role) values (lower('FIRST.ADMIN@lambrookschool.co.uk'), 'admin')
-on conflict (email) do update set role = 'admin';
 
 -- ---------------------------------------------------------------------
 -- Anyone who signed up before this ran: give them their Morning Slide record.
