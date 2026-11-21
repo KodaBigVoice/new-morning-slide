@@ -148,7 +148,7 @@ grant execute on function public.ms_approve(uuid), public.ms_decline(uuid), publ
 grant execute on function public.ms_is_staff(), public.ms_is_admin(), public.ms_forms() to authenticated;
 
 -- ---------------------------------------------------------------------
--- The first admin. More admins can be made later from Setup → Admin.
+-- The first admin: put your own school email here before running. More admins can be made later from Setup → Admin.
 -- ---------------------------------------------------------------------
-insert into public.ms_allowed (email, role) values ('FIRST.ADMIN@lambrookschool.co.uk', 'admin')
+insert into public.ms_allowed (email, role) values (lower('FIRST.ADMIN@lambrookschool.co.uk'), 'admin')
 on conflict (email) do update set role = 'admin';
