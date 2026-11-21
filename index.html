@@ -2,7 +2,7 @@
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
-<meta name="ms-updated" content="2026-11-21T23:16:16Z">
+<meta name="ms-updated" content="2026-11-21T23:25:19Z">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
 <title>Morning Slide</title>
@@ -5101,6 +5101,7 @@ function onClick(e) {
   const d = t.dataset;
   if (d.view) { view = d.view; msg = null; paint(); const f = $('acEmail'); if (f) f.focus(); return; }
   if (d.act === 'dp') { openDP(); return; }
+  if (d.act === 'syncretry') { syncErr = ''; paintAccount(); syncStart(); return; }
   if (d.act === 'reload') { refreshMe(); return; }
   if (d.act === 'retry') { offline = false; start(true); return; }
   if (d.act === 'signout') { sb.auth.signOut().then(() => { toast('Signed out. Everything on this laptop is still here.'); view = 'signin'; }); return; }
@@ -5454,9 +5455,9 @@ openAccount = v => {
 
 /* ---------- after sign-in: what an approved (and agreed) person gets ---------- */
 async function staffReady() {
-  if (isAdmin()) await loadAdmin(); else admin.loaded = false;
-  if (isStaff()) { fetchNotices(); fetchMusic(); syncStart(); loadEditors(); }
+  if (isStaff()) { syncStart(); fetchNotices().catch(() => {}); fetchMusic().catch(() => {}); loadEditors().catch(() => {}); }
   else { clearNotices(); clearMusic(); syncStop(); }
+  if (isAdmin()) { try { await loadAdmin(); } catch (e) { console.warn('[Morning Slide] admin', e); } } else admin.loaded = false;
 }
 
 /* ---------- data protection agreement ---------- */
@@ -5596,7 +5597,15 @@ $('adminBody').addEventListener('drop', e => { const z = e.target.closest('#amDr
 /* ---------- your slide, saved online (and slides shared with you) ---------- */
 const SYNC_KEY = 'morningSlide.v3.sync';
 let sync = (() => { try { return JSON.parse(localStorage.getItem(SYNC_KEY)) || null; } catch (e) { return null; } })();   // { uid, slideId, version, dirty, mine, ownerName, form, at }
-let syncOn = false, syncBusy = false, pushTimer = null, lastJSON = '', slides = [], editors = [], syncChoice = null;
+let syncOn = false, syncBusy = false, pushTimer = null, lastJSON = '', slides = [], editors = [], syncChoice = null, syncErr = '';
+const errText = e => (e && (e.message || e.error_description || e.msg || e.details)) || String(e);
+function syncFailed(where, e) {
+  syncErr = where + ': ' + errText(e);
+  console.warn('[Morning Slide] ' + syncErr, e);
+  if (!sync) { syncInfo = { kind: 'wait', text: 'Not saved online', tip: 'Your slide is safe on this laptop, but it couldn’t be saved online. ' + syncErr }; paintSaveState(); }
+  else syncPaint('wait');
+  if (!$('setupScreen').hidden && setupSec === 'account') paintAccount();
+}
 function storeSync() { try { if (sync) localStorage.setItem(SYNC_KEY, JSON.stringify(sync)); else localStorage.removeItem(SYNC_KEY); } catch (e) {} }
 function canon(v) {   // the same data always gives the same text (the database reorders keys)
   if (Array.isArray(v)) return '[' + v.map(canon).join(',') + ']';
@@ -5639,12 +5648,12 @@ async function push() {
     const { data, error } = await sb.from('ms_slides').update({ data: JSON.parse(j) }).eq('id', sync.slideId).eq('version', sync.version).select('version,updated_at');
     if (error) throw error;
     if (!data || !data.length) { syncBusy = false; await resolveClash(true); return; }
-    sync.version = data[0].version; sync.at = data[0].updated_at; lastJSON = j;
+    sync.version = data[0].version; sync.at = data[0].updated_at; lastJSON = j; syncErr = '';
     sync.dirty = JSON.stringify(state) !== j; storeSync();
     syncPaint(sync.dirty ? 'saving' : 'ok');
     if (sync.dirty) pushTimer = setTimeout(push, 800);
   } catch (e) {
-    syncPaint('wait'); clearTimeout(pushTimer); pushTimer = setTimeout(push, 30000);
+    syncFailed('Couldn’t save your latest changes online', e); clearTimeout(pushTimer); pushTimer = setTimeout(push, 30000);
   } finally { syncBusy = false; }
 }
 async function listSlides() {
@@ -5657,12 +5666,12 @@ async function syncStart() {
   if (syncOn || syncBusy || !isStaff()) return;
   syncBusy = true;
   try {
-    try { await listSlides(); } catch (e) { syncBusy = false; return; }   // 06-music-sync.sql not run yet: stay as before
+    try { await listSlides(); } catch (e) { syncBusy = false; syncFailed('Couldn’t look up your slide online', e); return; }
     if (sync && sync.uid !== me.id) sync = null;               // someone else used to sign in on this laptop
     let target = (sync && slides.find(s => s.id === sync.slideId)) || slides.find(s => s.mine);
     if (!target) {                                              // first time: put this laptop's slide online
       const { data, error } = await sb.from('ms_slides').insert({ data: JSON.parse(JSON.stringify(state)) }).select('id,version,updated_at').single();
-      if (error) throw error;
+      if (error) { syncFailed('Couldn’t save your slide online for the first time', error); return; }
       sync = { uid: me.id, slideId: data.id, version: data.version, dirty: false, mine: true, ownerName: me.name, at: data.updated_at };
       lastJSON = JSON.stringify(state); storeSync(); syncOn = true; syncPaint('ok');
       await listSlides();
@@ -5688,9 +5697,10 @@ async function syncStart() {
       toast('Your slide has been loaded from your account.'); return;
     }
     syncBusy = false;
+    syncErr = '';
     askWhich(target, row, same ? 'You’ve made changes on this laptop, and ' + (target.updated_by_name && target.updated_by_name !== me.name ? target.updated_by_name : 'you') + ' also changed the slide on another laptop.' : 'Your slide is already saved online, and this laptop has a different one.');
-  } catch (e) { syncPaint('wait'); }
-  finally { syncBusy = false; }
+  } catch (e) { syncFailed('Couldn’t get your slide from online', e); }
+  finally { syncBusy = false; if (syncOn) syncErr = ''; if (!$('setupScreen').hidden && setupSec === 'account') paintAccount(); }
 }
 function askWhich(target, row, why) {
   syncChoice = { target, row };
@@ -5763,7 +5773,9 @@ async function loadEditors() {
   if (!$('setupScreen').hidden && setupSec === 'account') paintAccount();
 }
 function slideCardHTML() {
-  if (!sync) return '<div class="card2"><h3>Your slide online</h3><p class="empty-note" style="margin:0">' + (syncInfo && syncInfo.kind === 'wait' ? 'Couldn’t reach Morning Slide online. Your slide is safe on this laptop.' : 'Getting your slide ready…') + '</p></div>';
+  if (!sync) return '<div class="card2"><h3>Your slide online</h3>' + (syncErr
+    ? '<div class="acct-msg err">Your slide is safe on this laptop, but it couldn’t be saved online.<br><small>' + esc(syncErr) + '</small></div><div class="row"><button type="button" class="btn small strong" data-act="syncretry">Try again</button></div>'
+    : '<p class="empty-note" style="margin:0">Getting your slide ready…</p>') + '</div>';
   const mine = slides.find(s => s.mine), others = slides.filter(s => !s.mine);
   let h = '<div class="card2"><h3>Your slide online</h3>';
   h += !sync.mine
