@@ -2,7 +2,7 @@
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
-<meta name="ms-updated" content="2026-11-21T23:00:29Z">
+<meta name="ms-updated" content="2026-11-21T23:09:40Z">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
 <title>Morning Slide</title>
@@ -118,6 +118,7 @@
 .slide .m-time { font-weight: 600; color: var(--main); font-variant-numeric: tabular-nums; }
 .slide .m-teacher { overflow: hidden; text-overflow: ellipsis; }
 .slide .music-empty { font-size: 28px; color: var(--muted); }
+.slide .music-empty.missing { color: #9A5B00; background: #FFF4D6; border: 2px dashed #E8B84A; border-radius: 14px; padding: 14px 18px; font-size: 24px; }
 
 .slide .panel { padding: 32px; display: flex; flex-direction: column; gap: 18px; min-height: 0; }
 .slide .panel.bullets { flex: 1 1 0; min-height: 300px; }
@@ -1795,10 +1796,14 @@ function lessonSource(st, date) {
   if (own && own.week === wk) return { kind: 'own', week: wk, rows: own.rows, src: own };
   if (weeks[wk]) return { kind: 'school', week: wk, rows: weeks[wk].rows, src: weeks[wk] };
   if (own && !own.week) return { kind: 'own', week: null, rows: own.rows, src: own };
-  const older = Object.keys(weeks).filter(k => k < wk).sort().pop();
-  if (older && !(own && own.week > older)) return { kind: 'school', week: older, rows: weeks[older].rows, src: weeks[older], stale: true };
-  if (own) return { kind: 'own', week: own.week, rows: own.rows, src: own, stale: own.week < wk };
+  // Other weeks are kept, but never shown in place of this one
+  if (own || Object.keys(weeks).length) return { kind: 'missing', week: wk, rows: [], school: Object.keys(weeks).length > 0 };
   return null;
+}
+// Shown on the editing screen only (never the projector) when the week's lessons aren't in yet
+function musicMissing(st, date) {
+  const src = lessonSource(st, date);
+  return src && src.kind === 'missing' ? 'Music lessons for the week of ' + shortDate(fromISO(src.week)) + ' haven’t been uploaded yet' : '';
 }
 function musicRows(st, date, wd) {
   const src = lessonSource(st, date);
@@ -1811,7 +1816,7 @@ function musicRows(st, date, wd) {
 }
 
 function musicHTML(rows, emptyText) {
-  if (!rows.length) return '<div class="music-empty">' + (emptyText || 'No music lessons today') + '</div>';
+  if (!rows.length) return '<div class="music-empty' + (/uploaded yet/.test(emptyText || '') ? ' missing' : '') + '">' + (emptyText || 'No music lessons today') + '</div>';
   let html = '', i = 0;
   while (i < rows.length) {
     let j = i;
@@ -2028,7 +2033,7 @@ function renderSlide(host, st, date, editor) {
       '<div class="grid">' +
         '<div class="banner">' + dateHTML(date) + '</div>' +
         '<div class="right">' +
-          '<div class="card music' + (day.panel === 'info' || day.panel === 'lunch' || day.panel === 'free' ? ' natural' : '') + '">' + hdEl(st, date, 'music') + '<div class="music-body">' + musicHTML(rows) + '</div></div>' +
+          '<div class="card music' + (day.panel === 'info' || day.panel === 'lunch' || day.panel === 'free' ? ' natural' : '') + '">' + hdEl(st, date, 'music') + '<div class="music-body">' + musicHTML(rows, editor && musicMissing(st, date) ? musicMissing(st, date) : '') + '</div></div>' +
           panelHTML(st, day, editor) +
         '</div>' +
         '<div class="pair region-top' + (day.showTask || day.ttView === 'first' ? '' : ' single') + '" style="--boxes:' + ((day.showTask ? 1 : 0) + 1 + (day.ttView === 'first' ? 1 : 0)) + '">' +
@@ -2251,7 +2256,7 @@ function renderPrep(host, st, date, editor) {
                      : '<div class="pt">' + (editor ? timerBell(st) : '') + '<div class="pt-label"></div><div class="pt-time" data-tip="Click to type a time"></div>' +
                        (editor ? '<div class="pt-barrow pt-ctrl">' + tBackBtn() + tPlayBtn() + tSkipBtn() + '<div class="pt-bars"></div>' + tPlusBtn() + tResetBtn() + '</div>' : '<div class="pt-bars"></div>') +
                        '<div class="pt-sub"></div></div>') +
-          '<div class="card music">' + hdEl(st, date, musicTitle) + '<div class="music-body">' + musicHTML(musicRows(st, musicDay), musicEmpty) + '</div></div>' +
+          '<div class="card music">' + hdEl(st, date, musicTitle) + '<div class="music-body">' + musicHTML(musicRows(st, musicDay), editor && musicMissing(st, musicDay) ? musicMissing(st, musicDay) : musicEmpty) + '</div></div>' +
         '</div>' +
       '</div>' +
     '</div>');
@@ -4034,7 +4039,9 @@ $('teacherInitial').addEventListener('change', () => { state.teacherInitial = $(
 $('matchMeet').addEventListener('change', () => { state.matchMeet = $('matchMeet').checked; changed(); });
 function refreshPupils() {
   const src = lessonSource(state, schoolDay(new Date())), form = state.form;
-  const L = src ? { rows: src.rows } : null;
+  const W = (musicCache && musicCache.weeks) || {};
+  const any = [].concat(state.lessons ? state.lessons.rows : [], ...Object.keys(W).map(k => W[k].rows));
+  const L = src && src.rows.length ? { rows: src.rows } : any.length ? { rows: any } : null;   // this week's pupils, or any week's while it isn't in
   $('teacherInitial').checked = state.teacherInitial !== false;
   $('matchMeet').checked = !!state.matchMeet;
   $('pupilsWrap').hidden = !(L && form);
@@ -4466,8 +4473,8 @@ function paintStatus() {
   const src = lessonSource(state, schoolDay(now)), wk = toISO(mondayOf(schoolDay(now)));
   const wcOf = w => 'wc ' + dmy(fromISO(w));
   if (!src) setStat('bbMusic', 'muted', 'None yet', 'No music lessons yet. Signed-in staff get them from the school; you can also upload the spreadsheet in Setup → Form & music.');
+  else if (src.kind === 'missing') setStat('bbMusic', 'warn', '⚠ Not uploaded yet', 'This week’s music lessons haven’t been uploaded yet, so none are showing on the slide. ' + (src.school ? 'They’ll appear as soon as an admin publishes them.' : 'Upload this week’s spreadsheet in Setup → Form & music.'));
   else if (src.week === wk) setStat('bbMusic', 'ok', '✓ ' + wcOf(wk), src.kind === 'school' ? 'This week’s lessons from the school, published ' + stamp(src.src.at) + '.' : 'This week’s lessons from your own spreadsheet, ' + (src.src.fileName || '') + '.');
-  else if (src.stale) setStat('bbMusic', 'warn', '⚠ Still last week’s', 'This week’s lessons aren’t in yet, so the slide is showing ' + wcOf(src.week) + '. ' + (src.kind === 'school' ? 'They’ll appear as soon as an admin publishes them.' : 'Upload this week’s spreadsheet in Setup → Form & music.'));
   else if (src.week) setStat('bbMusic', 'muted', wcOf(src.week), 'Your own spreadsheet is for ' + wcOf(src.week) + '.');
   else setStat('bbMusic', 'muted', 'Your own file', 'From your own spreadsheet, ' + (src.src.fileName || '') + '. Its name doesn’t say which week it’s for.');
 }
