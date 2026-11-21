@@ -2,7 +2,7 @@
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
-<meta name="ms-updated" content="2026-11-20T00:34:49Z">
+<meta name="ms-updated" content="2026-11-21T23:00:29Z">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
 <title>Morning Slide</title>
@@ -486,6 +486,8 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
 .projstatus.off { color: #B9C8D8; }
 .savestate { display: inline-flex; align-items: center; gap: 0.35rem; color: #9FDDB8; white-space: nowrap; }
 .savestate.bad { color: #FFB4A8; font-weight: 700; }
+.savestate.saving, .savestate.wait { color: #CFDCEA; }
+.savestate.wait { color: #FFD27A; }
 @media (max-width: 1500px) { .thint { display: none; } }
 .pl-short { display: none; }
 @media (max-width: 1400px) { .pl-long { display: none; } .pl-short { display: inline; } }
@@ -577,8 +579,26 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
 .topbtn.signedin { padding: 0.3rem 0.7rem 0.3rem 0.35rem; }
 .topbtn .av { width: 1.75rem; height: 1.75rem; border-radius: 50%; background: var(--steel); color: #fff; display: grid; place-items: center; font-size: 0.72rem; letter-spacing: 0.02em; }
 .topbtn .av.wait { background: #C48A12; }
-.bb-updated { color: #9FB2C7; font-size: 0.78rem; white-space: nowrap; }
-.bottombar:has(#timerGroup:not([hidden])) .bb-updated, .bottombar:has(#videoGroup:not([hidden])) .bb-updated { display: none; }
+.music-weeks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.music-weeks li { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.pill.soft { background: #EEF3F8; color: #3E5770; }
+.bb-status { display: flex; align-items: center; gap: 16px; min-width: 0; }
+.bb-stat { display: flex; flex-direction: column; gap: 1px; line-height: 1.15; font-size: 0.74rem; color: #9FB2C7; white-space: nowrap; border: 0; background: none; padding: 0; font-family: inherit; text-align: left; }
+button.bb-stat { cursor: pointer; border-radius: 6px; }
+button.bb-stat:hover b { text-decoration: underline; }
+.bb-stat b { color: #DCE6F0; font-weight: 700; font-size: 0.74rem; }
+.bb-stat .v { font-variant-numeric: tabular-nums; }
+.bb-stat .v.ok { color: #9FDDB8; }
+.bb-stat .v.warn { color: #FFD27A; font-weight: 700; }
+.bb-stat .v.muted { color: #9FB2C7; }
+.bottombar:has(#timerGroup:not([hidden])) .bb-status, .bottombar:has(#videoGroup:not([hidden])) .bb-status { display: none; }
+@media (max-width: 1180px) { #bbBuild { display: none; } }
+.bb-split { position: relative; display: inline-flex; }
+.bb-split .bb-dl { display: inline-flex; align-items: center; gap: 0.4rem; border-radius: 8px 0 0 8px; padding: 0 0.65rem; height: 34px; }
+.bb-split .bb-caret { border-radius: 0 8px 8px 0; border-left: 0; width: 28px; height: 34px; padding: 0; display: grid; place-items: center; }
+.bb-menu { position: absolute; right: 0; bottom: calc(100% + 8px); background: #fff; color: var(--ink); border-radius: 10px; box-shadow: 0 14px 30px -12px rgba(28, 48, 72, 0.55); padding: 6px; min-width: 200px; z-index: 40; }
+.bb-menu button { display: flex; align-items: center; gap: 0.5rem; width: 100%; border: 0; background: none; padding: 0.55rem 0.7rem; border-radius: 7px; font: inherit; font-weight: 700; color: inherit; cursor: pointer; text-align: left; white-space: nowrap; }
+.bb-menu button:hover, .bb-menu button:focus-visible { background: var(--mist, #eef3f8); }
 .bb-new { display: inline-flex; align-items: center; gap: 0.4rem; border: 1px solid rgba(255, 255, 255, 0.28); background: rgba(255, 255, 255, 0.06); color: #fff; border-radius: 8px; padding: 0.35rem 0.7rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
 .bb-new:hover { background: rgba(255, 255, 255, 0.14); }
 /* What's new */
@@ -612,7 +632,7 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
 .wn-soonrow .num { flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--steel); color: #fff; display: grid; place-items: center; font-weight: 700; }
 .wn-soonrow h3 { margin: 0; font-family: var(--disp); font-size: 1.38rem; white-space: nowrap; }
 .wn-soonrow .wn-soon { flex: 1; min-width: 0; }
-.wn-soon { flex-direction: row; align-items: center; gap: 16px; padding: 14px 18px; border-style: dashed; border-color: #C6D7EA; }
+.wn-soon { flex-direction: row; align-items: center; gap: 16px; padding: 14px 18px; }
 .wn-soon .t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
 .wn-soon .t > div { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .wn-soon .pill { padding: 2px 10px; border-radius: 999px; background: var(--mist); color: var(--steel); font-size: 0.74rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
@@ -728,6 +748,20 @@ select.text, input.text { width: 100%; padding: 0.5rem 0.65rem; border: 1px soli
 .modal { background: #fff; border-radius: 14px; padding: 1.3rem 1.4rem; max-width: 27rem; box-shadow: 0 20px 50px -20px rgba(28, 48, 72, 0.5); }
 .modal h3 { margin: 0 0 0.4rem; font-family: var(--disp); font-size: 1.15rem; }
 .modal p { margin: 0 0 1rem; color: var(--slate); }
+.modal.dp, .modal.sync { max-width: 33rem; }
+.dp-list { margin: 0 0 1rem; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.45rem; color: var(--ink); }
+.sync-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 0.9rem; }
+.sync-choices button { display: flex; flex-direction: column; gap: 4px; text-align: left; border: 1.5px solid var(--line); background: #fff; border-radius: 12px; padding: 0.8rem 0.9rem; cursor: pointer; font: inherit; color: var(--ink); }
+.sync-choices button:hover, .sync-choices button:focus-visible { border-color: var(--steel); background: #F3F8FD; }
+.sync-choices span { font-size: 0.85rem; color: var(--slate); }
+.am-week { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px 14px; border-radius: 12px; background: #F3F8FD; border: 1px solid #D5E2EF; }
+.am-week b { font-size: 1.02rem; }
+.am-preview { max-height: 320px; overflow: auto; border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; display: flex; flex-direction: column; gap: 10px; }
+.am-preview h4 { margin: 0; font-size: 0.9rem; }
+.am-preview div { font-size: 0.85rem; color: var(--slate); }
+.editors { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.editors li { display: flex; align-items: center; gap: 10px; }
+.editors li span.muted { color: var(--slate); font-size: 0.85rem; }
 
 /* Presenting on this screen, and the projector window */
 .stage { position: fixed; inset: 0; background: #eaf2fa; z-index: 200; overflow: hidden; cursor: none; }
@@ -809,7 +843,7 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
       <div class="box" id="checklist" hidden>
         <div>
           <h3 style="font-size:1.3rem;margin-bottom:4px">Let’s get your slide ready</h3>
-          <p class="subtle">Four quick steps. Everything stays on this laptop.</p>
+          <p class="subtle">Four quick steps.</p>
         </div>
         <div class="progress"><i id="checkBar"></i></div>
         <div class="steps" id="checkSteps"></div>
@@ -915,7 +949,11 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
     <button type="button" class="bb-btn bb-icon hd-btn" id="hdEdit" title="Change the headings" aria-label="Change the headings"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg><span class="hd-on">Change headings</span></button>
     <button type="button" class="bb-btn bb-icon" id="hdReset" title="Put headings back to default" aria-label="Put headings back to default" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 4v5h5"></path></svg></button>
     <span class="vsep"></span>
-    <span class="bb-updated" id="bbUpdated" title="When this version of Morning Slide was published. Press Ctrl+F5 to check for a newer one."></span>
+    <div class="bb-status" id="bbStatus">
+      <span class="bb-stat" id="bbBuild" title="When this version of Morning Slide was published. Press Ctrl+F5 to check for a newer one."><b>Last build</b><span class="v" id="bbUpdated"></span></span>
+      <span class="bb-stat" id="bbMatch" hidden><b>Matchday queues</b><span class="v"></span></span>
+      <button type="button" class="bb-stat" id="bbMusic" hidden><b>Music lessons</b><span class="v"></span></button>
+    </div>
     <div class="row" id="timerGroup" hidden style="gap:0.6rem;flex-wrap:nowrap">
       <input class="timebox" id="timeBox" readonly aria-label="Timer: click to type a time" title="Click to type a time" autocomplete="off" spellcheck="false">
       <div class="tlabel"><span id="tLabel"></span><div class="tbars" id="tBars"></div></div>
@@ -937,9 +975,14 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
     <span class="projstatus off" id="projStatus"><span class="led"></span><span id="projText">Not on the projector</span></span>
     <button type="button" class="bb-btn" id="projSwap" hidden>Show this instead</button>
     <span class="vsep"></span>
-    <span class="savestate" id="saveState"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7.5l2.6 2.5L11 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span>Saved in browser</span></span>
-    <button type="button" class="bb-btn bb-icon" id="openCopy" aria-label="Open a saved copy" title="Open a saved copy"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></button>
-    <button type="button" class="bb-btn bb-icon" id="saveCopy" aria-label="Save a copy" title="Save a copy"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg></button>
+    <span class="savestate local" id="saveState"><span>Saved on this laptop</span></span>
+    <div class="bb-split" id="dlSplit">
+      <button type="button" class="bb-btn bb-dl" id="saveCopy" title="Download a copy of your slide as a file"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M5 21h14"></path></svg><span>Download</span></button>
+      <button type="button" class="bb-btn bb-caret" id="dlMore" aria-label="More: open a saved file" title="Open a saved file" aria-haspopup="menu" aria-expanded="false"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"></path></svg></button>
+      <div class="bb-menu" id="dlMenu" role="menu" hidden>
+        <button type="button" role="menuitem" id="openCopy"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21V9"></path><path d="M7 14l5-5 5 5"></path><path d="M5 3h14"></path></svg>Open a saved file…</button>
+      </div>
+    </div>
   </footer>
 </div>
 
@@ -953,7 +996,7 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
   <section class="wn-hero">
     <div class="txt">
       <div class="head"><span class="num">1</span><h3>Start by creating an account</h3></div>
-      <p>Press <b>Create account</b> at the top right and use your school email. It takes a minute: you’ll get one email to confirm it’s you. Creating an account never changes anything already on your laptop.</p>
+      <p>Press <b>Create account</b> at the top right and use your school email. It takes a minute: you’ll get one email to confirm it’s you. Your slide is then saved online, so it’s the same on any laptop you sign in on.</p>
       <p class="soft">Not ready to create an account? That’s fine: just carry on using Morning Slide as normal.</p>
     </div>
     <div class="wn-bar" aria-hidden="true"><span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l14-6v14L3 13z"></path><path d="M7 12.5V17a2 2 0 0 0 4 0v-3"></path><path d="M20 9v6"></path></svg>Announcements</span><span class="hi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"></path></svg>Create account</span><span>Setup</span></div>
@@ -970,10 +1013,13 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
       <span class="where"><b>Where:</b> automatic, Years 5 to 8</span></article>
   </section>
   <section class="wn-soonrow">
-  <div class="head"><span class="num">2</span><h3>Coming soon</h3></div>
+  <div class="head"><span class="num">2</span><h3>Also new</h3></div>
   <article class="wn-card wn-soon"><span class="ic" style="background:#F1E4F6;color:#7A3D8F"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg></span>
     <div class="t"><div><h4>Music lessons update themselves</h4></div>
-      <p>Music lessons are uploaded once by an admin, and each form’s lessons appear on its slide by themselves. No more uploading the spreadsheet yourself.</p></div></article>
+      <p>Uploaded once a week by an admin; your form’s lessons appear on your slide by themselves.</p></div></article>
+  <article class="wn-card wn-soon"><span class="ic" style="background:#DCEFF5;color:#1F6478"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 19a4.5 4.5 0 0 0 .5-8.97A6 6 0 0 0 6.34 9.1 4 4 0 0 0 6.5 19z"></path></svg></span>
+    <div class="t"><div><h4>Your slide on any laptop</h4></div>
+      <p>Saved online with your account. Your assistant tutor can edit it too, with their own account.</p></div></article>
   </section>
   <footer>
     <p>See this again any time with <span class="chip"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 14l-1.8-4.6L5.5 9l4.7-1.4z"></path><path d="M19 14l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"></path></svg>What’s new?</span> at the bottom of the screen.</p>
@@ -990,7 +1036,7 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
     <button type="button" class="topbtn" id="setupBack"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M9 2L4 7l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>Back to the slides</button>
     <h1>Setup</h1>
     <span class="grow" style="flex:1"></span>
-    <span class="savestate" id="saveState2"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7.5l2.6 2.5L11 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg><span>Saved in browser</span></span>
+    <span class="savestate local" id="saveState2"><span>Saved on this laptop</span></span>
   </header>
   <div class="setupview">
     <nav class="setupnav" id="setupNav" aria-label="Setup sections">
@@ -1008,9 +1054,15 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
       <!-- Form & music -->
       <section class="setsec" data-sec="form">
         <h2>Form &amp; music lessons</h2>
-        <p class="lead">Upload the weekly Music &amp; LAMDA spreadsheet. The slide shows each day’s lessons for your form.</p>
+        <p class="lead">The slide shows each day’s music and LAMDA lessons for your form. Signed in, you get them from the school each week; signed out, upload the weekly spreadsheet yourself.</p>
+        <div class="card2" id="schoolMusicCard" hidden>
+          <h3>The school’s music lessons</h3>
+          <ul class="music-weeks" id="schoolMusicList"></ul>
+          <p class="hint" id="schoolMusicNote" style="margin:0"></p>
+        </div>
         <div class="card2">
-          <h3>This week’s spreadsheet</h3>
+          <h3 id="ownMusicTitle">This week’s spreadsheet</h3>
+          <p class="hint" id="ownMusicHint" hidden style="margin:0">Only needed if the school’s lessons are late. It’s used for the week in its name (e.g. “wc 23 Nov 2026”) only, then the school’s lessons take over again.</p>
           <div class="filecard" id="fileCard">
             <span class="ficon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><path d="M14 3v6h6"></path></svg></span>
             <span class="fmeta"><b id="lessonsInfo">No file yet</b><span id="lessonsSub"></span></span>
@@ -1020,6 +1072,7 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
           </div>
           <div class="dropzone" id="dropzone">Or drop next week’s file here</div>
           <p class="hint" id="ignoredNote" hidden></p>
+          <div class="row" style="margin-top:4px"><button type="button" class="btn small" id="useSchoolMusic" hidden>Use the school’s lessons instead</button></div>
         </div>
         <div class="card2">
           <h3>Your form</h3>
@@ -1029,7 +1082,7 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
           <label class="check"><input type="checkbox" id="matchMeet"><span>On matchdays, add each team’s meet time to Lunchtime Arrangements</span></label>
           <div id="pupilsWrap" hidden>
             <h3 style="margin-top:8px">Preferred names</h3>
-            <p class="hint" style="margin:0">Pupils come from the spreadsheet. Type the name a pupil goes by and the slide uses it; leave it blank to use the spreadsheet’s name. Names are kept for future weeks.</p>
+            <p class="hint" style="margin:0">Pupils come from this week’s lessons. Type the name a pupil goes by and the slide uses it; leave it blank to use the spreadsheet’s name. Names are kept for future weeks.</p>
             <table class="tt-table pupils" style="max-width:560px">
               <thead><tr><th>Name on the spreadsheet</th><th>Preferred name</th></tr></thead>
               <tbody id="pupilsBody"></tbody>
@@ -1174,14 +1227,14 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
       <!-- Account -->
       <section class="setsec" data-sec="account" hidden>
         <h2>Account</h2>
-        <p class="lead">Staff accounts will let Morning Slide share things across the school, like announcements and music lessons. You don’t need one: without signing in, everything works just as it does now. Signing in never changes anything already on this laptop.</p>
+        <p class="lead">With an account you get announcements and the school’s music lessons, and your slide is saved online so it’s on any laptop you sign in on. You don’t need one: without signing in, everything works just as it does now on this laptop.</p>
         <div id="acctBody"><div class="card2"><p class="empty-note">Loading…</p></div></div>
       </section>
 
       <!-- Admin -->
       <section class="setsec" data-sec="admin" hidden>
         <h2>Admin</h2>
-        <p class="lead">Approve new staff, choose who else is an admin, and keep the list of emails that are let straight in.</p>
+        <p class="lead">Approve new staff, choose who else is an admin, keep the list of emails that are let straight in, and publish the school’s music lessons and house meetings.</p>
         <div id="adminBody"><div class="card2"><p class="empty-note">Loading…</p></div></div>
       </section>
     </div>
@@ -1205,6 +1258,26 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
   <p>Which changes should go?</p>
   <div class="hd-choices" id="hdResetChoices"></div>
   <div class="row" style="justify-content:flex-end"><button type="button" class="btn" data-close>Cancel</button></div>
+</div></div>
+<div class="modal-back" id="dpModal" hidden><div class="modal dp" role="dialog" aria-modal="true" aria-labelledby="dpTitle">
+  <h3 id="dpTitle">Before you start: keeping pupils’ information safe</h3>
+  <p>Everything in Morning Slide can go up on the projector, and announcements and music lessons are shared with staff across the school.</p>
+  <ul class="dp-list">
+    <li>Use pupils’ <b>first names and surname initials only</b>.</li>
+    <li>Never include sensitive information: <b>SEND status, medical, safeguarding</b>, or anything you wouldn’t show the class.</li>
+  </ul>
+  <p class="hint" id="dpMore">Signed in, your slide is saved online with your account, so it’s on any laptop you sign in on. Pictures and videos you add stay on the laptop you added them on.</p>
+  <p class="hint" id="dpWhen" hidden></p>
+  <div class="row" style="justify-content:flex-end"><button type="button" class="btn" id="dpLater">Not now</button><button type="button" class="btn primary" id="dpAgree">I agree</button></div>
+</div></div>
+<div class="modal-back" id="syncModal" hidden><div class="modal sync" role="dialog" aria-modal="true" aria-labelledby="syncTitle">
+  <h3 id="syncTitle">Which slide do you want to keep?</h3>
+  <p id="syncText"></p>
+  <div class="sync-choices">
+    <button type="button" data-keep="online"><b>The slide saved online</b><span id="syncOnline"></span></button>
+    <button type="button" data-keep="here"><b>The slide on this laptop</b><span id="syncHere"></span></button>
+  </div>
+  <p class="hint" style="margin:0">The other one is replaced. Download a copy first (bottom right) if you might want it back.</p>
 </div></div>
 <div class="tip" id="tip" role="tooltip" hidden></div>
 <div class="stage" id="stage" hidden></div>
@@ -1468,6 +1541,7 @@ function pruneOverrides() {
   Object.keys(state.oneoff || {}).forEach(k => { if (k < yearAgo) delete state.oneoff[k]; });
 }
 let saveTimer = null;
+let onStateSaved = null;      // set by the accounts code: saves the slide online too
 function save() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
@@ -1475,6 +1549,7 @@ function save() {
     try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
     catch (e) { ok = false; toast('Couldn\'t save: this browser\'s storage is full. Try a smaller timetable image.'); }
     if (typeof onSaveResult === 'function') onSaveResult(ok);
+    if (ok && onStateSaved) onStateSaved();
   }, 250);
 }
 
@@ -1696,9 +1771,40 @@ function teacherName(st, t) {
   // "Miss A Woodhouse" → "Miss Woodhouse" (drops single-letter initials that come before a name)
   return t.replace(/\b[A-Z]\.?(?:-[A-Z]\.?)?\s+(?=\S)/g, '').replace(/\s{2,}/g, ' ').trim();
 }
-function musicRows(st, wd) {
-  if (!st.lessons || !st.form) return [];
-  return st.lessons.rows
+/* Music lessons come from the school (an admin uploads each week once; signed-in staff get them) or from
+   a teacher's own spreadsheet. A teacher's own file is used for its own week only (from "wc 23 Nov 2026" in its name). */
+const MUSIC_KEY = 'morningSlide.v3.music';
+function loadMusicCache() { try { return JSON.parse(localStorage.getItem(MUSIC_KEY)) || null; } catch (e) { return null; } }
+let musicCache = loadMusicCache();     // { uid, at, weeks: { 'YYYY-MM-DD' (Monday): { file, rows, at } } }
+function mondayOf(d) { const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); return addDays(x, -((x.getDay() + 6) % 7)); }
+function weekFromName(name) {
+  const s = String(name || '').replace(/[_]+/g, ' ');
+  const m = /(\d{1,2})(?:st|nd|rd|th)?[\s.-]+([A-Za-z]{3,9})\.?(?:[\s.-]+(\d{4}|\d{2}))?/.exec(s.replace(/^.*?\bw\/?c\b\.?/i, ''));
+  if (!m) return null;
+  const mi = MONTHS.findIndex(x => x.slice(0, 3).toLowerCase() === m[2].slice(0, 3).toLowerCase()); if (mi < 0) return null;
+  const now = new Date();
+  let y = m[3] ? +m[3] : now.getFullYear(); if (y < 100) y += 2000;
+  let d = new Date(y, mi, +m[1]);
+  if (d.getMonth() !== mi) return null;
+  if (!m[3] && Math.abs(d - now) > 183 * 864e5) d = new Date(y + (d < now ? 1 : -1), mi, +m[1]);
+  return { date: toISO(d), week: toISO(mondayOf(d)), monday: d.getDay() === 1 };
+}
+function lessonSource(st, date) {
+  if (date.getDay() === 0) date = addDays(date, 1);
+  const wk = toISO(mondayOf(date)), own = st.lessons, weeks = (musicCache && musicCache.weeks) || {};
+  if (own && own.week === wk) return { kind: 'own', week: wk, rows: own.rows, src: own };
+  if (weeks[wk]) return { kind: 'school', week: wk, rows: weeks[wk].rows, src: weeks[wk] };
+  if (own && !own.week) return { kind: 'own', week: null, rows: own.rows, src: own };
+  const older = Object.keys(weeks).filter(k => k < wk).sort().pop();
+  if (older && !(own && own.week > older)) return { kind: 'school', week: older, rows: weeks[older].rows, src: weeks[older], stale: true };
+  if (own) return { kind: 'own', week: own.week, rows: own.rows, src: own, stale: own.week < wk };
+  return null;
+}
+function musicRows(st, date, wd) {
+  const src = lessonSource(st, date);
+  if (!src || !st.form) return [];
+  wd = wd || dayCode(date);
+  return src.rows
     .filter(r => r[0] === st.form && r[2] === wd)
     .map(r => ({ name: displayName(st, r[1]), mins: r[3], teacher: teacherName(st, r[4]) }))
     .sort((a, b) => nameCmp(a.name, b.name) || (a.mins ?? 9999) - (b.mins ?? 9999));
@@ -1836,7 +1942,7 @@ function setSlideHTML(host, html) {      // replaces the slide but keeps anythin
   host.insertAdjacentHTML('afterbegin', html);
 }
 /* ---------- What's new (opens once on the first visit to v3, then from the bottom bar) ---------- */
-const WN_KEY = 'morningSlide.v3.whatsNewSeen';
+const WN_KEY = 'morningSlide.v3.whatsNewSeen.2';   // .2: music lessons and saving online (everyone sees it once more)
 let openAccount = view => openSetup('account');      // the account code replaces this once it has loaded
 function openWhatsNew() {
   $('whatsNew').hidden = false;
@@ -1900,7 +2006,7 @@ function noticesHTML(list, cls) {
 function renderSlide(host, st, date, editor) {
   const day = resolveDay(st, date);
   const t = themeFor(st, day.wd);
-  const rows = musicRows(st, day.wd);
+  const rows = musicRows(st, date, day.wd);
   host.style.background = t.bg;
   if (day.whole) {
     setSlideHTML(host,
@@ -2088,10 +2194,10 @@ function renderPrep(host, st, date, editor) {
   let second, secondTitle, musicTitle, musicDay, musicEmpty;
   if (morning) {
     second = resolveDay(st, date).notes; secondTitle = 'notes';
-    musicDay = wd; musicTitle = 'music'; musicEmpty = 'No music lessons today';
+    musicDay = date; musicTitle = 'music'; musicEmpty = 'No music lessons today';
   } else {
     second = resolveDay(st, date).tomorrow; secondTitle = 'tomorrow';
-    musicDay = dayCode(nextSchoolDay(date)); musicTitle = 'tmusic'; musicEmpty = 'No music lessons tomorrow';
+    musicDay = nextSchoolDay(date); musicTitle = 'tmusic'; musicEmpty = 'No music lessons tomorrow';
   }
   const info = resolveDay(st, date).prepInfo;
   const pf = prepFreeOf(st, date);
@@ -2376,6 +2482,7 @@ if (location.hash === '#slide') {
     if (e.key === STORE_KEY) { state = loadState(); draw(); }
     if (e.key === NOTICE_KEY) { noticeCache = loadNoticeCache(); draw(); }
     if (e.key === SHARED_KEY) { shared = loadShared(); draw(); }
+    if (e.key === MUSIC_KEY) { musicCache = loadMusicCache(); draw(); }
     if (e.key === TIMER_KEY) { timer = loadTimer(); paint(); }
   });
   // The projector keeps time too, so the timer moves on even if the laptop tab is in the background
@@ -2455,14 +2562,18 @@ function plainFirst(s) {
 
 /* ---------- Saved indicator ---------- */
 let saveOk = true;
+let syncInfo = null;         // { kind: 'ok' | 'saving' | 'wait' | 'bad', text, tip } while signed in and saving online
 function onSaveResult(ok) { saveOk = ok; paintSaveState(); }
+const CLOUD_SVG = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 19a4.5 4.5 0 0 0 .5-8.97A6 6 0 0 0 6.34 9.1 4 4 0 0 0 6.5 19z"></path></svg>';
+const TICK_SVG = '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7.5l2.6 2.5L11 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>';
 function paintSaveState() {
   ['saveState', 'saveState2'].forEach(id => {
     const el = $(id); if (!el) return;
-    el.classList.toggle('bad', !saveOk);
-    el.querySelector('span').textContent = saveOk ? 'Saved in browser' : 'Not saved: storage is full';
-    el.title = saveOk ? 'Everything you change is saved in this browser straight away.'
-      : 'This browser’s storage is full, so your latest changes aren’t saved. A smaller timetable image usually fixes it. Save a copy to be safe.';
+    const s = !saveOk ? { kind: 'bad', text: 'Not saved: storage is full', tip: 'This browser’s storage is full, so your latest changes aren’t saved. A smaller timetable image usually fixes it. Download a copy to be safe.' }
+      : syncInfo || { kind: 'local', text: 'Saved on this laptop', tip: 'Everything you change is saved on this laptop straight away. Sign in to save your slide online too, so it’s on any laptop.' };
+    el.className = 'savestate ' + s.kind;
+    el.innerHTML = (s.kind === 'local' || s.kind === 'bad' ? TICK_SVG : CLOUD_SVG) + '<span>' + esc(s.text) + '</span>';
+    el.title = s.tip || '';
   });
 }
 /* The main editing screen takes the colours of the day you're looking at (Setup stays as it is) */
@@ -2548,7 +2659,7 @@ function refreshUi() {
    ===================================================================== */
 function checklistSteps() {
   return [
-    { done: !!state.lessons, title: 'Upload this week’s music lessons', text: state.lessons ? state.lessons.fileName : 'The Music & LAMDA spreadsheet', action: 'Upload', go: 'form' },
+    { done: !!(state.lessons || lessonSource(state, new Date())), title: 'Upload this week’s music lessons', text: state.lessons ? state.lessons.fileName : lessonSource(state, new Date()) ? 'From the school' : 'The Music & LAMDA spreadsheet', action: 'Upload', go: 'form' },
     { done: !!state.form, title: 'Choose your form', text: state.form ? state.form : 'So the slide shows your pupils’ lessons', action: 'Choose', go: 'form' },
     { done: DAYS.some(d => ttRows(state, d).length || state.ttImage[d]), title: 'Add your timetable', text: 'Paste it, or type it in', action: 'Add', go: 'timetable' },
     { done: !!state.designChosen, title: 'Pick a look', text: 'Playful or Modern, and day colours', action: 'Pick', go: 'design' }
@@ -3833,26 +3944,39 @@ function parseTime(v) {
 }
 function normDay(v) { const s = String(v || '').trim().toUpperCase(); return ALL_DAYS.find(d => s.startsWith(d)) || s; }
 function formSort(a, b) { const na = parseInt(a, 10), nb = parseInt(b, 10); return na !== nb ? na - nb : a.localeCompare(b, 'en-GB', { numeric: true }); }
-async function loadLessonsFile(file) {
-  if (!file) return;
-  if (typeof XLSX === 'undefined') { toast('The spreadsheet reader didn’t load. Check your internet connection.'); return; }
+// Reads the Music & LAMDA spreadsheet: [[form, pupil, day, minutes, teacher], ...]. Used by teachers and by admins.
+async function parseLessonsFile(file) {
+  if (typeof XLSX === 'undefined') throw new Error('The spreadsheet reader didn’t load. Check your internet connection.');
+  let grid;
   try {
     const wb = XLSX.read(await file.arrayBuffer(), { type: 'array' });
-    const grid = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: true, defval: '' });
-    const rows = [], ignored = {};
-    grid.forEach((r, i) => {
-      const form = String(r[0] ?? '').trim(), name = String(r[1] ?? '').trim();
-      if (!form && !name) return;
-      if (i === 0 && form.toLowerCase() === 'form') return;
-      if (!/^\d/.test(form)) { ignored[form || '(blank)'] = (ignored[form || '(blank)'] || 0) + 1; return; }
-      rows.push([form, name, normDay(r[2]), parseTime(r[3]), String(r[4] ?? '').trim()]);
-    });
-    if (!rows.length) { toast('No lessons found. Check it’s the right file.'); return; }
-    state.lessons = { fileName: file.name, savedAt: new Date().toISOString(), rows, ignored };
-    changed(); refreshSetupForm();
-    toast('Lessons loaded: ' + rows.length + ' across all forms.');
-  } catch (e) { toast('“' + file.name + '” couldn’t be read as a spreadsheet.'); }
+    grid = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: true, defval: '' });
+  } catch (e) { throw new Error('“' + file.name + '” couldn’t be read as a spreadsheet.'); }
+  const rows = [], ignored = {};
+  grid.forEach((r, i) => {
+    const form = String(r[0] ?? '').trim(), name = String(r[1] ?? '').trim();
+    if (!form && !name) return;
+    if (i === 0 && form.toLowerCase() === 'form') return;
+    if (!/^\d/.test(form)) { ignored[form || '(blank)'] = (ignored[form || '(blank)'] || 0) + 1; return; }
+    rows.push([form, name, normDay(r[2]), parseTime(r[3]), String(r[4] ?? '').trim()]);
+  });
+  if (!rows.length) throw new Error('No lessons found. Check it’s the right file.');
+  return { rows, ignored };
 }
+async function loadLessonsFile(file) {
+  if (!file) return;
+  try {
+    const { rows, ignored } = await parseLessonsFile(file);
+    const w = weekFromName(file.name);
+    state.lessons = { fileName: file.name, savedAt: new Date().toISOString(), rows, ignored, week: w ? w.week : null };
+    changed(); refreshSetupForm();
+    toast('Lessons loaded: ' + rows.length + ' across all forms' + (w ? ', for the week commencing ' + shortDate(fromISO(w.week)) : '') + '.');
+  } catch (e) { toast(e.message); }
+}
+$('useSchoolMusic').addEventListener('click', () => {
+  if (!confirm('Use the school’s music lessons instead of your own spreadsheet? Your spreadsheet is removed from this slide; preferred names are kept.')) return;
+  state.lessons = null; changed(); refreshSetupForm(); toast('Using the school’s music lessons.');
+});
 $('lessonsBtn').addEventListener('click', () => { $('lessonsInput').value = ''; $('lessonsInput').click(); });
 $('lessonsInput').addEventListener('change', () => loadLessonsFile($('lessonsInput').files[0]));
 const dz = $('dropzone');
@@ -3862,30 +3986,46 @@ dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over
 window.addEventListener('dragover', e => { if (e.dataTransfer && [...e.dataTransfer.types].includes('Files')) e.preventDefault(); });
 window.addEventListener('drop', e => { if (e.dataTransfer && e.dataTransfer.files.length) e.preventDefault(); });
 function refreshSetupForm() {
-  const L = state.lessons;
+  const L = state.lessons, weeks = (musicCache && musicCache.weeks) || {}, wkeys = Object.keys(weeks).sort();
+  const school = wkeys.length > 0, cur = lessonSource(state, schoolDay(new Date()));
+  // The school's lessons (signed-in staff)
+  $('schoolMusicCard').hidden = !school;
+  if (school) {
+    const thisWk = toISO(mondayOf(schoolDay(new Date())));
+    $('schoolMusicList').innerHTML = wkeys.map(k => '<li><b>Week commencing ' + esc(shortDate(fromISO(k))) + '</b>' +
+      (k === thisWk ? ' <span class="pill">This week</span>' : k > thisWk ? ' <span class="pill soft">Next week</span>' : '') +
+      '<span class="hint" style="margin:0"> · ' + weeks[k].rows.filter(r => r[0] === state.form).length + ' for ' + esc(state.form || 'your form') + ' · published ' + esc(stamp(weeks[k].at)) + '</span></li>').join('');
+    $('schoolMusicNote').textContent = cur && cur.kind === 'own' ? 'This week your own spreadsheet is being used instead. Next week the school’s lessons take over again by themselves.' : 'Your form’s lessons appear on the slide by themselves. Nothing to upload.';
+  }
+  $('ownMusicTitle').textContent = school ? 'Your own spreadsheet (optional)' : 'This week’s spreadsheet';
+  $('ownMusicHint').hidden = !school;
+  $('useSchoolMusic').hidden = !(school && L);
   $('fileCard').classList.toggle('empty', !L);
   if (L) {
     const d = new Date(L.savedAt);
     $('lessonsInfo').textContent = L.fileName;
-    $('lessonsSub').textContent = 'Added ' + shortDate(d) + ' · ' + L.rows.length + ' lessons' + (state.form ? ' · ' + L.rows.filter(r => r[0] === state.form).length + ' for ' + state.form + ' this week' : '');
+    $('lessonsSub').textContent = (L.week ? 'Week commencing ' + shortDate(fromISO(L.week)) + ' · ' : 'Added ' + shortDate(d) + ' · ') + L.rows.length + ' lessons' + (state.form ? ' · ' + L.rows.filter(r => r[0] === state.form).length + ' for ' + state.form : '');
     $('lessonsBtn').textContent = 'Upload a new week';
     const ig = Object.values(L.ignored || {}).reduce((a, b) => a + b, 0);
     $('ignoredNote').hidden = false;
-    $('ignoredNote').textContent = 'Read on this laptop only; nothing is uploaded anywhere.' + (ig ? ' ' + ig + (ig === 1 ? ' row was' : ' rows were') + ' skipped because the form doesn’t start with a number.' : '');
-    const forms = [...new Set(L.rows.map(r => r[0]))].sort(formSort);
+    $('ignoredNote').textContent = 'Read on this laptop only.' + (ig ? ' ' + ig + (ig === 1 ? ' row was' : ' rows were') + ' skipped because the form doesn’t start with a number.' : '');
+  }
+  const allRows = [].concat(L ? L.rows : [], ...wkeys.map(k => weeks[k].rows));
+  if (allRows.length) {
+    const forms = [...new Set(allRows.map(r => r[0]).concat(state.form ? [state.form] : []))].sort(formSort);
     const byYear = {};
     forms.forEach(f => { const y = parseInt(f, 10); (byYear[y] = byYear[y] || []).push(f); });
     $('formSelect').innerHTML = '<option value="">Choose your form</option>' + Object.keys(byYear).sort((a, b) => a - b).map(y =>
       '<optgroup label="Year ' + y + '">' + byYear[y].map(f => '<option value="' + esc(f) + '">' + esc(f) + '</option>').join('') + '</optgroup>').join('');
     $('formSelect').value = forms.includes(state.form) ? state.form : '';
     $('formSelect').disabled = false;
-  } else {
+  }
+  if (!L) {
     $('lessonsInfo').textContent = 'No file yet';
     $('lessonsSub').textContent = 'The Music & LAMDA spreadsheet (.xlsx)';
     $('lessonsBtn').textContent = 'Upload the spreadsheet';
     $('ignoredNote').hidden = true;
-    $('formSelect').innerHTML = '<option value="">Upload the lessons file first</option>';
-    $('formSelect').disabled = true;
+    if (!allRows.length) { $('formSelect').innerHTML = '<option value="">Upload the lessons file first</option>'; $('formSelect').disabled = true; }
   }
   refreshPupils();
 }
@@ -3893,7 +4033,8 @@ $('formSelect').addEventListener('change', () => { state.form = $('formSelect').
 $('teacherInitial').addEventListener('change', () => { state.teacherInitial = $('teacherInitial').checked; changed(); });
 $('matchMeet').addEventListener('change', () => { state.matchMeet = $('matchMeet').checked; changed(); });
 function refreshPupils() {
-  const L = state.lessons, form = state.form;
+  const src = lessonSource(state, schoolDay(new Date())), form = state.form;
+  const L = src ? { rows: src.rows } : null;
   $('teacherInitial').checked = state.teacherInitial !== false;
   $('matchMeet').checked = !!state.matchMeet;
   $('pupilsWrap').hidden = !(L && form);
@@ -4201,7 +4342,11 @@ function openCopy() { $('importInput').value = ''; $('importInput').click(); }
 $('exportBtn').addEventListener('click', saveCopy);
 $('saveCopy').addEventListener('click', saveCopy);
 $('importBtn').addEventListener('click', openCopy);
-$('openCopy').addEventListener('click', openCopy);
+$('openCopy').addEventListener('click', () => { closeDlMenu(); openCopy(); });
+function closeDlMenu() { $('dlMenu').hidden = true; $('dlMore').setAttribute('aria-expanded', 'false'); }
+$('dlMore').addEventListener('click', e => { e.stopPropagation(); const open = $('dlMenu').hidden; $('dlMenu').hidden = !open; $('dlMore').setAttribute('aria-expanded', String(open)); if (open) $('openCopy').focus(); });
+document.addEventListener('click', e => { if (!$('dlMenu').hidden && !e.target.closest('#dlSplit')) closeDlMenu(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('dlMenu').hidden) { closeDlMenu(); $('dlMore').focus(); } });
 $('importInput').addEventListener('change', async () => {
   const f = $('importInput').files[0]; if (!f) return;
   try {
@@ -4239,6 +4384,7 @@ function renderAll(opts = {}) {
   if (!els.stage.hidden) { renderView(els.stage, state, proj.mode, fromISO(proj.date)); scaleInto(els.stage); }
   updateNoticeHint();
   updatePresenting();
+  paintStatus();
   sendToSlide();
 }
 // The school's schedule and matchday queues: everyone reads these, signed in or not
@@ -4253,12 +4399,13 @@ async function fetchShared() {
       get('ms_house?select=date,congers,rooms&date=gte.' + toISO(addDays(new Date(), -150)) + '&order=date'),
       get('ms_matchday?select=date,data,published_at&date=gte.' + toISO(addDays(new Date(), -1))),
     ]);
-    const matchday = {};
-    md.forEach(r => { matchday[r.date] = r.data; });
-    const next = { at: Date.now(), house, matchday };
+    const matchday = {}, mdAt = {};
+    md.forEach(r => { matchday[r.date] = r.data; mdAt[r.date] = r.published_at; });
+    const next = { at: Date.now(), house, matchday, mdAt };
     const same = shared && JSON.stringify(shared.house) === JSON.stringify(house) && JSON.stringify(shared.matchday) === JSON.stringify(matchday);
     shared = next;
     try { localStorage.setItem(SHARED_KEY, JSON.stringify(shared)); } catch (e) {}
+    paintStatus();
     if (!same) { renderAll(); if (!$('setupScreen').hidden && setupSec === 'house') refreshSchedule(); }
   } catch (e) { /* offline, or the tables aren't set up yet: keep the copy we have */ }
 }
@@ -4288,8 +4435,44 @@ function updateNoticeHint() {
 $('noticeStripBtn').addEventListener('click', () => { state.noticeStrip = !state.noticeStrip; changed(); });
 $('whatsNewBtn').addEventListener('click', openWhatsNew);
 // "Updated …": stamped automatically into the page each time a new version is committed
+const dmy = d => String(d.getDate()).padStart(2, '0') + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getFullYear()).slice(2);
+const hhmm = d => String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+const stamp = v => { const d = new Date(v); return isNaN(d) ? '' : DAY_NAMES[dayCode(d)].slice(0, 3) + ' ' + d.getDate() + ' ' + shortMonth(d) + ' at ' + hhmm(d); };
 { const m = document.querySelector('meta[name="ms-updated"]'), d = m && new Date(m.content);
-  if (d && !isNaN(d)) $('bbUpdated').textContent = 'Updated ' + d.getDate() + ' ' + MONTHS[d.getMonth()].slice(0, 3) + ', ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+  if (d && !isNaN(d)) $('bbUpdated').textContent = dmy(d) + ' ' + hhmm(d); }
+/* Bottom bar: are the matchday queues and music lessons up to date? */
+function setStat(id, cls, text, tip) {
+  const el = $(id); if (!el) return;
+  el.hidden = false;
+  const v = el.querySelector('.v'); v.className = 'v ' + cls; v.textContent = text;
+  el.title = tip;
+}
+function paintStatus() {
+  if (!$('bbMatch')) return;
+  const now = new Date(), iso = toISO(now);
+  // Matchday queues: only on Wednesdays and Saturdays, and only for Years 5 to 8
+  const yr = parseInt(state.form, 10), md = (shared && shared.matchday) || {}, at = (shared && shared.mdAt) || {};
+  if (yr && (yr < 5 || yr > 8)) $('bbMatch').hidden = true;
+  else if (now.getDay() === 3 || now.getDay() === 6) {
+    if (md[iso]) setStat('bbMatch', 'ok', '✓ Updated ' + dmy(new Date(at[iso] || now)), 'Today’s lunch queues are in Lunchtime Arrangements. Published ' + stamp(at[iso]) + '.');
+    else setStat('bbMatch', 'warn', '⚠ Not published yet', 'Today’s lunch queues haven’t been published from Matchday Queues yet. Lunchtime Arrangements shows your own text until they are.');
+  } else {
+    let n = addDays(now, 1); while (n.getDay() !== 3 && n.getDay() !== 6) n = addDays(n, 1);
+    const ni = toISO(n), nm = DAY_NAMES[dayCode(n)].slice(0, 3);
+    if (md[ni]) setStat('bbMatch', 'ok', '✓ Next: ' + nm + ' ' + dmy(n), 'The lunch queues for ' + shortDate(n) + ' are ready. Published ' + stamp(at[ni]) + '.');
+    else setStat('bbMatch', 'muted', 'Next: ' + nm + ' ' + dmy(n), 'The lunch queues for ' + shortDate(n) + ' haven’t been published yet. That’s normal until nearer the day.');
+  }
+  // Music lessons: is this week's in?
+  const src = lessonSource(state, schoolDay(now)), wk = toISO(mondayOf(schoolDay(now)));
+  const wcOf = w => 'wc ' + dmy(fromISO(w));
+  if (!src) setStat('bbMusic', 'muted', 'None yet', 'No music lessons yet. Signed-in staff get them from the school; you can also upload the spreadsheet in Setup → Form & music.');
+  else if (src.week === wk) setStat('bbMusic', 'ok', '✓ ' + wcOf(wk), src.kind === 'school' ? 'This week’s lessons from the school, published ' + stamp(src.src.at) + '.' : 'This week’s lessons from your own spreadsheet, ' + (src.src.fileName || '') + '.');
+  else if (src.stale) setStat('bbMusic', 'warn', '⚠ Still last week’s', 'This week’s lessons aren’t in yet, so the slide is showing ' + wcOf(src.week) + '. ' + (src.kind === 'school' ? 'They’ll appear as soon as an admin publishes them.' : 'Upload this week’s spreadsheet in Setup → Form & music.'));
+  else if (src.week) setStat('bbMusic', 'muted', wcOf(src.week), 'Your own spreadsheet is for ' + wcOf(src.week) + '.');
+  else setStat('bbMusic', 'muted', 'Your own file', 'From your own spreadsheet, ' + (src.src.fileName || '') + '. Its name doesn’t say which week it’s for.');
+}
+$('bbMusic').addEventListener('click', () => openSetup('form'));
+setInterval(paintStatus, 60000);
 $('whatsNew').addEventListener('click', e => {
   if (e.target === $('whatsNew')) return closeWhatsNew();
   const b = e.target.closest('[data-wn]'); if (!b) return;
@@ -4501,7 +4684,7 @@ async function client() {
 }
 
 async function refreshMe(event) {
-  if (!session) { me = null; admin.loaded = false; clearNotices(); paint(); return; }
+  if (!session) { me = null; admin.loaded = false; clearNotices(); clearMusic(); syncStop(); paint(); return; }
   if (!me || me.id !== session.user.id) { me = null; meError = ''; }   // still loading: show "Loading…", not an error
   const { data, error } = await sb.from('ms_staff').select('*').eq('id', session.user.id).maybeSingle();
   const was = me;
@@ -4512,13 +4695,13 @@ async function refreshMe(event) {
     toast(me.status === 'approved' ? 'Email confirmed. You’re signed in.' : 'Email confirmed. An admin will approve your account soon.');
     if (view !== 'recovery') openSetup('account');
   }
-  if (me && me.role === 'admin' && me.status === 'approved') await loadAdmin(); else admin.loaded = false;
-  if (me && me.status === 'approved') fetchNotices(); else clearNotices();
+  if (me && !me.agreed_at && !dpLater && !/^link/.test(view)) openDP();
+  await staffReady();
   if (!was || !me || was.id !== me.id || was.status !== me.status || was.role !== me.role || view === 'recovery') { if (!/^(recovery|link)/.test(view)) view = 'signin'; }
   paint();
 }
 
-const isAdmin = () => !!(me && me.status === 'approved' && me.role === 'admin');
+const isAdmin = () => !!(me && me.status === 'approved' && me.agreed_at && me.role === 'admin');
 
 async function loadAdmin() {
   const [req, staff, allowed, forms] = await Promise.all([
@@ -4598,6 +4781,8 @@ function paintAccount() {
       '</b><span>' + esc(me.email) + '</span></div><span style="flex:1"></span><button type="button" class="btn small" data-act="signout">Sign out</button></div>' + msgHTML() +
       (pending ? '<p class="hint" style="margin:0">An admin has been asked to approve your account. Once they have, you’ll be signed in here automatically next time you open Morning Slide.</p>' : '') +
       '</div>' +
+      (!me.agreed_at ? '<div class="card2"><h3>One more step</h3><p style="margin:0">Agree to the data protection guidance to use announcements, the school’s music lessons and saving your slide online.</p><div class="row"><button type="button" class="btn primary" data-act="dp">Read and agree</button></div></div>' : '') +
+      (isStaff() ? slideCardHTML() : '') +
       '<div class="card2"><h3>Your details</h3><form class="acct-form" data-form="details"><div class="pair">' +
       field('acName', 'Title and surname <small>as on iSAMS</small>', 'text', ' value="' + esc(me.name) + '" maxlength="60" required') +
       field('acInit', 'Initials', 'text', ' value="' + esc(me.initials) + '" maxlength="5" required style="text-transform:uppercase"') +
@@ -4632,6 +4817,7 @@ function paintAccount() {
           '<div class="row"><button class="btn primary">Sign in</button><button type="button" class="linkbtn" data-view="forgot">Forgotten your password?</button></div></form>') +
       '</div>';
   }
+  html += '<div class="card2"><h3>Data protection</h3><p class="hint" style="margin:0">How to keep pupils’ information safe in Morning Slide' + (me && me.agreed_at ? ': you agreed on ' + esc(shortDate(new Date(me.agreed_at))) : '') + '.</p><div class="row"><button type="button" class="btn small" data-act="dp">Read the guidance</button></div></div>';
   body.innerHTML = html;
 }
 
@@ -4666,6 +4852,7 @@ function paintAdmin() {
         '</td><td class="acts">' + (a.email === me.email ? '' : '<button type="button" class="btn small" data-unallow="' + esc(a.email) + '">Remove</button>') + '</td></tr>').join('') + '</tbody></table>' : '') +
     '<p class="hint" style="margin:0">Removing an email only stops new sign-ups going straight through. It doesn’t delete an account that already exists.</p></div>';
 
+  html += musicAdminHTML();
   html += houseAdminHTML();
   html += '<div class="card2"><h3>Forms</h3>' + (admin.forms.length ? '<div class="chips">' + admin.forms.map(f => '<span>' + esc(f.form || f) + '</span>').join('') + '</div>' : '<p class="empty-note">No forms found.</p>') +
     '<p class="hint" style="margin:0">These come from Timetable Maker, so you only keep one list. Change them there.</p></div>';
@@ -4747,6 +4934,12 @@ async function onSubmit(e) {
       const { error } = await sb.rpc('ms_update_me', { new_name: val('acName'), new_initials: val('acInit').toUpperCase() });
       if (error) throw error;
       await refreshMe(); toast('Saved'); return;
+    }
+    if (kind === 'share') {
+      const email = val('acShare').toLowerCase();
+      const { data, error } = await sb.rpc('ms_share_slide', { their_email: email });
+      if (error) throw new Error(/no approved/i.test(error.message) ? 'There’s no approved Morning Slide account for ' + email + ' yet. Ask them to create one first.' : error.message);
+      await loadEditors(); toast(data + ' can now edit your slide.'); return;
     }
     if (kind === 'allow') {
       const list = [...new Set(val('acAllow').toLowerCase().split(/[\s,;]+/).filter(Boolean))];
@@ -4888,6 +5081,7 @@ function onClick(e) {
   const t = e.target.closest('button'); if (!t) return;
   const d = t.dataset;
   if (d.view) { view = d.view; msg = null; paint(); const f = $('acEmail'); if (f) f.focus(); return; }
+  if (d.act === 'dp') { openDP(); return; }
   if (d.act === 'reload') { refreshMe(); return; }
   if (d.act === 'retry') { offline = false; start(true); return; }
   if (d.act === 'signout') { sb.auth.signOut().then(() => { toast('Signed out. Everything on this laptop is still here.'); view = 'signin'; }); return; }
@@ -4911,7 +5105,7 @@ for (const id of ['acctBody', 'adminBody']) {
 /* =====================================================================
    NOTICES: posting, and the list for your form
    ===================================================================== */
-const isStaff = () => !!(me && me.status === 'approved');
+const isStaff = () => !!(me && me.status === 'approved' && me.agreed_at);   // approved, and agreed to the data protection guidance
 const todayISO = () => toISO(new Date());
 let npTab = 'new', npOpen = false, npBusy = false;
 let draft = null;            // the notice being written or edited
@@ -5062,7 +5256,7 @@ function newTabHTML(tree) {
     (d.when === 'today' ? '' : '<div class="np-prep"><button type="button" class="switch" role="switch" id="npPrep" aria-checked="' + d.prep + '" aria-labelledby="npPrepL"></button><span id="npPrepL">Also show it on the prep slide the evening before</span></div>');
   return '<div class="np-body">' +
     '<section><h3><label for="npText">Your announcement</label></h3><div class="np-write"><textarea id="npText" rows="3" maxlength="140" placeholder="e.g. Choir rehearsal moved to the Music School at 1:15">' + esc(d.body) + '</textarea><span class="np-by">– ' + esc(me.initials) + '</span></div>' +
-      '<div class="np-under"><span>This is how it looks on the slide, below each form’s own notes. Please don’t use pupils’ names.</span><span id="npCount">' + d.body.length + ' / 140</span></div></section>' +
+      '<div class="np-under"><span>This is how it looks on the slide, below each form’s own notes. First names and surname initials only, and nothing sensitive.</span><span id="npCount">' + d.body.length + ' / 140</span></div></section>' +
     '<section><h3>Who’s it for?</h3>' + who + '</section>' +
     '<section><h3>When?</h3>' + when + '</section>' +
   '</div>' +
@@ -5229,6 +5423,352 @@ openAccount = v => {
   openSetup('account');
   setTimeout(() => { const f = $(view === 'signup' ? 'acName' : 'acEmail'); if (f && !me) f.focus(); }, 60);
 };
+
+/* ---------- after sign-in: what an approved (and agreed) person gets ---------- */
+async function staffReady() {
+  if (isAdmin()) await loadAdmin(); else admin.loaded = false;
+  if (isStaff()) { fetchNotices(); fetchMusic(); syncStart(); loadEditors(); }
+  else { clearNotices(); clearMusic(); syncStop(); }
+}
+
+/* ---------- data protection agreement ---------- */
+let dpLater = false;
+function openDP(readOnly) {
+  const needs = !!(me && !me.agreed_at);
+  $('dpLater').textContent = needs ? 'Not now' : 'Close';
+  $('dpAgree').hidden = !needs;
+  $('dpMore').hidden = !session;
+  $('dpWhen').hidden = !(me && me.agreed_at);
+  if (me && me.agreed_at) $('dpWhen').textContent = 'You agreed on ' + shortDate(new Date(me.agreed_at)) + '.';
+  $('dpModal').hidden = false;
+  setTimeout(() => (needs ? $('dpAgree') : $('dpLater')).focus(), 30);
+}
+$('dpLater').addEventListener('click', () => {
+  $('dpModal').hidden = true;
+  if (me && !me.agreed_at) { dpLater = true; toast('No problem. Announcements, music lessons and saving online start once you agree, in Setup → Account.'); paint(); }
+});
+$('dpAgree').addEventListener('click', async () => {
+  $('dpAgree').disabled = true;
+  try {
+    const { data, error } = await sb.rpc('ms_agree');
+    if (error) throw error;
+    me.agreed_at = data || new Date().toISOString();
+    $('dpModal').hidden = true;
+    toast('Thank you. You’re all set.');
+    await staffReady(); paint();
+  } catch (e) { toast('Couldn’t save that: ' + friendly(e).replace(/<[^>]+>/g, '')); }
+  finally { $('dpAgree').disabled = false; }
+});
+$('dpModal').addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); $('dpLater').click(); } });
+
+/* ---------- the school's music lessons ---------- */
+function saveMusicCache(c) {
+  musicCache = c;
+  try { if (c) localStorage.setItem(MUSIC_KEY, JSON.stringify(c)); else localStorage.removeItem(MUSIC_KEY); } catch (e) {}
+  renderAll(); refreshUi();
+  if (!$('setupScreen').hidden) refreshSetupForm();
+}
+function clearMusic() { if (musicCache) saveMusicCache(null); }
+async function fetchMusic() {
+  if (!sb || !isStaff()) return;
+  const { data, error } = await sb.from('ms_music').select('week_start,file_name,rows,published_at').gte('week_start', toISO(addDays(mondayOf(new Date()), -14))).order('week_start');
+  if (error) return;    // 06-music-sync.sql not run yet, or offline: keep what we have
+  const weeks = {};
+  (data || []).forEach(r => { weeks[r.week_start] = { file: r.file_name, rows: r.rows || [], at: r.published_at }; });
+  if (musicCache && musicCache.uid === me.id && JSON.stringify(musicCache.weeks) === JSON.stringify(weeks)) {
+    musicCache.at = Date.now(); try { localStorage.setItem(MUSIC_KEY, JSON.stringify(musicCache)); } catch (e) {}
+    return;
+  }
+  saveMusicCache({ uid: me.id, at: Date.now(), weeks });
+  if (isAdmin() && setupSec === 'admin' && !$('setupScreen').hidden && !am.file) paintAdmin();
+}
+setInterval(() => { if (isStaff() && document.visibilityState === 'visible') fetchMusic().catch(() => {}); }, 180000);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && isStaff() && (!musicCache || Date.now() - musicCache.at > 60000)) fetchMusic().catch(() => {}); });
+
+/* ---------- Admin: publish the week's music lessons ---------- */
+let am = { file: null };   // { file, name, rows, ignored, week, guessed, fromName, changing, preview, err }
+const longD = iso => { const d = fromISO(iso); return DAY_NAMES[dayCode(d)] + ' ' + d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear(); };
+function musicAdminHTML() {
+  const weeks = (musicCache && musicCache.weeks) || {}, wk = Object.keys(weeks).sort();
+  const thisWk = toISO(mondayOf(schoolDay(new Date())));
+  let h = '<div class="card2" id="musicAdmin"><h3>Music lessons</h3><p class="hint" style="margin:0">Upload the weekly Music &amp; LAMDA spreadsheet once and every form’s lessons appear on its slide by themselves. Each week is kept separately, so publishing next week’s on Friday doesn’t change Saturday’s lessons.</p>';
+  if (!am.file) {
+    h += '<div class="dropzone" id="amDrop" style="padding:26px">Drop the spreadsheet here, or <button type="button" class="linkbtn" data-am="choose">choose the file</button></div>';
+  } else {
+    const forms = new Set(am.rows.map(r => r[0]));
+    h += '<div class="filecard"><span class="fmeta"><b>' + esc(am.name) + '</b><span>' + am.rows.length + ' lessons across ' + forms.size + ' forms</span></span><span style="flex:1"></span><button type="button" class="btn small" data-am="clear">Choose a different file</button></div>';
+    h += '<div class="am-week">' + (am.week ? '<span>Week commencing <b>' + esc(longD(am.week)) + '</b></span>' : '<span><b>Which week is it for?</b></span>') +
+      (am.changing || !am.week ? '<input type="date" class="text" id="amDate" value="' + (am.week || '') + '" style="width:auto">' : '<button type="button" class="btn small" data-am="change">Change</button>') + '</div>';
+    if (!am.week) h += '<p class="hint" style="margin:0">The file name doesn’t say which week it’s for. Choose its Monday.</p>';
+    else if (am.note) h += '<p class="hint" style="margin:0">' + esc(am.note) + '</p>';
+    if (am.week && weeks[am.week]) h += '<p class="hint" style="margin:0">That week was already published on ' + esc(stamp(weeks[am.week].at)) + '. Publishing again replaces it.</p>';
+    h += '<div class="row"><button type="button" class="btn small" data-am="preview" aria-expanded="' + !!am.preview + '">' + (am.preview ? 'Hide preview' : 'Preview') + '</button><button type="button" class="btn primary" data-am="publish"' + (am.week ? '' : ' disabled') + '>Publish</button></div>';
+    if (am.preview) {
+      const by = {};
+      am.rows.forEach(r => (by[r[0]] = by[r[0]] || []).push(r));
+      const dayOrder = r => ALL_DAYS.indexOf(r[2]) * 2000 + (r[3] ?? 1999);
+      h += '<div class="am-preview">' + Object.keys(by).sort(formSort).map(f => '<section><h4>' + esc(f) + ' · ' + by[f].length + '</h4>' +
+        by[f].sort((a, b) => dayOrder(a) - dayOrder(b)).map(r => '<div>' + esc(DAY_NAMES[r[2]] ? DAY_NAMES[r[2]].slice(0, 3) : r[2]) + ' ' + esc(fmtTime(r[3])) + ' · ' + esc(r[1]) + ' · ' + esc(r[4]) + '</div>').join('') + '</section>').join('') + '</div>';
+    }
+  }
+  if (wk.length) h += '<h3 style="font-size:0.95rem;margin-top:4px">Published</h3><ul class="music-weeks">' + wk.map(k => '<li><b>Week commencing ' + esc(shortDate(fromISO(k))) + '</b>' +
+    (k === thisWk ? ' <span class="pill">This week</span>' : k > thisWk ? ' <span class="pill soft">Next week</span>' : '') +
+    '<span class="hint" style="margin:0"> · ' + weeks[k].rows.length + ' lessons · ' + esc(stamp(weeks[k].at)) + '</span><span style="flex:1"></span><button type="button" class="btn small" data-am-del="' + k + '">Remove</button></li>').join('') + '</ul>' +
+    '<p class="hint" style="margin:0">Weeks are deleted automatically two weeks after they finish.</p>';
+  return h + '<input type="file" id="amInput" accept=".xlsx,.xls,.csv" hidden></div>';
+}
+async function amLoad(file) {
+  if (!file) return;
+  try {
+    const { rows, ignored } = await parseLessonsFile(file);
+    const w = weekFromName(file.name);
+    am = { file, name: file.name, rows, ignored, week: w ? w.week : '', note: w && !w.monday ? 'The file name says ' + longD(w.date) + ', so this uses that week’s Monday.' : '' };
+  } catch (e) { toast(e.message); }
+  paintAdmin();
+}
+function amSetDate(v) {
+  const d = fromISO(v); if (!v || !d || isNaN(d)) return;
+  const m = toISO(mondayOf(d));
+  am.week = m; am.changing = false;
+  am.note = m !== v ? 'You picked ' + longD(v) + ', so this uses that week’s Monday.' : '';
+  paintAdmin();
+}
+$('adminBody').addEventListener('click', async e => {
+  const b = e.target.closest('[data-am], [data-am-del]'); if (!b) return;
+  if (b.dataset.amDel) {
+    const k = b.dataset.amDel;
+    if (!confirm('Remove the music lessons for the week commencing ' + shortDate(fromISO(k)) + '? Slides go back to teachers’ own spreadsheets, or nothing, for that week.')) return;
+    const { error } = await sb.from('ms_music').delete().eq('week_start', k);
+    if (error) { toast('Couldn’t remove it: ' + error.message); return; }
+    toast('Removed'); await fetchMusic(); paintAdmin(); return;
+  }
+  const a = b.dataset.am;
+  if (a === 'choose') { $('amInput').value = ''; $('amInput').click(); }
+  if (a === 'clear') { am = { file: null }; paintAdmin(); }
+  if (a === 'change') { am.changing = true; paintAdmin(); setTimeout(() => { const i = $('amDate'); if (i) { i.focus(); try { i.showPicker(); } catch (x) {} } }, 30); }
+  if (a === 'preview') { am.preview = !am.preview; paintAdmin(); }
+  if (a === 'publish') {
+    if (!am.week) return;
+    b.disabled = true; b.textContent = 'Publishing…';
+    const { error } = await sb.from('ms_music').upsert({ week_start: am.week, file_name: am.name, rows: am.rows }, { onConflict: 'week_start' });
+    if (error) { toast('Couldn’t publish: ' + (/relation|does not exist/i.test(error.message) ? 'run 06-music-sync.sql in Supabase first.' : error.message)); b.disabled = false; b.textContent = 'Publish'; return; }
+    const wk = am.week; am = { file: null };
+    await fetchMusic(); paintAdmin();
+    toast('Published: week commencing ' + shortDate(fromISO(wk)) + '. Everyone’s slide picks it up within a few minutes.');
+  }
+});
+$('adminBody').addEventListener('change', e => {
+  if (e.target.id === 'amInput') amLoad(e.target.files[0]);
+  if (e.target.id === 'amDate') amSetDate(e.target.value);
+});
+$('adminBody').addEventListener('dragover', e => { const z = e.target.closest('#amDrop'); if (z) { e.preventDefault(); z.classList.add('over'); } });
+$('adminBody').addEventListener('dragleave', e => { const z = e.target.closest('#amDrop'); if (z) z.classList.remove('over'); });
+$('adminBody').addEventListener('drop', e => { const z = e.target.closest('#amDrop'); if (z) { e.preventDefault(); z.classList.remove('over'); amLoad(e.dataTransfer.files[0]); } });
+
+/* ---------- your slide, saved online (and slides shared with you) ---------- */
+const SYNC_KEY = 'morningSlide.v3.sync';
+let sync = (() => { try { return JSON.parse(localStorage.getItem(SYNC_KEY)) || null; } catch (e) { return null; } })();   // { uid, slideId, version, dirty, mine, ownerName, form, at }
+let syncOn = false, syncBusy = false, pushTimer = null, lastJSON = '', slides = [], editors = [], syncChoice = null;
+function storeSync() { try { if (sync) localStorage.setItem(SYNC_KEY, JSON.stringify(sync)); else localStorage.removeItem(SYNC_KEY); } catch (e) {} }
+function canon(v) {   // the same data always gives the same text (the database reorders keys)
+  if (Array.isArray(v)) return '[' + v.map(canon).join(',') + ']';
+  if (v && typeof v === 'object') return '{' + Object.keys(v).sort().filter(k => v[k] !== undefined).map(k => JSON.stringify(k) + ':' + canon(v[k])).join(',') + '}';
+  return JSON.stringify(v === undefined ? null : v);
+}
+function isBlank(st) {
+  return !st.form && !st.lessons && DAYS.every(d => !(st.task[d] || '').trim() && !(st.notes[d] || '').trim() && !(st.at830[d] || '').trim()) && canon(st.timetable) === canon(DEFAULT_TT);
+}
+function whose() { return sync && !sync.mine ? sync.ownerName + '’s slide' : 'your slide'; }
+function syncPaint(kind) {
+  if (!sync) { syncInfo = null; paintSaveState(); return; }
+  const other = !sync.mine ? ' · ' + sync.ownerName + '’s' : '';
+  syncInfo = kind === 'saving' ? { kind: 'saving', text: 'Saving…', tip: 'Saving your changes online.' }
+    : kind === 'wait' ? { kind: 'wait', text: 'Saved on this laptop', tip: 'Couldn’t reach Morning Slide online just now. Your changes are safe on this laptop and will be saved online when it’s back.' }
+    : { kind: 'ok', text: 'Saved online' + other, tip: 'Every change is saved online straight away, so ' + whose() + ' is the same on any laptop you sign in on.' + (sync.at ? ' Last saved ' + stamp(sync.at) + '.' : '') };
+  paintSaveState();
+}
+function applyOnline(data) {
+  try { const cur = localStorage.getItem(STORE_KEY); if (cur) localStorage.setItem('morningSlide.v3.beforeOnline', cur); } catch (e) {}
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch (e) {}
+  state = loadState(); afterLoad(); renderAll();
+  lastJSON = JSON.stringify(state);
+}
+onStateSaved = () => {
+  if (!sync || (me && sync.uid !== me.id)) return;
+  const j = JSON.stringify(state);
+  if (j === lastJSON) return;
+  sync.dirty = true; storeSync();
+  if (!syncOn) { if (me) syncPaint('wait'); return; }
+  syncPaint('saving');
+  clearTimeout(pushTimer); pushTimer = setTimeout(push, 1200);
+};
+async function push() {
+  if (!syncOn || !sync || !sync.dirty) return;
+  if (syncBusy) { clearTimeout(pushTimer); pushTimer = setTimeout(push, 800); return; }
+  syncBusy = true;
+  const j = JSON.stringify(state);
+  try {
+    const { data, error } = await sb.from('ms_slides').update({ data: JSON.parse(j) }).eq('id', sync.slideId).eq('version', sync.version).select('version,updated_at');
+    if (error) throw error;
+    if (!data || !data.length) { syncBusy = false; await resolveClash(true); return; }
+    sync.version = data[0].version; sync.at = data[0].updated_at; lastJSON = j;
+    sync.dirty = JSON.stringify(state) !== j; storeSync();
+    syncPaint(sync.dirty ? 'saving' : 'ok');
+    if (sync.dirty) pushTimer = setTimeout(push, 800);
+  } catch (e) {
+    syncPaint('wait'); clearTimeout(pushTimer); pushTimer = setTimeout(push, 30000);
+  } finally { syncBusy = false; }
+}
+async function listSlides() {
+  const { data, error } = await sb.rpc('ms_my_slides');
+  if (error) throw error;
+  slides = data || [];
+  return slides;
+}
+async function syncStart() {
+  if (syncOn || syncBusy || !isStaff()) return;
+  syncBusy = true;
+  try {
+    try { await listSlides(); } catch (e) { syncBusy = false; return; }   // 06-music-sync.sql not run yet: stay as before
+    if (sync && sync.uid !== me.id) sync = null;               // someone else used to sign in on this laptop
+    let target = (sync && slides.find(s => s.id === sync.slideId)) || slides.find(s => s.mine);
+    if (!target) {                                              // first time: put this laptop's slide online
+      const { data, error } = await sb.from('ms_slides').insert({ data: JSON.parse(JSON.stringify(state)) }).select('id,version,updated_at').single();
+      if (error) throw error;
+      sync = { uid: me.id, slideId: data.id, version: data.version, dirty: false, mine: true, ownerName: me.name, at: data.updated_at };
+      lastJSON = JSON.stringify(state); storeSync(); syncOn = true; syncPaint('ok');
+      await listSlides();
+      toast('Your slide is now saved online. Sign in on any laptop to get it.');
+      paint(); return;
+    }
+    const same = !!(sync && sync.slideId === target.id);
+    if (same && target.version === sync.version) {             // nothing changed online since this laptop last saved
+      syncOn = true; lastJSON = sync.dirty ? '' : JSON.stringify(state);
+      if (sync.dirty) { syncBusy = false; push(); } else syncPaint('ok');
+      return;
+    }
+    const { data: row, error } = await sb.from('ms_slides').select('data,version,updated_at').eq('id', target.id).single();
+    if (error) throw error;
+    const meta = { uid: me.id, slideId: target.id, version: row.version, dirty: false, mine: target.mine, ownerName: target.owner_name, at: row.updated_at };
+    if (same && !sync.dirty) {                                  // changed elsewhere, not here: just take it
+      sync = meta; storeSync(); applyOnline(row.data); syncOn = true; syncPaint('ok');
+      toast('Your slide has been updated with changes made on another laptop.'); return;
+    }
+    if (canon(row.data) === canon(JSON.parse(JSON.stringify(state)))) { sync = meta; storeSync(); lastJSON = JSON.stringify(state); syncOn = true; syncPaint('ok'); return; }
+    if (!same && isBlank(state)) {                              // a fresh laptop: nothing to lose here
+      sync = meta; storeSync(); applyOnline(row.data); syncOn = true; syncPaint('ok');
+      toast('Your slide has been loaded from your account.'); return;
+    }
+    syncBusy = false;
+    askWhich(target, row, same ? 'You’ve made changes on this laptop, and ' + (target.updated_by_name && target.updated_by_name !== me.name ? target.updated_by_name : 'you') + ' also changed the slide on another laptop.' : 'Your slide is already saved online, and this laptop has a different one.');
+  } catch (e) { syncPaint('wait'); }
+  finally { syncBusy = false; }
+}
+function askWhich(target, row, why) {
+  syncChoice = { target, row };
+  const d = row.data || {};
+  $('syncText').textContent = why;
+  $('syncOnline').textContent = (d.form ? d.form + ' · ' : '') + 'last changed ' + stamp(row.updated_at) + (target.updated_by_name ? ' by ' + target.updated_by_name : '');
+  $('syncHere').textContent = (state.form ? state.form + ' · ' : '') + 'what you see now';
+  $('syncModal').hidden = false;
+  syncPaint('wait');
+  setTimeout(() => $('syncModal').querySelector('button').focus(), 30);
+}
+$('syncModal').addEventListener('click', async e => {
+  const b = e.target.closest('[data-keep]'); if (!b || !syncChoice) return;
+  const { target, row } = syncChoice; syncChoice = null;
+  $('syncModal').hidden = true;
+  sync = { uid: me.id, slideId: target.id, version: row.version, dirty: false, mine: target.mine, ownerName: target.owner_name, at: row.updated_at };
+  syncOn = true;
+  if (b.dataset.keep === 'online') { storeSync(); applyOnline(row.data); syncPaint('ok'); toast('Using the slide saved online.'); }
+  else { sync.dirty = true; lastJSON = ''; storeSync(); await push(); toast('This laptop’s slide is now saved online.'); }
+});
+async function resolveClash() {
+  // Someone saved this slide on another laptop since this one last did
+  try {
+    await listSlides();
+    const target = slides.find(s => s.id === sync.slideId);
+    if (!target) { const w = whose(); syncStop(true); toast('You can no longer edit ' + w + '. It’s still on this laptop.'); syncStart(); return; }
+    const { data: row } = await sb.from('ms_slides').select('data,version,updated_at').eq('id', target.id).single();
+    askWhich(target, row, (target.updated_by_name && target.updated_by_name !== me.name ? target.updated_by_name : 'Someone') + ' changed this slide on another laptop while you were editing it here.');
+  } catch (e) { syncPaint('wait'); }
+}
+function syncStop(forget) {
+  // Signing out: this laptop remembers which slide it had, so signing in again carries straight on
+  syncOn = false; clearTimeout(pushTimer);
+  if (forget && sync) { sync = null; storeSync(); }
+  slides = []; editors = [];
+  syncInfo = null; paintSaveState();
+}
+// Pick up changes made on another laptop (e.g. by a co-tutor)
+async function pull() {
+  if (!syncOn || !sync || sync.dirty || syncBusy || editing || document.visibilityState !== 'visible') return;
+  try {
+    await listSlides();
+    const t = slides.find(s => s.id === sync.slideId);
+    if (!t) { syncStop(true); toast('You can no longer edit that slide. It’s still on this laptop.'); syncStart(); paint(); return; }
+    if (t.version === sync.version) return;
+    const { data: row } = await sb.from('ms_slides').select('data,version,updated_at').eq('id', t.id).single();
+    if (sync.dirty || editing) return;
+    sync.version = row.version; sync.at = row.updated_at; storeSync();
+    applyOnline(row.data); syncPaint('ok');
+    toast('Updated with changes ' + (t.updated_by_name && t.updated_by_name !== me.name ? 'from ' + t.updated_by_name : 'from another laptop') + '.');
+  } catch (e) {}
+}
+setInterval(pull, 45000);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') setTimeout(pull, 500); });
+window.addEventListener('online', () => { if (sync && sync.dirty && syncOn) push(); else if (isStaff() && !syncOn) syncStart(); });
+async function useSlide(id) {
+  if (sync && sync.dirty) { await push(); if (sync && sync.dirty) { toast('Your changes haven’t saved online yet. Try again in a moment.'); return; } }
+  const s = slides.find(x => x.id === id); if (!s) return;
+  const { data: row, error } = await sb.from('ms_slides').select('data,version,updated_at').eq('id', id).single();
+  if (error) { toast('Couldn’t open that slide.'); return; }
+  sync = { uid: me.id, slideId: id, version: row.version, dirty: false, mine: s.mine, ownerName: s.owner_name, at: row.updated_at };
+  storeSync(); syncOn = true; applyOnline(row.data); syncPaint('ok');
+  toast(s.mine ? 'Back to your own slide.' : 'You’re now editing ' + s.owner_name + '’s slide' + (s.form ? ' (' + s.form + ')' : '') + '.');
+  paint();
+}
+async function loadEditors() {
+  if (!sb || !isStaff()) return;
+  const { data, error } = await sb.rpc('ms_my_editors');
+  editors = error ? [] : (data || []);
+  if (!$('setupScreen').hidden && setupSec === 'account') paintAccount();
+}
+function slideCardHTML() {
+  if (!sync) return '<div class="card2"><h3>Your slide online</h3><p class="empty-note" style="margin:0">' + (syncInfo && syncInfo.kind === 'wait' ? 'Couldn’t reach Morning Slide online. Your slide is safe on this laptop.' : 'Getting your slide ready…') + '</p></div>';
+  const mine = slides.find(s => s.mine), others = slides.filter(s => !s.mine);
+  let h = '<div class="card2"><h3>Your slide online</h3>';
+  h += !sync.mine
+    ? '<div class="acct-msg">You’re editing <b>' + esc(sync.ownerName) + '’s slide</b>. Changes you make here are saved to their slide. <button type="button" class="linkbtn" data-slide="' + esc(mine ? mine.id : '') + '"' + (mine ? '' : ' hidden') + '>Back to my slide</button></div>'
+    : '<p class="hint" style="margin:0">Saved online with your account, so it’s the same on any laptop you sign in on. Pictures and videos you add stay on the laptop you added them on.</p>';
+  h += '<h3 style="font-size:0.95rem;margin-top:4px">Who else can edit your slide</h3>' +
+    (editors.length ? '<ul class="editors">' + editors.map(p => '<li><b>' + esc(p.name) + '</b><span class="muted">' + esc(p.email) + '</span><span style="flex:1"></span><button type="button" class="btn small" data-unshare="' + esc(p.user_id) + '">Remove</button></li>').join('') + '</ul>' : '<p class="empty-note" style="margin:0">Nobody else yet.</p>') +
+    '<form class="acct-form" data-form="share" style="max-width:none"><div class="row" style="align-items:flex-end;flex-wrap:nowrap"><label style="flex:1">Add someone, e.g. your assistant tutor <small>their school email</small><input class="text" id="acShare" type="email" placeholder="name' + DOMAIN + '" required></label><button class="btn small strong">Add</button></div></form>' +
+    '<p class="hint" style="margin:0">They sign in with their own account and choose your slide here. They need an approved Morning Slide account.</p>';
+  if (others.length) h += '<h3 style="font-size:0.95rem;margin-top:4px">Slides shared with you</h3><ul class="editors">' + others.map(s => '<li><b>' + esc(s.owner_name) + '</b><span class="muted">' + esc(s.form || '') + '</span><span style="flex:1"></span>' +
+    (sync.slideId === s.id ? '<span class="pill">Editing now</span>' : '<button type="button" class="btn small strong" data-slide="' + esc(s.id) + '">Edit this slide</button>') +
+    '<button type="button" class="btn small" data-leave="' + esc(s.id) + '">Stop</button></li>').join('') + '</ul>';
+  return h + '</div>';
+}
+$('acctBody').addEventListener('click', async e => {
+  const b = e.target.closest('[data-slide], [data-unshare], [data-leave]'); if (!b) return;
+  if (b.dataset.slide) { b.disabled = true; await useSlide(b.dataset.slide); return; }
+  if (b.dataset.unshare) {
+    const p = editors.find(x => x.user_id === b.dataset.unshare) || {};
+    if (!confirm('Stop ' + (p.name || 'them') + ' editing your slide?')) return;
+    const { error } = await sb.rpc('ms_unshare_slide', { sid: (slides.find(s => s.mine) || {}).id, uid: b.dataset.unshare });
+    if (error) { toast(error.message); return; }
+    await loadEditors(); toast('Removed'); return;
+  }
+  if (b.dataset.leave) {
+    const s = slides.find(x => x.id === b.dataset.leave) || {};
+    if (!confirm('Stop editing ' + (s.owner_name || 'their') + '’s slide? They can add you again.')) return;
+    const { error } = await sb.rpc('ms_unshare_slide', { sid: b.dataset.leave, uid: me.id });
+    if (error) { toast(error.message); return; }
+    if (sync && sync.slideId === b.dataset.leave) { const mine = (await listSlides()).find(x => x.mine); if (mine) await useSlide(mine.id); }
+    await listSlides(); paintAccount(); toast('Done');
+  }
+});
 
 /* ---------- start ---------- */
 async function start(show) {
