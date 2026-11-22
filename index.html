@@ -2,7 +2,7 @@
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
-<meta name="ms-updated" content="2026-11-21T23:25:19Z">
+<meta name="ms-updated" content="2026-11-22T00:08:21Z">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
 <title>Morning Slide</title>
@@ -131,6 +131,10 @@
 .slide .split-q { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; border: 2px solid currentColor; font-size: 17px; letter-spacing: 0; cursor: help; flex: none; opacity: 0.75; }
 .slide .split-copy { font: inherit; font-size: 18px; letter-spacing: 0; text-transform: none; border: 2px solid var(--line, #c5d3df); background: #fff; color: var(--main); border-radius: 999px; padding: 2px 14px; cursor: pointer; }
 .slide .split-toggle { display: none; }
+.slide .src-bar { display: none; }
+.slide.editor-preview .src-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: -4px 0 12px; font-size: 22px; color: var(--muted); line-height: 1.2; }
+.slide.editor-preview .src-bar button { font: inherit; font-size: 22px; font-weight: 700; border: 3px solid var(--main); background: #fff; color: var(--main); border-radius: 999px; padding: 4px 16px; cursor: pointer; white-space: nowrap; }
+.slide.editor-preview .src-bar button:hover { background: var(--main); color: #fff; }
 .slide.editor-preview .split-toggle { display: inline-flex; align-items: center; gap: 8px; position: absolute; right: 18px; bottom: 14px; z-index: 2; font: inherit; font-size: 21px; font-weight: 700; border: 3px solid var(--main); background: #fff; color: var(--main); border-radius: 999px; padding: 5px 18px; cursor: pointer; box-shadow: 0 4px 12px -6px rgba(0, 0, 0, 0.35); }
 .slide.editor-preview .split-toggle:hover { background: var(--main); color: #fff; }
 .slide.editor-preview .split-toggle::before { content: "⇅"; font-size: 1.1em; }
@@ -750,6 +754,9 @@ button.bb-stat:hover b { text-decoration: underline; }
 .modal h3 { margin: 0 0 0.4rem; font-family: var(--disp); font-size: 1.15rem; }
 .modal p { margin: 0 0 1rem; color: var(--slate); }
 .modal.dp, .modal.sync { max-width: 33rem; }
+.modal.music-ed { max-width: 40rem; width: 100%; }
+.modal.music-ed input.text { width: 100%; min-width: 0; padding: 0.4rem 0.5rem; }
+.modal.music-ed td:nth-child(2) { width: 120px; }
 .dp-list { margin: 0 0 1rem; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.45rem; color: var(--ink); }
 .sync-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 0.9rem; }
 .sync-choices button { display: flex; flex-direction: column; gap: 4px; text-align: left; border: 1.5px solid var(--line); background: #fff; border-radius: 12px; padding: 0.8rem 0.9rem; cursor: pointer; font: inherit; color: var(--ink); }
@@ -1280,6 +1287,13 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
   </div>
   <p class="hint" style="margin:0">The other one is replaced. Download a copy first (bottom right) if you might want it back.</p>
 </div></div>
+<div class="modal-back" id="musicModal" hidden><div class="modal music-ed" role="dialog" aria-modal="true" aria-labelledby="meTitle">
+  <h3 id="meTitle">Music lessons</h3>
+  <p>Just for your slide, just for this day. The uploaded lessons aren’t changed; “Back to…” on the slide undoes this.</p>
+  <table class="people"><thead><tr><th>Pupil</th><th>Time</th><th>Teacher</th><th></th></tr></thead><tbody id="meRows"></tbody></table>
+  <div class="row" style="margin-top:8px"><button type="button" class="btn small" id="meAdd">Add a lesson</button></div>
+  <div class="row" style="justify-content:flex-end;margin-top:12px"><button type="button" class="btn" id="meCancel">Cancel</button><button type="button" class="btn primary" id="meSave">Save for my slide</button></div>
+</div></div>
 <div class="tip" id="tip" role="tooltip" hidden></div>
 <div class="stage" id="stage" hidden></div>
 <div class="toast" id="toast" role="status"></div>
@@ -1806,6 +1820,9 @@ function musicMissing(st, date) {
   return src && src.kind === 'missing' ? 'Music lessons for the week of ' + shortDate(fromISO(src.week)) + ' haven’t been uploaded yet' : '';
 }
 function musicRows(st, date, wd) {
+  const ov = ((st.overrides || {})[toISO(date)] || {}).music;
+  if (Array.isArray(ov)) return ov.map(r => ({ name: displayName(st, r[0]), mins: r[1], teacher: teacherName(st, r[2]) }))
+    .sort((a, b) => nameCmp(a.name, b.name) || (a.mins ?? 9999) - (b.mins ?? 9999));
   const src = lessonSource(st, date);
   if (!src || !st.form) return [];
   wd = wd || dayCode(date);
@@ -1875,7 +1892,7 @@ function freeHTML(slot, it, editor, cls) {
 /* Matchday Queues: the lines for this form's year group, written the way tutors write them:
    - **Boys – away**            (team names only when teams do different things)
      - Lunch @ 12:50 via Art Door
-     - Meet @ 13:45            (only if this teacher turned meet times on) */
+     - Meet @ 13:45            (only if this teacher turned meet times on; "Start @" for teams with no meet time) */
 function matchdayText(st, date) {
   const data = shared && shared.matchday && shared.matchday[toISO(date)];
   const year = formYear(st.form);
@@ -1897,9 +1914,9 @@ function matchdayText(st, date) {
   cats.forEach(c => {
     const groups = [];
     c.teams.forEach(t => {
-      const k = [t.away ? 'a' : 'h', t.time, t.door, meetOn ? t.meet || '' : ''].join('|');
+      const k = [t.away ? 'a' : 'h', t.time, t.door, meetOn ? (t.meet || '') + '/' + (t.start || '') : ''].join('|');
       let g = groups.find(x => x.k === k);
-      if (!g) groups.push(g = { k, away: !!t.away, time: t.time, door: t.door, meet: t.meet, labels: [] });
+      if (!g) groups.push(g = { k, away: !!t.away, time: t.time, door: t.door, meet: t.meet, start: t.start, labels: [] });
       if (t.label && !g.labels.includes(t.label)) g.labels.push(t.label);
     });
     groups.sort((a, b) => (a.away === b.away ? 0 : a.away ? -1 : 1) || String(a.time).localeCompare(String(b.time)));
@@ -1908,21 +1925,38 @@ function matchdayText(st, date) {
       out.push('- **' + who + ' – ' + (g.away ? 'away' : 'home') + '**');
       out.push('  - Lunch @ ' + g.time + ' via ' + g.door);
       if (meetOn && g.meet) out.push('  - Meet @ ' + g.meet);
+      else if (meetOn && g.start) out.push('  - Start @ ' + g.start);
     });
   });
   return out.join('\n');
+}
+// Editing screen only: where a box's contents come from, and a button to change it just for your slide
+function srcBar(label, act, btn, extra) {
+  return '<div class="src-bar"><span>' + esc(label) + '</span><button type="button" data-src-act="' + act + '"' + (extra || '') + '>' + esc(btn) + '</button></div>';
+}
+function musicSrc(st, date, editor) {
+  if (!editor) return '';
+  const iso = toISO(date), own = Array.isArray(((st.overrides || {})[iso] || {}).music), src = lessonSource(st, date);
+  if (own) return srcBar('Your own lessons for this day', 'music-reset', src && src.kind === 'own' ? 'Back to your spreadsheet' : 'Back to the school’s', ' data-iso="' + iso + '"');
+  const label = !src ? 'No lessons uploaded' : src.kind === 'school' ? 'From the school' : src.kind === 'own' ? 'From your spreadsheet' : 'Not uploaded yet';
+  return srcBar(label, 'music-edit', 'Change for my slide', ' data-iso="' + iso + '"');
 }
 function panelHTML(st, day, editor) {
   if (day.panel === 'none') return '';
   if (day.panel === 'free') return freeHTML('side', day.free.side, editor, 'free-side region-side');
   if (day.panel === 'house') {
-    return '<div class="card panel house region-side">' + hdEl(st, day.date, 'house') + '<div class="houses">' +
+    const hIso = toISO(day.date), hOwn = !!(day.ovr && day.ovr.house) || !!((st.schedEdits || {})[hIso]);
+    return '<div class="card panel house region-side">' + hdEl(st, day.date, 'house') +
+      (editor ? (hOwn ? srcBar('Your own rooms for this day', 'house-reset', 'Back to the school’s') : srcBar('From the school’s schedule', 'house-edit', 'Change rooms for my slide')) : '') + '<div class="houses">' +
       HOUSES.map(h => '<div class="house-tile" style="background:' + h.tint + '"><div class="house-name" style="background:' + h.bg + ';color:' + h.fg + '">' + h.name + '</div>' +
         '<div class="house-loc" data-fit="27,19" data-field="house:' + h.name + '">' + esc(day.houses[h.name] || '') + '</div></div>').join('') + '</div></div>';
   }
-  const mday = day.panel === 'lunch' ? matchdayText(st, day.date) : '';
+  const auto = day.panel === 'lunch' ? matchdayText(st, day.date) : '';
+  const mOwn = day.panel === 'lunch' && typeof ((st.overrides || {})[toISO(day.date)] || {}).mday === 'string';
+  const mday = mOwn ? st.overrides[toISO(day.date)].mday : auto;
   return '<div class="card panel bullets region-side">' + (day.panel === 'info' ? '<div class="heading" data-field="panelTitle">' + esc(day.panelTitle) + '</div>' : hdEl(st, day.date, 'lunch')) +
-    (mday ? '<div class="rich mday" data-fit="28,15"' + (editor ? ' data-tip="From Matchday Queues, for your year group. Your own notes go underneath."' : '') + '>' + richHTML(mday) + '</div>' : '') +
+    (editor && (auto || mOwn) ? (mOwn ? srcBar('Your own version for this day', 'mday-reset', 'Back to Matchday Queues') : srcBar('From Matchday Queues', 'mday-edit', 'Change for my slide')) : '') +
+    (mday || (mOwn && editor) ? '<div class="rich mday" data-fit="28,15"' + (mOwn ? ' data-field="mday"' : editor ? ' data-tip="From Matchday Queues, for your year group. Press “Change for my slide” to edit it. Your own notes go underneath."' : '') + '>' + richHTML(mday) + '</div>' : '') +
     splitHTML(st, day.date, day.panel, 'panelText', day.panelText, '30,18', editor) +
     (noticeTarget(st, day) === 'side' ? noticesHTML(noticesFor(st, day.date, 'morning')) : '') + '</div>';
 }
@@ -2033,7 +2067,7 @@ function renderSlide(host, st, date, editor) {
       '<div class="grid">' +
         '<div class="banner">' + dateHTML(date) + '</div>' +
         '<div class="right">' +
-          '<div class="card music' + (day.panel === 'info' || day.panel === 'lunch' || day.panel === 'free' ? ' natural' : '') + '">' + hdEl(st, date, 'music') + '<div class="music-body">' + musicHTML(rows, editor && musicMissing(st, date) ? musicMissing(st, date) : '') + '</div></div>' +
+          '<div class="card music' + (day.panel === 'info' || day.panel === 'lunch' || day.panel === 'free' ? ' natural' : '') + '">' + hdEl(st, date, 'music') + musicSrc(st, date, editor) + '<div class="music-body">' + musicHTML(rows, editor && musicMissing(st, date) ? musicMissing(st, date) : '') + '</div></div>' +
           panelHTML(st, day, editor) +
         '</div>' +
         '<div class="pair region-top' + (day.showTask || day.ttView === 'first' ? '' : ' single') + '" style="--boxes:' + ((day.showTask ? 1 : 0) + 1 + (day.ttView === 'first' ? 1 : 0)) + '">' +
@@ -2256,7 +2290,7 @@ function renderPrep(host, st, date, editor) {
                      : '<div class="pt">' + (editor ? timerBell(st) : '') + '<div class="pt-label"></div><div class="pt-time" data-tip="Click to type a time"></div>' +
                        (editor ? '<div class="pt-barrow pt-ctrl">' + tBackBtn() + tPlayBtn() + tSkipBtn() + '<div class="pt-bars"></div>' + tPlusBtn() + tResetBtn() + '</div>' : '<div class="pt-bars"></div>') +
                        '<div class="pt-sub"></div></div>') +
-          '<div class="card music">' + hdEl(st, date, musicTitle) + '<div class="music-body">' + musicHTML(musicRows(st, musicDay), editor && musicMissing(st, musicDay) ? musicMissing(st, musicDay) : musicEmpty) + '</div></div>' +
+          '<div class="card music">' + hdEl(st, date, musicTitle) + musicSrc(st, musicDay, editor) + '<div class="music-body">' + musicHTML(musicRows(st, musicDay), editor && musicMissing(st, musicDay) ? musicMissing(st, musicDay) : musicEmpty) + '</div></div>' +
         '</div>' +
       '</div>' +
     '</div>');
@@ -2559,11 +2593,48 @@ function setOvr(key, val) {
   if (val == null) delete o[key]; else o[key] = val;
   if (Object.keys(o).length) state.overrides[iso] = o; else delete state.overrides[iso];
 }
-const OVR_NAMES = { nview: 'What’s happening box', tomorrow: 'Tomorrow Morning', prepInfo: 'prep info', headings: 'headings', otherTitle: 'other info heading', otherText: 'other info', whole: 'whole slide', free: 'freestyle', pfree: 'prep freestyle', task: 'morning task', at830: '8:30 box', notes: 'What’s happening', panel: 'side panel', panelText: 'side panel text', infoTitle: 'panel heading', house: 'house rooms', ttView: 'central column' };
+const OVR_NAMES = { mday: 'matchday lunch lines', music: 'music lessons', nview: 'What’s happening box', tomorrow: 'Tomorrow Morning', prepInfo: 'prep info', headings: 'headings', otherTitle: 'other info heading', otherText: 'other info', whole: 'whole slide', free: 'freestyle', pfree: 'prep freestyle', task: 'morning task', at830: '8:30 box', notes: 'What’s happening', panel: 'side panel', panelText: 'side panel text', infoTitle: 'panel heading', house: 'house rooms', ttView: 'central column' };
 function plainFirst(s) {
   const line = String(s || '').replace(/^\s*[-*•]\s+/gm, '').replace(/\*\*|__|\*/g, '').split('\n').map(x => x.trim()).find(Boolean) || '';
   return line.length > 38 ? line.slice(0, 36).trim() + '…' : line;
 }
+
+/* ---------- Changing one day's music lessons, just for your slide ---------- */
+let meIso = null;
+const minsToHHMM = m => m == null || isNaN(m) ? '' : String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
+function meRowHTML(r) {
+  return '<tr><td><input class="text" data-me="name" value="' + esc(r[0] || '') + '" placeholder="e.g. Amy B" aria-label="Pupil"></td>' +
+    '<td><input class="text" type="time" data-me="time" value="' + minsToHHMM(r[1]) + '" aria-label="Time"></td>' +
+    '<td><input class="text" data-me="teacher" value="' + esc(r[2] || '') + '" placeholder="e.g. Miss A Woodhouse" aria-label="Teacher"></td>' +
+    '<td class="acts"><button type="button" class="btn small" data-me-del aria-label="Remove this lesson">✕</button></td></tr>';
+}
+function openMusicEdit(iso) {
+  meIso = iso;
+  const d = fromISO(iso), ov = ((state.overrides || {})[iso] || {}).music;
+  let rows = Array.isArray(ov) ? ov : [];
+  if (!Array.isArray(ov)) {
+    const src = lessonSource(state, d);
+    rows = src ? src.rows.filter(r => r[0] === state.form && r[2] === dayCode(d)).map(r => [r[1], r[3], r[4]]) : [];
+  }
+  $('meTitle').textContent = 'Music lessons for ' + DAY_NAMES[dayCode(d)] + ' ' + d.getDate() + ' ' + MONTHS[d.getMonth()];
+  $('meRows').innerHTML = (rows.length ? rows : [['', null, '']]).map(meRowHTML).join('');
+  $('musicModal').hidden = false;
+  setTimeout(() => { const i = $('meRows').querySelector('input'); if (i) i.focus(); }, 30);
+}
+$('meAdd').addEventListener('click', () => { $('meRows').insertAdjacentHTML('beforeend', meRowHTML(['', null, ''])); const ins = $('meRows').querySelectorAll('input[data-me="name"]'); ins[ins.length - 1].focus(); });
+$('meRows').addEventListener('click', e => { const b = e.target.closest('[data-me-del]'); if (b) b.closest('tr').remove(); });
+$('meCancel').addEventListener('click', () => { $('musicModal').hidden = true; });
+$('musicModal').addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); $('musicModal').hidden = true; } });
+$('meSave').addEventListener('click', () => {
+  const rows = [...$('meRows').querySelectorAll('tr')].map(tr => {
+    const v = k => tr.querySelector('[data-me="' + k + '"]').value.trim();
+    return [v('name'), parseTime(v('time')), v('teacher')];
+  }).filter(r => r[0]);
+  const o = state.overrides[meIso] || (state.overrides[meIso] = {});
+  o.music = rows;
+  $('musicModal').hidden = true; changed();
+  toast(rows.length ? 'Saved for this day, just on your slide.' : 'No music lessons on your slide for this day.');
+});
 
 /* ---------- Saved indicator ---------- */
 let saveOk = true;
@@ -3266,7 +3337,7 @@ $('tomCopyOnce').addEventListener('click', () => {
 /* =====================================================================
    Typing on the preview
    ===================================================================== */
-const RICH = new Set(['notes', 'panelText', 'prepInfo', 'tomorrow', 'otherText']);
+const RICH = new Set(['notes', 'panelText', 'prepInfo', 'tomorrow', 'otherText', 'mday']);
 const isRich = f => RICH.has(f) || /^free:\w+:text$/.test(f) || /^once:/.test(f);
 const SCOPED = { tomorrow: 'tomorrow', task: 'task', at830: 'at830', notes: 'notes', panelTitle: 'infoTitle', panelText: 'panelText', otherTitle: 'otherTitle', otherText: 'otherText', prepInfo: 'prepInfo' };
 // The weekly part of a split box: changes default to "just today" so the usual announcements are safe
@@ -3278,7 +3349,7 @@ function splitBoxOf(f) {
   if (f === 'panelText') { const p = resolveDay(state, viewDate).panel; return p === 'info' || p === 'lunch' ? p : null; }
   return null;
 }   // field → override key
-const PH = { prepInfo: 'Click to add', otherTitle: 'Other info', otherText: 'Click to add', task: 'Click to add', at830: 'Click to add', notes: 'Click to add', panelText: 'Click to add', panelTitle: PANEL_TITLES.info, tomorrow: 'Click to add' };
+const PH = { mday: 'Click to add', prepInfo: 'Click to add', otherTitle: 'Other info', otherText: 'Click to add', task: 'Click to add', at830: 'Click to add', notes: 'Click to add', panelText: 'Click to add', panelTitle: PANEL_TITLES.info, tomorrow: 'Click to add' };
 let editing = null;            // { el, field, scope: 'week' | 'today', forceToday }
 let fitTimer = null;
 
@@ -3419,6 +3490,8 @@ function setField(f, v) {
     else if (f === 'prepInfo') state.prepInfo[wd] = v;
     else if (f === 'tomorrow') { state.tomorrowWeekly = state.tomorrowWeekly || {}; state.tomorrowWeekly[wd] = v; }
     else if (f === 'panelText') { const p = resolveDay(state, viewDate).panel; state[p === 'lunch' ? 'lunch' : 'info'][wd] = v; }
+  } else if (f === 'mday') {
+    setOvr('mday', v);
   } else if (f.startsWith('house:')) {
     const h = Object.assign({}, resolveDay(state, viewDate).houses); h[f.slice(6)] = v; setOvr('house', h);
   } else if (f.startsWith('prep:')) {
@@ -3555,7 +3628,35 @@ function addPrep() {
   if (el) el.focus();
 }
 els.preview.addEventListener('mousedown', e => { if (e.target.closest('[data-add-prep]')) { e.preventDefault(); addPrep(); } });
+els.preview.addEventListener('mousedown', e => { if (e.target.closest('[data-src-act]')) e.preventDefault(); });
 els.preview.addEventListener('click', e => {
+  const s = e.target.closest('[data-src-act]');
+  if (s) {
+    const a = s.dataset.srcAct, iso = toISO(viewDate);
+    endEditNow();
+    if (a === 'mday-edit') {
+      setOvr('mday', matchdayText(state, viewDate)); changed({});
+      setTimeout(() => { const el = els.preview.querySelector('[data-field="mday"]'); if (el) el.focus(); }, 120);
+      toast('Change it however you like. It’s just for your slide, just for this day.');
+    }
+    if (a === 'mday-reset') { setOvr('mday', null); changed(); toast('Back to the lines from Matchday Queues.'); }
+    if (a === 'house-edit') {
+      const el = els.preview.querySelector('[data-field^="house:"]'); if (el) el.focus();
+      toast('Type in any room. It’s just for your slide, just for this day.');
+    }
+    if (a === 'house-reset') {
+      setOvr('house', null);
+      if (state.schedEdits && state.schedEdits[iso]) delete state.schedEdits[iso];
+      changed(); toast('Back to the school’s rooms.');
+    }
+    if (a === 'music-edit') openMusicEdit(s.dataset.iso);
+    if (a === 'music-reset') {
+      const o = state.overrides[s.dataset.iso];
+      if (o) { delete o.music; if (!Object.keys(o).length) delete state.overrides[s.dataset.iso]; }
+      changed(); toast('Back to the uploaded lessons.');
+    }
+    return;
+  }
   const t = e.target.closest('[data-split-toggle]');
   if (t) {
     const box = t.dataset.splitToggle; state.split = state.split || {};
@@ -4456,13 +4557,15 @@ function setStat(id, cls, text, tip) {
 }
 function paintStatus() {
   if (!$('bbMatch')) return;
-  const now = new Date(), iso = toISO(now);
+  const now = schoolDay(typeof viewDate !== 'undefined' && viewDate ? viewDate : new Date()), iso = toISO(now), past = iso < toISO(new Date());
   // Matchday queues: only on Wednesdays and Saturdays, and only for Years 5 to 8
   const yr = parseInt(state.form, 10), md = (shared && shared.matchday) || {}, at = (shared && shared.mdAt) || {};
   if (yr && (yr < 5 || yr > 8)) $('bbMatch').hidden = true;
   else if (now.getDay() === 3 || now.getDay() === 6) {
-    if (md[iso]) setStat('bbMatch', 'ok', '✓ Updated ' + dmy(new Date(at[iso] || now)), 'Today’s lunch queues are in Lunchtime Arrangements. Published ' + stamp(at[iso]) + '.');
-    else setStat('bbMatch', 'warn', '⚠ Not published yet', 'Today’s lunch queues haven’t been published from Matchday Queues yet. Lunchtime Arrangements shows your own text until they are.');
+    const dn = shortDate(now);
+    if (md[iso]) setStat('bbMatch', 'ok', '✓ ' + DAY_NAMES[dayCode(now)].slice(0, 3) + ' ' + dmy(now), 'The lunch queues for ' + dn + ' are in Lunchtime Arrangements. Published ' + stamp(at[iso]) + '.');
+    else if (past) setStat('bbMatch', 'muted', 'None published', 'No lunch queues were published for ' + dn + '.');
+    else setStat('bbMatch', 'warn', '⚠ Not published yet', 'The lunch queues for ' + dn + ' haven’t been published from Matchday Queues yet. Lunchtime Arrangements shows your own text until they are.');
   } else {
     let n = addDays(now, 1); while (n.getDay() !== 3 && n.getDay() !== 6) n = addDays(n, 1);
     const ni = toISO(n), nm = DAY_NAMES[dayCode(n)].slice(0, 3);
@@ -4470,11 +4573,11 @@ function paintStatus() {
     else setStat('bbMatch', 'muted', 'Next: ' + nm + ' ' + dmy(n), 'The lunch queues for ' + shortDate(n) + ' haven’t been published yet. That’s normal until nearer the day.');
   }
   // Music lessons: is this week's in?
-  const src = lessonSource(state, schoolDay(now)), wk = toISO(mondayOf(schoolDay(now)));
+  const src = lessonSource(state, now), wk = toISO(mondayOf(now));
   const wcOf = w => 'wc ' + dmy(fromISO(w));
   if (!src) setStat('bbMusic', 'muted', 'None yet', 'No music lessons yet. Signed-in staff get them from the school; you can also upload the spreadsheet in Setup → Form & music.');
-  else if (src.kind === 'missing') setStat('bbMusic', 'warn', '⚠ Not uploaded yet', 'This week’s music lessons haven’t been uploaded yet, so none are showing on the slide. ' + (src.school ? 'They’ll appear as soon as an admin publishes them.' : 'Upload this week’s spreadsheet in Setup → Form & music.'));
-  else if (src.week === wk) setStat('bbMusic', 'ok', '✓ ' + wcOf(wk), src.kind === 'school' ? 'This week’s lessons from the school, published ' + stamp(src.src.at) + '.' : 'This week’s lessons from your own spreadsheet, ' + (src.src.fileName || '') + '.');
+  else if (src.kind === 'missing') setStat('bbMusic', 'warn', '⚠ Not uploaded yet', 'The music lessons for the week of ' + shortDate(fromISO(wk)) + ' haven’t been uploaded yet, so none are showing on the slide. ' + (src.school ? 'They’ll appear as soon as an admin publishes them.' : 'Upload this week’s spreadsheet in Setup → Form & music.'));
+  else if (src.week === wk) setStat('bbMusic', 'ok', '✓ ' + wcOf(wk), src.kind === 'school' ? 'The lessons for the week of ' + shortDate(fromISO(wk)) + ' are from the school, published ' + stamp(src.src.at) + '.' : 'The lessons for the week of ' + shortDate(fromISO(wk)) + ' are from your own spreadsheet, ' + (src.src.fileName || '') + '.');
   else if (src.week) setStat('bbMusic', 'muted', wcOf(src.week), 'Your own spreadsheet is for ' + wcOf(src.week) + '.');
   else setStat('bbMusic', 'muted', 'Your own file', 'From your own spreadsheet, ' + (src.src.fileName || '') + '. Its name doesn’t say which week it’s for.');
 }

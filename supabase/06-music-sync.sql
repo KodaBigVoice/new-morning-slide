@@ -91,12 +91,21 @@ language sql stable security definer set search_path = public as $$
       or exists (select 1 from ms_slide_editors e where e.slide_id = sid and e.user_id = auth.uid())));
 $$;
 
+create or replace function public.ms_is_editor(sid uuid) returns boolean
+language sql stable security definer set search_path = public as $$
+  select exists (select 1 from ms_slide_editors e where e.slide_id = sid and e.user_id = auth.uid());
+$$;
+grant execute on function public.ms_is_editor(uuid) to authenticated;
+-- (Checks the row's owner directly, so a new slide can be read back the moment it's saved.)
 drop policy if exists ms_slides_read on public.ms_slides;
-create policy ms_slides_read on public.ms_slides for select using (public.ms_can_edit(id));
+create policy ms_slides_read on public.ms_slides for select
+  using (public.ms_is_staff() and (owner = auth.uid() or public.ms_is_editor(id)));
 drop policy if exists ms_slides_new on public.ms_slides;
 create policy ms_slides_new on public.ms_slides for insert with check (public.ms_is_staff() and owner = auth.uid());
 drop policy if exists ms_slides_edit on public.ms_slides;
-create policy ms_slides_edit on public.ms_slides for update using (public.ms_can_edit(id)) with check (public.ms_can_edit(id));
+create policy ms_slides_edit on public.ms_slides for update
+  using (public.ms_is_staff() and (owner = auth.uid() or public.ms_is_editor(id)))
+  with check (public.ms_is_staff() and (owner = auth.uid() or public.ms_is_editor(id)));
 drop policy if exists ms_slides_delete on public.ms_slides;
 create policy ms_slides_delete on public.ms_slides for delete using (owner = auth.uid());
 
