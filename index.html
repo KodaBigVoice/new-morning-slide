@@ -2,7 +2,7 @@
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
-<meta name="ms-updated" content="2026-11-22T00:21:56Z">
+<meta name="ms-updated" content="2026-11-22T00:24:28Z">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
 <title>Morning Slide</title>
@@ -3624,11 +3624,11 @@ const srcTip = $('srcTip');
 let srcHost = null, srcHide = null;
 function srcInfo(kind, iso) {
   const o = (state.overrides || {})[iso] || {};
-  if (kind === 'mday') return typeof o.mday === 'string' ? { own: true } : { from: 'From Matchday Queues, for your year group' };
-  if (kind === 'house') return o.house || (state.schedEdits || {})[iso] ? { own: true } : { from: 'From the house meeting schedule' };
+  if (kind === 'mday') return typeof o.mday === 'string' ? { own: true } : { from: 'Updated automatically' };
+  if (kind === 'house') return o.house || (state.schedEdits || {})[iso] ? { own: true } : { from: 'Updated automatically' };
   if (Array.isArray(o.music)) return { own: true };
   const src = lessonSource(state, fromISO(iso));
-  return { from: !src ? 'No music lessons uploaded' : src.kind === 'school' ? 'From the school’s music lessons' : src.kind === 'own' ? 'From your own spreadsheet' : 'This week’s lessons aren’t uploaded yet' };
+  return { from: !src ? 'No music lessons uploaded' : src.kind === 'school' ? 'Updated automatically' : src.kind === 'own' ? 'From your own spreadsheet' : 'This week’s lessons aren’t uploaded yet' };
 }
 function showSrcTip(host) {
   clearTimeout(srcHide);
@@ -3751,7 +3751,7 @@ function showBars() {
   const f = ed.field, rich = isRich(f), wd = DAY_NAMES[wdOf(viewDate)];
   let scope = !!SCOPED[f], note = '';
   if (f === 'at830' && ed.forceToday && ed.scope !== 'today') { scope = false; note = 'Set by the house meeting schedule: your change is just for ' + dayMonth(viewDate); }
-  if (f.startsWith('house:')) note = 'From the house meeting schedule · your edit is just for today, on your slide only';
+  if (f.startsWith('house:')) note = 'Updated automatically · your edit is just for today, on your slide only';
   else if (f.startsWith('prep:')) note = 'Same every ' + wd;
   else if (f.startsWith('once:')) note = 'Just this ' + wd + ' · gone next week';
   else if (f.startsWith('free:')) note = slotNote(f.split(':')[1]);
