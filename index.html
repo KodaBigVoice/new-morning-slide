@@ -2,7 +2,7 @@
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
-<meta name="ms-updated" content="2026-11-22T00:30:26Z">
+<meta name="ms-updated" content="2026-11-22T00:39:23Z">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
 <title>Morning Slide</title>
@@ -132,6 +132,7 @@
 .slide .split-copy { font: inherit; font-size: 18px; letter-spacing: 0; text-transform: none; border: 2px solid var(--line, #c5d3df); background: #fff; color: var(--main); border-radius: 999px; padding: 2px 14px; cursor: pointer; }
 .slide .split-toggle { display: none; }
 .srctip { position: fixed; z-index: 290; display: flex; align-items: center; gap: 10px; padding: 0.4rem 0.45rem 0.4rem 0.75rem; border-radius: 10px; background: var(--ink); color: #fff; font-size: 0.8rem; line-height: 1.3; max-width: 330px; box-shadow: 0 10px 24px -10px rgba(0, 0, 0, 0.5); }
+.srctip button + button { margin-left: -4px; }
 .srctip button { flex: none; border: 0; background: #fff; color: var(--ink); font: inherit; font-weight: 700; border-radius: 7px; padding: 0.35rem 0.65rem; cursor: pointer; white-space: nowrap; }
 .srctip button:hover, .srctip button:focus-visible { background: #DCE6F0; }
 .slide.editor-preview .split-toggle { display: inline-flex; align-items: center; gap: 8px; position: absolute; right: 18px; bottom: 14px; z-index: 2; font: inherit; font-size: 21px; font-weight: 700; border: 3px solid var(--main); background: #fff; color: var(--main); border-radius: 999px; padding: 5px 18px; cursor: pointer; box-shadow: 0 4px 12px -6px rgba(0, 0, 0, 0.35); }
@@ -754,7 +755,10 @@ button.bb-stat:hover b { text-decoration: underline; }
 .modal h3 { margin: 0 0 0.4rem; font-family: var(--disp); font-size: 1.15rem; }
 .modal p { margin: 0 0 1rem; color: var(--slate); }
 .modal.dp, .modal.sync { max-width: 33rem; }
-.modal.music-ed { max-width: 40rem; width: 100%; }
+.modal.music-ed { max-width: 40rem; width: 100%; max-height: calc(100vh - 2rem); display: flex; flex-direction: column; padding-bottom: 0; }
+.modal.music-ed .me-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; margin: 0 -1.4rem; padding: 0 1.4rem 0.6rem; }
+.modal.music-ed .people thead th { position: sticky; top: 0; background: #fff; z-index: 1; }
+.modal.music-ed .me-foot { flex: none; justify-content: flex-end; margin: 0 -1.4rem; padding: 0.8rem 1.4rem 1rem; border-top: 1px solid var(--line); background: #fff; border-radius: 0 0 14px 14px; }
 .modal.music-ed input.text { width: 100%; min-width: 0; padding: 0.4rem 0.5rem; }
 .modal.music-ed td:nth-child(2) { width: 120px; }
 .dp-list { margin: 0 0 1rem; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.45rem; color: var(--ink); }
@@ -1290,11 +1294,13 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
 <div class="modal-back" id="musicModal" hidden><div class="modal music-ed" role="dialog" aria-modal="true" aria-labelledby="meTitle">
   <h3 id="meTitle">Music lessons</h3>
   <p>Just for today, just on your slide. The uploaded lessons aren’t changed: hover over the lessons and press Undo to go back to them.</p>
-  <table class="people"><thead><tr><th>Pupil</th><th>Time</th><th>Teacher</th><th></th></tr></thead><tbody id="meRows"></tbody></table>
-  <div class="row" style="margin-top:8px"><button type="button" class="btn small" id="meAdd">Add a lesson</button></div>
-  <div class="row" style="justify-content:flex-end;margin-top:12px"><button type="button" class="btn" id="meCancel">Cancel</button><button type="button" class="btn primary" id="meSave">Save for my slide</button></div>
+  <div class="me-scroll">
+    <table class="people"><thead><tr><th>Pupil</th><th>Time</th><th>Teacher</th><th></th></tr></thead><tbody id="meRows"></tbody></table>
+    <div class="row" style="margin-top:8px"><button type="button" class="btn small" id="meAdd">Add a lesson</button></div>
+  </div>
+  <div class="row me-foot"><button type="button" class="btn" id="meCancel">Cancel</button><button type="button" class="btn primary" id="meSave">Save for my slide</button></div>
 </div></div>
-<div class="srctip" id="srcTip" hidden><span id="srcText"></span><button type="button" id="srcBtn"></button></div>
+<div class="srctip" id="srcTip" hidden><span id="srcText"></span><button type="button" id="srcEdit" hidden>Edit</button><button type="button" id="srcBtn"></button></div>
 <div class="tip" id="tip" role="tooltip" hidden></div>
 <div class="stage" id="stage" hidden></div>
 <div class="toast" id="toast" role="status"></div>
@@ -2617,7 +2623,7 @@ function openMusicEdit(iso) {
   $('musicModal').hidden = false;
   setTimeout(() => { const i = $('meRows').querySelector('input'); if (i) i.focus(); }, 30);
 }
-$('meAdd').addEventListener('click', () => { $('meRows').insertAdjacentHTML('beforeend', meRowHTML(['', null, ''])); const ins = $('meRows').querySelectorAll('input[data-me="name"]'); ins[ins.length - 1].focus(); });
+$('meAdd').addEventListener('click', () => { $('meRows').insertAdjacentHTML('beforeend', meRowHTML(['', null, ''])); const ins = $('meRows').querySelectorAll('input[data-me="name"]'); ins[ins.length - 1].focus(); ins[ins.length - 1].scrollIntoView({ block: 'nearest' }); });
 $('meRows').addEventListener('click', e => { const b = e.target.closest('[data-me-del]'); if (b) b.closest('tr').remove(); });
 $('meCancel').addEventListener('click', () => { $('musicModal').hidden = true; });
 $('musicModal').addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); $('musicModal').hidden = true; } });
@@ -3552,6 +3558,7 @@ function runCmd(cmd) {
 
 function startEdit(el) {
   const f = el.dataset.field;
+  if (typeof srcTip !== 'undefined' && srcTip) { srcTip.hidden = true; srcHost = null; }
   const day = resolveDay(state, viewDate);
   const has = fieldHasOvr(f, day), sb = splitBoxOf(f);
   editing = { el, field: f, scope: has || (sb && isSplit(state, sb)) ? 'today' : 'week', forceToday: false };
@@ -3644,6 +3651,7 @@ function showSrcTip(host) {
   srcTip.dataset.kind = kind; srcTip.dataset.iso = iso;
   $('srcText').textContent = inf.own ? 'Edited for today, on your slide only' : inf.from;
   $('srcBtn').textContent = inf.own ? 'Undo' : 'Edit for today';
+  $('srcEdit').hidden = !(inf.own && kind === 'music');     // the other two: just click into the text to keep editing
   srcTip.hidden = false;
   const box = host.closest('.card') || host, r = box.getBoundingClientRect(), w = srcTip.offsetWidth;
   srcTip.style.left = Math.max(6, Math.min(r.right - w - 10, innerWidth - w - 6)) + 'px';
@@ -3661,6 +3669,7 @@ els.preview.addEventListener('mouseleave', hideSrcTipSoon);
 srcTip.addEventListener('mouseenter', () => clearTimeout(srcHide));
 srcTip.addEventListener('mouseleave', hideSrcTipSoon);
 srcTip.addEventListener('mousedown', e => e.preventDefault());
+$('srcEdit').addEventListener('click', () => { const iso = srcTip.dataset.iso; srcTip.hidden = true; srcHost = null; openMusicEdit(iso); });
 $('srcBtn').addEventListener('click', () => {
   const kind = srcTip.dataset.kind, iso = srcTip.dataset.iso, own = srcInfo(kind, iso).own;
   srcTip.hidden = true; srcHost = null;
@@ -3758,7 +3767,7 @@ function showBars() {
   const f = ed.field, rich = isRich(f), wd = DAY_NAMES[wdOf(viewDate)];
   let scope = !!SCOPED[f], note = '';
   if (f === 'at830' && ed.forceToday && ed.scope !== 'today') { scope = false; note = 'Set by the house meeting schedule: your change is just for ' + dayMonth(viewDate); }
-  if (f.startsWith('house:')) note = 'Updated automatically · your edit is just for today, on your slide only';
+  if (f.startsWith('house:')) note = '';            // the hover card already says it's just for today
   else if (f.startsWith('prep:')) note = 'Same every ' + wd;
   else if (f.startsWith('once:')) note = 'Just this ' + wd + ' · gone next week';
   else if (f.startsWith('free:')) note = slotNote(f.split(':')[1]);
@@ -3771,7 +3780,7 @@ function showBars() {
   $('fmtScope').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.scope === ed.scope)));
   $('fmtNote').textContent = note; $('fmtNote').hidden = !note;
   bar.querySelector('.fmt-sep').hidden = !(rich && (scope || note));
-  bar.hidden = false;
+  bar.hidden = !rich && !scope && !note && !f.startsWith('free:') && !f.startsWith('hd:');   // nothing to offer: no bar
   // The note under the box
   const day = resolveDay(state, viewDate);
   if (fieldHasOvr(f, day) && (ed.scope === 'today' || f.startsWith('house:'))) {
