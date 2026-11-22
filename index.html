@@ -2,7 +2,7 @@
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
-<meta name="ms-updated" content="2026-11-22T00:39:23Z">
+<meta name="ms-updated" content="2026-11-22T01:00:54Z">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
 <title>Morning Slide</title>
@@ -1052,11 +1052,11 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
   </header>
   <div class="setupview">
     <nav class="setupnav" id="setupNav" aria-label="Setup sections">
-      <button type="button" data-sec="form"><b>Form &amp; music</b><span>Weekly spreadsheet, your form</span></button>
+      <button type="button" data-sec="form"><b>Form &amp; music lessons</b><span>Your form, music lessons</span></button>
       <button type="button" data-sec="timetable"><b>Timetable</b><span>Your lessons for each day</span></button>
       <button type="button" data-sec="design"><b>Design</b><span>Fonts and day colours</span></button>
       <button type="button" data-sec="prep"><b>Prep</b><span>Morning prep days, timer</span></button>
-      <button type="button" data-sec="house"><b>House meetings</b><span>This term’s schedule</span></button>
+      <button type="button" data-sec="house" hidden><b>House meetings</b><span>This term’s schedule</span></button>
       <button type="button" data-sec="backup"><b>Backup &amp; reset</b><span>Save, open or start again</span></button>
       <button type="button" data-sec="account"><b>Account</b><span id="acctNavSub">Sign in with your school email</span></button>
       <button type="button" data-sec="admin" id="adminNav" hidden><b>Admin<span class="badge" id="adminNavBadge" hidden></span></b><span>Access requests and staff</span></button>
@@ -1067,6 +1067,21 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
       <section class="setsec" data-sec="form">
         <h2>Form &amp; music lessons</h2>
         <p class="lead">The slide shows each day’s music and LAMDA lessons for your form. Signed in, you get them from the school each week; signed out, upload the weekly spreadsheet yourself.</p>
+        <div class="card2">
+          <h3>Your form</h3>
+          <select class="text" id="formSelect" style="max-width:320px"></select>
+          <p class="hint">Only your form’s lessons appear on the slide. Your form also shows at the top of the main screen.</p>
+          <label class="check"><input type="checkbox" id="teacherInitial"><span>Show music teachers’ first initial (Miss A Woodhouse, not Miss Woodhouse)</span></label>
+          <label class="check"><input type="checkbox" id="matchMeet"><span>On matchdays, add each team’s meet time to Lunchtime Arrangements</span></label>
+          <div id="pupilsWrap" hidden>
+            <h3 style="margin-top:8px">Preferred names</h3>
+            <p class="hint" style="margin:0">Pupils come from this week’s lessons. Type the name a pupil goes by and the slide uses it; leave it blank to use the spreadsheet’s name. Names are kept for future weeks.</p>
+            <table class="tt-table pupils" style="max-width:560px">
+              <thead><tr><th>Name on the spreadsheet</th><th>Preferred name</th></tr></thead>
+              <tbody id="pupilsBody"></tbody>
+            </table>
+          </div>
+        </div>
         <div class="card2" id="schoolMusicCard" hidden>
           <h3>The school’s music lessons</h3>
           <ul class="music-weeks" id="schoolMusicList"></ul>
@@ -1085,21 +1100,6 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
           <div class="dropzone" id="dropzone">Or drop next week’s file here</div>
           <p class="hint" id="ignoredNote" hidden></p>
           <div class="row" style="margin-top:4px"><button type="button" class="btn small" id="useSchoolMusic" hidden>Use the school’s lessons instead</button></div>
-        </div>
-        <div class="card2">
-          <h3>Your form</h3>
-          <select class="text" id="formSelect" style="max-width:320px"></select>
-          <p class="hint">Only your form’s lessons appear on the slide. Your form also shows at the top of the main screen.</p>
-          <label class="check"><input type="checkbox" id="teacherInitial"><span>Show music teachers’ first initial (Miss A Woodhouse, not Miss Woodhouse)</span></label>
-          <label class="check"><input type="checkbox" id="matchMeet"><span>On matchdays, add each team’s meet time to Lunchtime Arrangements</span></label>
-          <div id="pupilsWrap" hidden>
-            <h3 style="margin-top:8px">Preferred names</h3>
-            <p class="hint" style="margin:0">Pupils come from this week’s lessons. Type the name a pupil goes by and the slide uses it; leave it blank to use the spreadsheet’s name. Names are kept for future weeks.</p>
-            <table class="tt-table pupils" style="max-width:560px">
-              <thead><tr><th>Name on the spreadsheet</th><th>Preferred name</th></tr></thead>
-              <tbody id="pupilsBody"></tbody>
-            </table>
-          </div>
         </div>
       </section>
 
@@ -4989,7 +4989,7 @@ function paintAdmin() {
   if (!admin.loaded) { body.innerHTML = '<div class="card2"><p class="empty-note">Loading…</p></div>'; return; }
   const when = t => { const d = new Date(t); return d.getDate() + ' ' + MONTHS[d.getMonth()]; };
   const reqs = admin.requests;
-  let html = '<div class="card2"><h3>Access requests' + (waiting() ? ' <span class="badge">' + waiting() + '</span>' : '') + '</h3>' +
+  let html = musicAdminHTML() + '<div class="card2"><h3>Access requests' + (waiting() ? ' <span class="badge">' + waiting() + '</span>' : '') + '</h3>' +
     (reqs.length ? '<table class="people"><thead><tr><th>Name</th><th>School initials</th><th>Email</th><th>Asked</th><th></th></tr></thead><tbody>' +
       reqs.map(r => editId === r.id ? editRow(r, '<td class="muted">' + when(r.created_at) + '</td>') : '<tr><td><b>' + esc(r.name) + '</b>' + (r.confirmed === false ? ' <span class="pill warn" data-tip="They haven’t clicked the link in their confirmation email yet">Email not confirmed</span>' : '') +
         '</td><td>' + esc(r.initials) + '</td><td class="muted">' + esc(r.email) + '</td><td class="muted">' + when(r.created_at) +
@@ -5015,7 +5015,6 @@ function paintAdmin() {
         '</td><td class="acts">' + (a.email === me.email ? '' : '<button type="button" class="btn small" data-unallow="' + esc(a.email) + '">Remove</button>') + '</td></tr>').join('') + '</tbody></table>' : '') +
     '<p class="hint" style="margin:0">Removing an email only stops new sign-ups going straight through. It doesn’t delete an account that already exists.</p></div>';
 
-  html += musicAdminHTML();
   html += houseAdminHTML();
   html += '<div class="card2"><h3>Forms</h3>' + (admin.forms.length ? '<div class="chips">' + admin.forms.map(f => '<span>' + esc(f.form || f) + '</span>').join('') + '</div>' : '<p class="empty-note">No forms found.</p>') +
     '<p class="hint" style="margin:0">These come from Timetable Maker, so you only keep one list. Change them there.</p></div>';
