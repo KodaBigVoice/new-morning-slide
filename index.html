@@ -2,7 +2,7 @@
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
-<meta name="ms-updated" content="2026-11-22T00:24:28Z">
+<meta name="ms-updated" content="2026-11-22T00:28:25Z">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
 <title>Morning Slide</title>
@@ -1937,10 +1937,9 @@ function panelHTML(st, day, editor) {
   if (day.panel === 'free') return freeHTML('side', day.free.side, editor, 'free-side region-side');
   if (day.panel === 'house') {
     const hIso = toISO(day.date), hOwn = !!(day.ovr && day.ovr.house) || !!((st.schedEdits || {})[hIso]);
-    void hOwn;
     return '<div class="card panel house region-side"' + (editor ? srcAttr('house', day.date) : '') + '>' + hdEl(st, day.date, 'house') + '<div class="houses">' +
       HOUSES.map(h => '<div class="house-tile" style="background:' + h.tint + '"><div class="house-name" style="background:' + h.bg + ';color:' + h.fg + '">' + h.name + '</div>' +
-        '<div class="house-loc" data-fit="27,19" data-field="house:' + h.name + '">' + esc(day.houses[h.name] || '') + '</div></div>').join('') + '</div></div>';
+        '<div class="house-loc" data-fit="27,19"' + (hOwn ? ' data-field="house:' + h.name + '"' : '') + '>' + esc(day.houses[h.name] || '') + '</div></div>').join('') + '</div></div>';
   }
   const auto = day.panel === 'lunch' ? matchdayText(st, day.date) : '';
   const mOwn = day.panel === 'lunch' && typeof ((st.overrides || {})[toISO(day.date)] || {}).mday === 'string';
@@ -3366,7 +3365,7 @@ function decoratePreview(slide) {
   });
 }
 function fieldHasOvr(field, day) {
-  if (field.startsWith('house:')) return !!day.ovr.house;
+  if (field.startsWith('house:')) return false;     // house rooms: the hover card says "Edited for today" instead
   const k = SCOPED[field];
   return !!k && day.ovr[k] != null;
 }
@@ -3670,7 +3669,8 @@ function srcAction(a, iso) {
     }
     if (a === 'mday-reset') { setOvr('mday', null); changed(); toast('Undone: back to Matchday Queues.'); }
     if (a === 'house-edit') {
-      const el = els.preview.querySelector('[data-field^="house:"]'); if (el) el.focus();
+      setOvr('house', Object.assign({}, resolveDay(state, viewDate).houses)); changed({});
+      setTimeout(() => { const el = els.preview.querySelector('[data-field^="house:"]'); if (el) el.focus(); }, 120);
       toast('Type in any room: just for today, just on your slide.');
     }
     if (a === 'house-reset') {
