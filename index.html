@@ -2,7 +2,7 @@
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
-<meta name="ms-updated" content="2026-11-22T00:28:25Z">
+<meta name="ms-updated" content="2026-11-22T00:30:26Z">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
 <title>Morning Slide</title>
@@ -710,6 +710,7 @@ button.bb-stat:hover b { text-decoration: underline; }
 .np-list { display: flex; flex-direction: column; gap: 10px; }
 .np-item { display: flex; align-items: flex-start; gap: 14px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; }
 .np-item.hidden-n { background: var(--frost); }
+.np-local { width: 100%; font: inherit; font-family: var(--disp); font-size: 1.05rem; padding: 0.45rem 0.6rem; border: 1.5px solid var(--steel); border-radius: 8px; resize: vertical; }
 .np-item.hidden-n .np-text { color: var(--slate); text-decoration: line-through; text-decoration-color: rgba(100, 121, 143, 0.5); }
 .np-item .np-text { flex: 1; min-width: 0; }
 .np-item .np-text b { display: block; font-family: var(--disp); font-weight: 400; font-size: 1.12rem; line-height: 1.35; color: var(--ink); }
@@ -2004,7 +2005,13 @@ function noticesFor(st, date, where, withHidden) {
   const iso = toISO(date), hides = new Set(c.hides || []);
   return (c.notices || []).filter(n => n.start_date <= iso && n.end_date >= iso && (where !== 'eve' || n.prep_eve) &&
       noticeReaches(n, st.form, c) && (withHidden || !hides.has(n.id)))
-    .sort((a, b) => (a.created_at < b.created_at ? -1 : 1));
+    .sort((a, b) => (a.created_at < b.created_at ? -1 : 1))
+    .map(n => noticeShown(st, n));
+}
+// A teacher can reword an announcement just on their own slide ("Edit on my slide")
+function noticeShown(st, n) {
+  const e = (st.noticeEdits || {})[n.id];
+  return typeof e === 'string' ? Object.assign({}, n, { body: e, edited: true, original: n.body }) : n;
 }
 // The teacher's chosen box if it has room today, otherwise What's happening, otherwise nowhere (Freestyle covers it)
 const NB_NAMES = { notes: 'What’s happening', main: 'the central column', side: 'the side panel' };
@@ -5269,11 +5276,15 @@ for (const id of ['acctBody', 'adminBody']) {
    ===================================================================== */
 const isStaff = () => !!(me && me.status === 'approved' && me.agreed_at);   // approved, and agreed to the data protection guidance
 const todayISO = () => toISO(new Date());
-let npTab = 'new', npOpen = false, npBusy = false;
+let npTab = 'new', npOpen = false, npBusy = false, npLocal = null;   // npLocal: the announcement being reworded for your own slide
 let draft = null;            // the notice being written or edited
 
 function saveNoticeCache(c) {
   noticeCache = c;
+  if (c && Array.isArray(c.notices) && state.noticeEdits) {
+    const ids = new Set(c.notices.map(n => n.id)), gone = Object.keys(state.noticeEdits).filter(k => !ids.has(k));
+    if (gone.length) { gone.forEach(k => delete state.noticeEdits[k]); save(); }
+  }
   try { if (c) localStorage.setItem(NOTICE_KEY, JSON.stringify(c)); else localStorage.removeItem(NOTICE_KEY); } catch (e) {}
   renderAll(); refreshUi(); paintNoticeBadge(); if (npOpen) paintPanel();
 }
@@ -5452,12 +5463,19 @@ function formTabHTML() {
   const head = state.form ? '' : '<p class="np-empty">Choose your form in Setup to see the announcements meant for it. Until then you’ll only see whole-school ones.</p>';
   if (!list.length) return '<div class="np-body">' + head + '<p class="np-empty">No announcements for ' + esc(state.form || 'your form') + ' at the moment.</p></div>';
   const now = list.filter(n => n.start_date <= t), later = list.filter(n => n.start_date > t);
-  const row = n => itemHTML(n, { hidden: hides.has(n.id), html: (hides.has(n.id) ? '' : seeBtn(n)) + '<button type="button" class="btn small" data-hide="' + esc(n.id) + '">' + (hides.has(n.id) ? 'Show on my slide' : 'Hide on my slide') + '</button>' },
-    '– ' + esc(n.author_name || n.author_initials) + ' · ' + esc(datesText(n)) + (hides.has(n.id) ? ' · hidden on your slide' : ''));
+  const row = n0 => {
+    const n = noticeShown(state, n0), hid = hides.has(n.id);
+    if (npLocal === n.id) return '<div class="np-item"><div class="np-text" style="display:flex;flex-direction:column;gap:6px"><textarea id="npLocalText" rows="2" maxlength="140" class="np-local">' + esc(n.body) + '</textarea>' +
+      '<span>Just on your slide. Everyone else still sees: “' + esc(n0.body) + '”</span></div><div class="np-acts"><button type="button" class="btn small strong" data-local-save="' + esc(n.id) + '">Save</button><button type="button" class="btn small" data-local-cancel>Cancel</button></div></div>';
+    return itemHTML(n, { hidden: hid, html: (hid ? '' : seeBtn(n)) +
+      (hid ? '' : n.edited ? '<button type="button" class="btn small" data-local-undo="' + esc(n.id) + '">Undo my edit</button>' : '<button type="button" class="btn small" data-local-edit="' + esc(n.id) + '">Edit on my slide</button>') +
+      '<button type="button" class="btn small" data-hide="' + esc(n.id) + '">' + (hid ? 'Show on my slide' : 'Hide on my slide') + '</button>' },
+      '– ' + esc(n.author_name || n.author_initials) + ' · ' + esc(datesText(n)) + (hid ? ' · hidden on your slide' : n.edited ? ' · edited on your slide' : ''));
+  };
   return '<div class="np-body">' + head + '<div class="np-list">' +
     (now.length ? '<div class="np-group">On the slide today</div>' + now.map(row).join('') : '') +
     (later.length ? '<div class="np-group">Coming up</div>' + later.map(row).join('') : '') + '</div>' +
-    '<p class="np-empty" style="font-size:0.85rem">Hiding an announcement only takes it off your own slides, on any laptop you sign in on. Everyone else still sees it.</p></div>';
+    '<p class="np-empty" style="font-size:0.85rem">Hiding or editing an announcement only changes your own slide, on any laptop you sign in on. Everyone else still sees the original.</p></div>';
 }
 function mineTabHTML() {
   const list = ((noticeCache || {}).notices || []).filter(n => n.author === me.id && n.end_date >= todayISO());
@@ -5535,6 +5553,17 @@ $('noticePanel').addEventListener('click', async e => {
   }
   if (ds.when) { d.when = ds.when; return paintPanel(); }
   if (b.id === 'npPrep') { d.prep = !d.prep; return paintPanel(); }
+  if (ds.localEdit) { npLocal = ds.localEdit; paintPanel(); setTimeout(() => { const x = $('npLocalText'); if (x) { x.focus(); x.setSelectionRange(x.value.length, x.value.length); } }, 20); return; }
+  if ('localCancel' in ds) { npLocal = null; return paintPanel(); }
+  if (ds.localSave || ds.localUndo) {
+    const id = ds.localSave || ds.localUndo, n = (noticeCache.notices || []).find(x => x.id === id);
+    const v = ds.localSave ? $('npLocalText').value.trim() : '';
+    state.noticeEdits = state.noticeEdits || {};
+    if (v && n && v !== n.body) state.noticeEdits[id] = v; else delete state.noticeEdits[id];
+    npLocal = null; changed(); paintPanel();
+    toast(state.noticeEdits[id] ? 'Edited on your slide only' : 'Back to the original announcement');
+    return;
+  }
   if (ds.hide) {
     const id = ds.hide, hidden = (noticeCache.hides || []).includes(id);
     const r = hidden ? await sb.from('ms_notice_hides').delete().eq('notice_id', id) : await sb.from('ms_notice_hides').insert({ notice_id: id });
