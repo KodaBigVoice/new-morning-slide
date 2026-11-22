@@ -2,7 +2,7 @@
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
-<meta name="ms-updated" content="2026-11-22T00:08:21Z">
+<meta name="ms-updated" content="2026-11-22T00:21:56Z">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
 <title>Morning Slide</title>
@@ -131,10 +131,9 @@
 .slide .split-q { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; border: 2px solid currentColor; font-size: 17px; letter-spacing: 0; cursor: help; flex: none; opacity: 0.75; }
 .slide .split-copy { font: inherit; font-size: 18px; letter-spacing: 0; text-transform: none; border: 2px solid var(--line, #c5d3df); background: #fff; color: var(--main); border-radius: 999px; padding: 2px 14px; cursor: pointer; }
 .slide .split-toggle { display: none; }
-.slide .src-bar { display: none; }
-.slide.editor-preview .src-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: -4px 0 12px; font-size: 22px; color: var(--muted); line-height: 1.2; }
-.slide.editor-preview .src-bar button { font: inherit; font-size: 22px; font-weight: 700; border: 3px solid var(--main); background: #fff; color: var(--main); border-radius: 999px; padding: 4px 16px; cursor: pointer; white-space: nowrap; }
-.slide.editor-preview .src-bar button:hover { background: var(--main); color: #fff; }
+.srctip { position: fixed; z-index: 290; display: flex; align-items: center; gap: 10px; padding: 0.4rem 0.45rem 0.4rem 0.75rem; border-radius: 10px; background: var(--ink); color: #fff; font-size: 0.8rem; line-height: 1.3; max-width: 330px; box-shadow: 0 10px 24px -10px rgba(0, 0, 0, 0.5); }
+.srctip button { flex: none; border: 0; background: #fff; color: var(--ink); font: inherit; font-weight: 700; border-radius: 7px; padding: 0.35rem 0.65rem; cursor: pointer; white-space: nowrap; }
+.srctip button:hover, .srctip button:focus-visible { background: #DCE6F0; }
 .slide.editor-preview .split-toggle { display: inline-flex; align-items: center; gap: 8px; position: absolute; right: 18px; bottom: 14px; z-index: 2; font: inherit; font-size: 21px; font-weight: 700; border: 3px solid var(--main); background: #fff; color: var(--main); border-radius: 999px; padding: 5px 18px; cursor: pointer; box-shadow: 0 4px 12px -6px rgba(0, 0, 0, 0.35); }
 .slide.editor-preview .split-toggle:hover { background: var(--main); color: #fff; }
 .slide.editor-preview .split-toggle::before { content: "⇅"; font-size: 1.1em; }
@@ -1289,11 +1288,12 @@ body.slide-only { background: #eaf2fa; overflow: hidden; }
 </div></div>
 <div class="modal-back" id="musicModal" hidden><div class="modal music-ed" role="dialog" aria-modal="true" aria-labelledby="meTitle">
   <h3 id="meTitle">Music lessons</h3>
-  <p>Just for your slide, just for this day. The uploaded lessons aren’t changed; “Back to…” on the slide undoes this.</p>
+  <p>Just for today, just on your slide. The uploaded lessons aren’t changed: hover over the lessons and press Undo to go back to them.</p>
   <table class="people"><thead><tr><th>Pupil</th><th>Time</th><th>Teacher</th><th></th></tr></thead><tbody id="meRows"></tbody></table>
   <div class="row" style="margin-top:8px"><button type="button" class="btn small" id="meAdd">Add a lesson</button></div>
   <div class="row" style="justify-content:flex-end;margin-top:12px"><button type="button" class="btn" id="meCancel">Cancel</button><button type="button" class="btn primary" id="meSave">Save for my slide</button></div>
 </div></div>
+<div class="srctip" id="srcTip" hidden><span id="srcText"></span><button type="button" id="srcBtn"></button></div>
 <div class="tip" id="tip" role="tooltip" hidden></div>
 <div class="stage" id="stage" hidden></div>
 <div class="toast" id="toast" role="status"></div>
@@ -1892,7 +1892,7 @@ function freeHTML(slot, it, editor, cls) {
 /* Matchday Queues: the lines for this form's year group, written the way tutors write them:
    - **Boys – away**            (team names only when teams do different things)
      - Lunch @ 12:50 via Art Door
-     - Meet @ 13:45            (only if this teacher turned meet times on; "Start @" for teams with no meet time) */
+     - Meet @ 13:45            (only if this teacher turned meet times on; home teams with no meet time get "Start @") */
 function matchdayText(st, date) {
   const data = shared && shared.matchday && shared.matchday[toISO(date)];
   const year = formYear(st.form);
@@ -1925,29 +1925,20 @@ function matchdayText(st, date) {
       out.push('- **' + who + ' – ' + (g.away ? 'away' : 'home') + '**');
       out.push('  - Lunch @ ' + g.time + ' via ' + g.door);
       if (meetOn && g.meet) out.push('  - Meet @ ' + g.meet);
-      else if (meetOn && g.start) out.push('  - Start @ ' + g.start);
+      else if (meetOn && !g.away && g.start) out.push('  - Start @ ' + g.start);
     });
   });
   return out.join('\n');
 }
 // Editing screen only: where a box's contents come from, and a button to change it just for your slide
-function srcBar(label, act, btn, extra) {
-  return '<div class="src-bar"><span>' + esc(label) + '</span><button type="button" data-src-act="' + act + '"' + (extra || '') + '>' + esc(btn) + '</button></div>';
-}
-function musicSrc(st, date, editor) {
-  if (!editor) return '';
-  const iso = toISO(date), own = Array.isArray(((st.overrides || {})[iso] || {}).music), src = lessonSource(st, date);
-  if (own) return srcBar('Your own lessons for this day', 'music-reset', src && src.kind === 'own' ? 'Back to your spreadsheet' : 'Back to the school’s', ' data-iso="' + iso + '"');
-  const label = !src ? 'No lessons uploaded' : src.kind === 'school' ? 'From the school' : src.kind === 'own' ? 'From your spreadsheet' : 'Not uploaded yet';
-  return srcBar(label, 'music-edit', 'Change for my slide', ' data-iso="' + iso + '"');
-}
+const srcAttr = (kind, date) => ' data-src="' + kind + '" data-src-iso="' + toISO(date) + '"';
 function panelHTML(st, day, editor) {
   if (day.panel === 'none') return '';
   if (day.panel === 'free') return freeHTML('side', day.free.side, editor, 'free-side region-side');
   if (day.panel === 'house') {
     const hIso = toISO(day.date), hOwn = !!(day.ovr && day.ovr.house) || !!((st.schedEdits || {})[hIso]);
-    return '<div class="card panel house region-side">' + hdEl(st, day.date, 'house') +
-      (editor ? (hOwn ? srcBar('Your own rooms for this day', 'house-reset', 'Back to the school’s') : srcBar('From the school’s schedule', 'house-edit', 'Change rooms for my slide')) : '') + '<div class="houses">' +
+    void hOwn;
+    return '<div class="card panel house region-side"' + (editor ? srcAttr('house', day.date) : '') + '>' + hdEl(st, day.date, 'house') + '<div class="houses">' +
       HOUSES.map(h => '<div class="house-tile" style="background:' + h.tint + '"><div class="house-name" style="background:' + h.bg + ';color:' + h.fg + '">' + h.name + '</div>' +
         '<div class="house-loc" data-fit="27,19" data-field="house:' + h.name + '">' + esc(day.houses[h.name] || '') + '</div></div>').join('') + '</div></div>';
   }
@@ -1955,8 +1946,7 @@ function panelHTML(st, day, editor) {
   const mOwn = day.panel === 'lunch' && typeof ((st.overrides || {})[toISO(day.date)] || {}).mday === 'string';
   const mday = mOwn ? st.overrides[toISO(day.date)].mday : auto;
   return '<div class="card panel bullets region-side">' + (day.panel === 'info' ? '<div class="heading" data-field="panelTitle">' + esc(day.panelTitle) + '</div>' : hdEl(st, day.date, 'lunch')) +
-    (editor && (auto || mOwn) ? (mOwn ? srcBar('Your own version for this day', 'mday-reset', 'Back to Matchday Queues') : srcBar('From Matchday Queues', 'mday-edit', 'Change for my slide')) : '') +
-    (mday || (mOwn && editor) ? '<div class="rich mday" data-fit="28,15"' + (mOwn ? ' data-field="mday"' : editor ? ' data-tip="From Matchday Queues, for your year group. Press “Change for my slide” to edit it. Your own notes go underneath."' : '') + '>' + richHTML(mday) + '</div>' : '') +
+    (mday || (mOwn && editor) ? '<div class="rich mday" data-fit="28,15"' + (mOwn ? ' data-field="mday"' : '') + (editor ? srcAttr('mday', day.date) : '') + '>' + richHTML(mday) + '</div>' : '') +
     splitHTML(st, day.date, day.panel, 'panelText', day.panelText, '30,18', editor) +
     (noticeTarget(st, day) === 'side' ? noticesHTML(noticesFor(st, day.date, 'morning')) : '') + '</div>';
 }
@@ -2067,7 +2057,7 @@ function renderSlide(host, st, date, editor) {
       '<div class="grid">' +
         '<div class="banner">' + dateHTML(date) + '</div>' +
         '<div class="right">' +
-          '<div class="card music' + (day.panel === 'info' || day.panel === 'lunch' || day.panel === 'free' ? ' natural' : '') + '">' + hdEl(st, date, 'music') + musicSrc(st, date, editor) + '<div class="music-body">' + musicHTML(rows, editor && musicMissing(st, date) ? musicMissing(st, date) : '') + '</div></div>' +
+          '<div class="card music' + (day.panel === 'info' || day.panel === 'lunch' || day.panel === 'free' ? ' natural' : '') + '">' + hdEl(st, date, 'music') + '<div class="music-body"' + (editor ? srcAttr('music', date) : '') + '>' + musicHTML(rows, editor && musicMissing(st, date) ? musicMissing(st, date) : '') + '</div></div>' +
           panelHTML(st, day, editor) +
         '</div>' +
         '<div class="pair region-top' + (day.showTask || day.ttView === 'first' ? '' : ' single') + '" style="--boxes:' + ((day.showTask ? 1 : 0) + 1 + (day.ttView === 'first' ? 1 : 0)) + '">' +
@@ -2290,7 +2280,7 @@ function renderPrep(host, st, date, editor) {
                      : '<div class="pt">' + (editor ? timerBell(st) : '') + '<div class="pt-label"></div><div class="pt-time" data-tip="Click to type a time"></div>' +
                        (editor ? '<div class="pt-barrow pt-ctrl">' + tBackBtn() + tPlayBtn() + tSkipBtn() + '<div class="pt-bars"></div>' + tPlusBtn() + tResetBtn() + '</div>' : '<div class="pt-bars"></div>') +
                        '<div class="pt-sub"></div></div>') +
-          '<div class="card music">' + hdEl(st, date, musicTitle) + musicSrc(st, musicDay, editor) + '<div class="music-body">' + musicHTML(musicRows(st, musicDay), editor && musicMissing(st, musicDay) ? musicMissing(st, musicDay) : musicEmpty) + '</div></div>' +
+          '<div class="card music">' + hdEl(st, date, musicTitle) + '<div class="music-body"' + (editor ? srcAttr('music', musicDay) : '') + '>' + musicHTML(musicRows(st, musicDay), editor && musicMissing(st, musicDay) ? musicMissing(st, musicDay) : musicEmpty) + '</div></div>' +
         '</div>' +
       '</div>' +
     '</div>');
@@ -3628,35 +3618,75 @@ function addPrep() {
   if (el) el.focus();
 }
 els.preview.addEventListener('mousedown', e => { if (e.target.closest('[data-add-prep]')) { e.preventDefault(); addPrep(); } });
-els.preview.addEventListener('mousedown', e => { if (e.target.closest('[data-src-act]')) e.preventDefault(); });
-els.preview.addEventListener('click', e => {
-  const s = e.target.closest('[data-src-act]');
-  if (s) {
-    const a = s.dataset.srcAct, iso = toISO(viewDate);
+/* Matchday lines, music lessons and house rooms come from the school. Hovering one says where from, with one button:
+   "Edit for today" (just your slide), or "Undo" once you have. The card sits inside the box, so it's easy to reach. */
+const srcTip = $('srcTip');
+let srcHost = null, srcHide = null;
+function srcInfo(kind, iso) {
+  const o = (state.overrides || {})[iso] || {};
+  if (kind === 'mday') return typeof o.mday === 'string' ? { own: true } : { from: 'From Matchday Queues, for your year group' };
+  if (kind === 'house') return o.house || (state.schedEdits || {})[iso] ? { own: true } : { from: 'From the house meeting schedule' };
+  if (Array.isArray(o.music)) return { own: true };
+  const src = lessonSource(state, fromISO(iso));
+  return { from: !src ? 'No music lessons uploaded' : src.kind === 'school' ? 'From the school’s music lessons' : src.kind === 'own' ? 'From your own spreadsheet' : 'This week’s lessons aren’t uploaded yet' };
+}
+function showSrcTip(host) {
+  clearTimeout(srcHide);
+  if (editing && host.contains(editing.el)) { srcTip.hidden = true; return; }
+  srcHost = host;
+  const kind = host.dataset.src, iso = host.dataset.srcIso, inf = srcInfo(kind, iso);
+  srcTip.dataset.kind = kind; srcTip.dataset.iso = iso;
+  $('srcText').textContent = inf.own ? 'Edited for today, on your slide only' : inf.from;
+  $('srcBtn').textContent = inf.own ? 'Undo' : 'Edit for today';
+  srcTip.hidden = false;
+  const box = host.closest('.card') || host, r = box.getBoundingClientRect(), w = srcTip.offsetWidth;
+  srcTip.style.left = Math.max(6, Math.min(r.right - w - 10, innerWidth - w - 6)) + 'px';
+  srcTip.style.top = Math.max(6, r.top + 10) + 'px';
+}
+function hideSrcTipSoon() { clearTimeout(srcHide); srcHide = setTimeout(() => { if (!srcTip.matches(':hover')) { srcTip.hidden = true; srcHost = null; } }, 350); }
+els.preview.addEventListener('mouseover', e => {
+  const h = e.target.closest && e.target.closest('[data-src]');
+  const box = h && (h.closest('.card') || h);
+  if (h) { if (h !== srcHost || srcTip.hidden) showSrcTip(h); else clearTimeout(srcHide); }
+  else if (srcHost && !(srcHost.closest('.card') || srcHost).contains(e.target)) hideSrcTipSoon();
+  void box;
+});
+els.preview.addEventListener('mouseleave', hideSrcTipSoon);
+srcTip.addEventListener('mouseenter', () => clearTimeout(srcHide));
+srcTip.addEventListener('mouseleave', hideSrcTipSoon);
+srcTip.addEventListener('mousedown', e => e.preventDefault());
+$('srcBtn').addEventListener('click', () => {
+  const kind = srcTip.dataset.kind, iso = srcTip.dataset.iso, own = srcInfo(kind, iso).own;
+  srcTip.hidden = true; srcHost = null;
+  srcAction(kind + (own ? '-reset' : '-edit'), iso);
+});
+function srcAction(a, iso) {
+  {
     endEditNow();
     if (a === 'mday-edit') {
       setOvr('mday', matchdayText(state, viewDate)); changed({});
       setTimeout(() => { const el = els.preview.querySelector('[data-field="mday"]'); if (el) el.focus(); }, 120);
-      toast('Change it however you like. It’s just for your slide, just for this day.');
+      toast('Edit it however you like: just for today, just on your slide.');
     }
-    if (a === 'mday-reset') { setOvr('mday', null); changed(); toast('Back to the lines from Matchday Queues.'); }
+    if (a === 'mday-reset') { setOvr('mday', null); changed(); toast('Undone: back to Matchday Queues.'); }
     if (a === 'house-edit') {
       const el = els.preview.querySelector('[data-field^="house:"]'); if (el) el.focus();
-      toast('Type in any room. It’s just for your slide, just for this day.');
+      toast('Type in any room: just for today, just on your slide.');
     }
     if (a === 'house-reset') {
       setOvr('house', null);
       if (state.schedEdits && state.schedEdits[iso]) delete state.schedEdits[iso];
-      changed(); toast('Back to the school’s rooms.');
+      changed(); toast('Undone: back to the house meeting schedule.');
     }
-    if (a === 'music-edit') openMusicEdit(s.dataset.iso);
+    if (a === 'music-edit') openMusicEdit(iso);
     if (a === 'music-reset') {
-      const o = state.overrides[s.dataset.iso];
-      if (o) { delete o.music; if (!Object.keys(o).length) delete state.overrides[s.dataset.iso]; }
-      changed(); toast('Back to the uploaded lessons.');
+      const o = state.overrides[iso];
+      if (o) { delete o.music; if (!Object.keys(o).length) delete state.overrides[iso]; }
+      changed(); toast('Undone: back to the uploaded lessons.');
     }
-    return;
   }
+}
+els.preview.addEventListener('click', e => {
   const t = e.target.closest('[data-split-toggle]');
   if (t) {
     const box = t.dataset.splitToggle; state.split = state.split || {};
@@ -3721,7 +3751,7 @@ function showBars() {
   const f = ed.field, rich = isRich(f), wd = DAY_NAMES[wdOf(viewDate)];
   let scope = !!SCOPED[f], note = '';
   if (f === 'at830' && ed.forceToday && ed.scope !== 'today') { scope = false; note = 'Set by the house meeting schedule: your change is just for ' + dayMonth(viewDate); }
-  if (f.startsWith('house:')) note = 'From the house meeting schedule · a change here is just for ' + shortDate(viewDate);
+  if (f.startsWith('house:')) note = 'From the house meeting schedule · your edit is just for today, on your slide only';
   else if (f.startsWith('prep:')) note = 'Same every ' + wd;
   else if (f.startsWith('once:')) note = 'Just this ' + wd + ' · gone next week';
   else if (f.startsWith('free:')) note = slotNote(f.split(':')[1]);
